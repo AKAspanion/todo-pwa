@@ -1,3 +1,6 @@
 {
-    "hello": "hi"
+    "todo": "TODO",
+    "login": {
+        "todo": "Log in to application"
+    }
 }

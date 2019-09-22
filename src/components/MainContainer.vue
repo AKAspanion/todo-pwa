@@ -1,6 +1,7 @@
 <template>
     <div>
-        <v-snackbar v-model="snackbar.model" bottom left :timeout="6000">
+        <v-progress-linear v-if="loading" indeterminate class="fixed-progress"></v-progress-linear>
+        <v-snackbar v-model="snackbar.model" bottom :timeout="5000">
             {{ snackbar.text }}
             <v-btn dark text @click="snackbar.model = false">Close</v-btn>
         </v-snackbar>
@@ -32,11 +33,20 @@ export default Vue.extend({
             get() {
                 return this.$store.getters.snackBar;
             }
+        },
+        loading: {
+            get() {
+                return this.$store.getters.loading;
+            }
         }
     }
 });
 </script>
 <style>
+.fixed-progress {
+    position: fixed !important;
+    top: 0;
+}
 body {
     overflow: hidden;
 }

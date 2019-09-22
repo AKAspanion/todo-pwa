@@ -9,10 +9,14 @@ export default new Vuex.Store({
             model: false,
             text: "",
         },
+        loading: true,
     },
     mutations: {
         setSnackBar(state, payload) {
             state.snackBar = payload;
+        },
+        setLoading(state, payload) {
+            state.loading = payload;
         },
     },
     actions: {
@@ -22,10 +26,16 @@ export default new Vuex.Store({
                 text: payload,
             });
         },
+        LOADING({ commit }, payload) {
+            commit("setLoading", payload);
+        },
     },
     getters: {
         snackBar(state) {
             return state.snackBar;
+        },
+        loading(state) {
+            return state.loading;
         },
     },
 });

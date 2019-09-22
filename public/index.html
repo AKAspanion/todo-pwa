@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="Description" content="TODO PWA. Author: Ankit Kumar Pandit.">
   <link rel="icon" href="<%= BASE_URL %>favicon.ico">
   <title>todo-pwa</title>
 </head>
@@ -14,10 +15,70 @@
     <strong>We're sorry but todo-pwa doesn't work properly without JavaScript enabled. Please enable it to
       continue.</strong>
   </noscript>
+  <div id="loading">
+    <div id="loader-container">
+      <div id="loader"></div>
+    </div>
+  </div>
   <div id="app"></div>
   <!-- built files will be auto injected -->
 </body>
 <script src="/__/firebase/6.6.2/firebase-app.js"></script>
 <script src="/__/firebase/init.js"></script>
+<script>
+  window.onload = function () {
+    document.getElementById("loading").style.display = "none"
+  }
+</script>
+<style>
+  #loading {
+    position: fixed;
+    z-index: 999;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #FAFAFA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #loader-container {
+    transform: translate(-50%, -50%);
+  }
+
+  #loader {
+    border: 2px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 2px solid #3498db;
+    width: 64px;
+    height: 64px;
+    -webkit-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+  }
+
+  @-webkit-keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
 
 </html>

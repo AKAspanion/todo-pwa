@@ -8,13 +8,22 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import MainContainer from "@/components/MainContainer.vue"; // @ is an alias to /src
+import FirebaseWeb from "./firebase";
+const firebase = new FirebaseWeb();
 
 @Component({
     components: {
         MainContainer
     }
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+    mounted() {
+        // this.$store.dispatch("LOADING", false);
+        if (!firebase.isAppInitialized) {
+            firebase.initializeFirebase();
+        }
+    }
+}
 </script>
 <style>
 #app {
