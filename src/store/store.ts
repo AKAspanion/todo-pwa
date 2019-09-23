@@ -9,6 +9,12 @@ export default new Vuex.Store({
             model: false,
             text: "",
         },
+        user: {
+            uid: '',
+            displayName: '',
+            photoURL: '',
+            email: '',
+        },
         loading: true,
     },
     mutations: {
@@ -17,6 +23,9 @@ export default new Vuex.Store({
         },
         setLoading(state, payload) {
             state.loading = payload;
+        },
+        setUser(state, payload) {
+            state.user = payload;
         },
     },
     actions: {
@@ -29,6 +38,25 @@ export default new Vuex.Store({
         LOADING({ commit }, payload) {
             commit("setLoading", payload);
         },
+
+        SET_USER({ commit }, payload) {
+            const { uid, displayName, photoURL, email } = payload;
+            commit("setUser", {
+                uid,
+                email,
+                displayName,
+                photoURL,
+            });
+        },
+
+        UNSET_USER({ commit }) {
+            commit("setUser", {
+                uid: '',
+                displayName: '',
+                photoURL: '',
+                email: '',
+            });
+        },
     },
     getters: {
         snackBar(state) {
@@ -36,6 +64,9 @@ export default new Vuex.Store({
         },
         loading(state) {
             return state.loading;
+        },
+        user(state) {
+            return state.user;
         },
     },
 });

@@ -1,29 +1,47 @@
 <template>
     <div class="home">
-        <h1>This is home page</h1>
-        <v-btn @click="onSignoutClick">Signout</v-btn>
+        <v-toolbar flat class="px-3" height="80">
+            <v-btn icon>
+                <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+                <v-avatar>
+                    <template v-if="currentUser.photoURL">
+                        <v-img :src="currentUser.photoURL"></v-img>
+                    </template>
+                    <template v-else>
+                        <v-icon>mdi-face</v-icon>
+                    </template>
+                </v-avatar>
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+                <v-icon>mdi-dots-horizontal</v-icon>
+            </v-btn>
+        </v-toolbar>
+        <v-card flat tile height="calc(100vh - 80px)">
+            {{currentUser.displayName}}
+            <div class="py-3">
+                <v-btn @click="onSignoutClick">Signout</v-btn>
+            </div>
+        </v-card>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import Vue from "vue";
 import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
 export default Vue.extend({
     data() {
-        return {
-            name: "Login",
-            signingIn: false,
-            signInForm: false,
-            rules: {
-                required: (value: any) => !!value || "Field is Required."
-            },
-            user: {
-                email: "",
-                password: ""
-            }
-        };
+        return {};
+    },
+    computed: {
+        currentUser() {
+            return this.$store.getters.user;
+        }
     },
     methods: {
         onSignoutClick() {

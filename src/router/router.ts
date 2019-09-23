@@ -4,6 +4,8 @@ import Router from 'vue-router';
 import FirebaseWeb from '@/firebase';
 const firebase = new FirebaseWeb();
 
+import store from '@/store/store';
+
 Vue.use(Router);
 
 const router = new Router({
@@ -38,10 +40,14 @@ router.beforeEach((to, from, next) => {
     }
     firebase.authChangeListener((user: any) => {
         if (!user && to.path !== '/login') {
+            store.dispatch('UNSET_USER');
             next({
                 path: '/login',
             });
         } else {
+            if (user !== null) {
+                store.dispatch('SET_USER', user);
+            }
             next();
         }
     });

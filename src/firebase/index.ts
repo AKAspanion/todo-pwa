@@ -2,13 +2,13 @@ import * as firebase from 'firebase';
 
 class FirebaseWeb {
     private firebaseConfig: any = {
-        apiKey: 'AIzaSyCNL8bBdZAen7K64lEys2lQ-0oM6hc6Rf0',
-        authDomain: 'spanion-todo.firebaseapp.com',
-        databaseURL: 'https://spanion-todo.firebaseio.com',
-        projectId: 'spanion-todo',
-        storageBucket: 'spanion-todo.appspot.com',
-        messagingSenderId: '1022572071834',
-        appId: '1:1022572071834:web:b0fe15a64a13ebac448823',
+        apiKey: process.env.VUE_APP_API_KEY,
+        authDomain: process.env.VUE_APP_AUTH_DOMAIN,
+        databaseURL: process.env.VUE_APP_DATABASE_URL,
+        projectId: process.env.VUE_APP_PROJECT_ID,
+        storageBucket: process.env.VUE_APP_STORAGE_BUCKET,
+        messagingSenderId: process.env.VUE_APP_MESSAGING_SENDER_ID,
+        appId: process.env.VUE_APP_APP_ID,
     };
 
     public isAppInitialized() {

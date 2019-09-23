@@ -39,6 +39,9 @@ export default Vue.extend({
                 return this.$store.getters.loading;
             }
         }
+    },
+    mounted() {
+        this.themeModel = true;
     }
 });
 </script>
