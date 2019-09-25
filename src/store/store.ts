@@ -3,7 +3,7 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
     state: {
         snackBar: {
             model: false,
@@ -61,9 +61,11 @@ export default new Vuex.Store({
         },
         LOGIN({ commit }) {
             commit("setLogin", true);
+            localStorage.setItem('isLoggedIn', JSON.stringify(true));
         },
         LOGOUT({ commit }) {
             commit("setLogin", false);
+            localStorage.setItem('isLoggedIn', JSON.stringify(false));
         },
     },
     getters: {
@@ -81,3 +83,5 @@ export default new Vuex.Store({
         },
     },
 });
+
+export default store;

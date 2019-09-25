@@ -11,14 +11,14 @@
                         <v-btn width="280" large dark color="primary" @click="onFacebookLogin">
                             <v-icon left>mdi-facebook</v-icon>
                             <v-spacer></v-spacer>
-                            <div class="text-left" style="width: 200px;">Login with Facebook</div>
+                            <div class="text-left" style="width: 200px;">Signup with Facebook</div>
                         </v-btn>
                     </v-flex>
                     <v-flex class="py-3">
                         <v-btn width="280" large dark color="green" @click="onGoogleLogin">
                             <v-icon left>mdi-google</v-icon>
                             <v-spacer></v-spacer>
-                            <div class="text-left" style="width: 200px;">Login with Google</div>
+                            <div class="text-left" style="width: 200px;">Signup with Google</div>
                         </v-btn>
                     </v-flex>
                     <v-flex>
@@ -62,7 +62,7 @@
                             <template v-if="!isEmailLogin">
                                 <v-icon left>mdi-email</v-icon>
                                 <v-spacer></v-spacer>
-                                <div class="text-left" style="width: 200px;">Login with Email</div>
+                                <div class="text-left" style="width: 200px;">Signup with Email</div>
                             </template>
                             <template v-else>LOGIN</template>
                         </v-btn>
