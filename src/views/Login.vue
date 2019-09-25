@@ -104,17 +104,14 @@ export default Vue.extend({
             }
         },
         onGoogleLogin() {
-            this.$store.dispatch("LOADING", true);
             firebase.signInWithGoogle();
         },
         onFacebookLogin() {
-            this.$store.dispatch("LOADING", true);
             firebase.signInWithFacebook();
         },
         onSignIn() {
             if (this.signInForm) {
                 this.signingIn = true;
-                this.$store.dispatch("LOADING", true);
                 firebase
                     .signInWithEmail(this.user)
                     .then((response: any) => {
@@ -124,21 +121,19 @@ export default Vue.extend({
                     .catch((err: any) => {
                         this.$store.dispatch(
                             "SHOW_SNACK",
-                            err.message || "Error"
+                            err.message || "Error logging in!"
                         );
                     })
                     .then(() => {
-                        this.$store.dispatch("LOADING", false);
                         this.signingIn = false;
                     });
-            } else this.$store.dispatch("SHOW_SNACK", "Please fill form");
+            } else this.$store.dispatch("SHOW_SNACK", "Please give details");
         },
         navigateToHome() {
             this.$router.replace("/home");
         }
     },
     mounted() {
-        this.$store.dispatch("LOADING", false);
         if (firebase.getUser()) {
             this.navigateToHome();
         }

@@ -61,8 +61,6 @@ export default Vue.extend({
                 });
         }
     },
-    mounted() {
-        this.$store.dispatch("LOADING", false);
-    }
+    mounted() {}
 });
 </script>

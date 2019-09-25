@@ -38,15 +38,19 @@ router.beforeEach((to, from, next) => {
     if (!firebase.isAppInitialized()) {
         firebase.initializeFirebase();
     }
+    store.dispatch("LOADING", true);
     firebase.authChangeListener((user: any) => {
+        store.dispatch("LOADING", false);
         if (!user && to.path !== '/login') {
             store.dispatch('UNSET_USER');
+            store.dispatch('LOGOUT');
             next({
                 path: '/login',
             });
         } else {
             if (user !== null) {
                 store.dispatch('SET_USER', user);
+                store.dispatch('LOGIN');
             }
             next();
         }

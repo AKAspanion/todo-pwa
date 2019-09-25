@@ -15,7 +15,8 @@ export default new Vuex.Store({
             photoURL: '',
             email: '',
         },
-        loading: true,
+        loading: false,
+        isLoggedIn: false,
     },
     mutations: {
         setSnackBar(state, payload) {
@@ -26,6 +27,9 @@ export default new Vuex.Store({
         },
         setUser(state, payload) {
             state.user = payload;
+        },
+        setLogin(state, payload) {
+            state.isLoggedIn = payload;
         },
     },
     actions: {
@@ -38,7 +42,6 @@ export default new Vuex.Store({
         LOADING({ commit }, payload) {
             commit("setLoading", payload);
         },
-
         SET_USER({ commit }, payload) {
             const { uid, displayName, photoURL, email } = payload;
             commit("setUser", {
@@ -48,7 +51,6 @@ export default new Vuex.Store({
                 photoURL,
             });
         },
-
         UNSET_USER({ commit }) {
             commit("setUser", {
                 uid: '',
@@ -56,6 +58,12 @@ export default new Vuex.Store({
                 photoURL: '',
                 email: '',
             });
+        },
+        LOGIN({ commit }) {
+            commit("setLogin", true);
+        },
+        LOGOUT({ commit }) {
+            commit("setLogin", false);
         },
     },
     getters: {
@@ -67,6 +75,9 @@ export default new Vuex.Store({
         },
         user(state) {
             return state.user;
+        },
+        loggedIn(state) {
+            return state.isLoggedIn;
         },
     },
 });
