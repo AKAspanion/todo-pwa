@@ -68,6 +68,10 @@
                         </v-btn>
                     </v-flex>
                 </v-card-text>
+                <v-card-text class="pb-1 pt-4">
+                    <span class="caption">Don't have an account?&nbsp;</span>
+                    <span class="link caption" @click="navigateToSignup">Sign Up</span>
+                </v-card-text>
             </v-card>
         </v-layout>
     </div>
@@ -102,7 +106,6 @@ export default Vue.extend({
     },
     methods: {
         onEmailLogin() {
-            // TODO: create form
             if (this.isEmailLogin) {
                 this.onSignIn();
             } else {
@@ -137,6 +140,9 @@ export default Vue.extend({
         },
         navigateToHome() {
             this.$router.replace("/home");
+        },
+        navigateToSignup() {
+            this.$router.replace("/signup");
         }
     },
     mounted() {

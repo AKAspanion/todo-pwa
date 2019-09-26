@@ -1,72 +1,58 @@
 <template>
     <div class="login-container">
         <v-layout row fill-height justify-center align-center class="pa-0 px-8">
-            <v-card outlined max-width="400px" class="pb-4">
+            <v-card outlined min-width="320px" max-width="400" class="pb-4">
                 <v-layout column wrap align-center class="pt-4">
                     <div class="pt-4 title selectable" @click="navigateToHome">{{$t('todo')}}</div>
-                    <div class="pa-2 caption font-weight-light">{{$t('login.todo')}}</div>
                 </v-layout>
-                <v-card-text class="pb-0">
+                <v-card-text>
+                    <v-form v-model="signInForm" @submit.prevent="onEmailLogin">
+                        <v-card-text class="px-0 pb-0">
+                            <v-text-field
+                                ref="userEmail"
+                                v-model="user.email"
+                                outlined
+                                :label="$t('email.label')"
+                                :hint="$t('email.enter')"
+                                persistent-hint
+                                :rules="rules.emailRules"
+                            ></v-text-field>
+                            <div class="pa-1"></div>
+                            <v-text-field
+                                ref="userPass"
+                                v-model="user.password"
+                                outlined
+                                :label="$t('password.label')"
+                                :hint="$t('password.enter')"
+                                persistent-hint
+                                :rules="rules.password"
+                                type="password"
+                            ></v-text-field>
+                        </v-card-text>
+                        <v-card-actions class="px-0 py-4">
+                            <v-btn type="submit" block color="primary">Sign up</v-btn>
+                        </v-card-actions>
+                    </v-form>
+                </v-card-text>
+                <v-flex class="overline py-0">OR</v-flex>
+                <v-card-text>
                     <v-flex>
-                        <v-btn width="280" large dark color="primary" @click="onFacebookLogin">
-                            <v-icon left>mdi-facebook</v-icon>
-                            <v-spacer></v-spacer>
-                            <div class="text-left" style="width: 200px;">Signup with Facebook</div>
-                        </v-btn>
+                        <span class="pa-1">
+                            <v-btn icon>
+                                <v-icon color="blue">mdi-facebook</v-icon>
+                            </v-btn>
+                        </span>
+                        <span class="pa-1">
+                            <v-btn icon>
+                                <v-icon color="green">mdi-google</v-icon>
+                            </v-btn>
+                        </span>
                     </v-flex>
-                    <v-flex class="py-3">
-                        <v-btn width="280" large dark color="green" @click="onGoogleLogin">
-                            <v-icon left>mdi-google</v-icon>
-                            <v-spacer></v-spacer>
-                            <div class="text-left" style="width: 200px;">Signup with Google</div>
-                        </v-btn>
-                    </v-flex>
-                    <v-flex>
-                        <v-divider></v-divider>
-                        <v-expand-transition>
-                            <div v-if="isEmailLogin">
-                                <v-form v-model="signInForm" @submit.prevent="onEmailLogin">
-                                    <v-card-text v-if="isEmailLogin" class="px-0 pb-0">
-                                        <v-text-field
-                                            ref="userEmail"
-                                            v-model="user.email"
-                                            outlined
-                                            :label="$t('email')"
-                                            :hint="$t('email.enter')"
-                                            persistent-hint
-                                            :rules="rules.emailRules"
-                                        ></v-text-field>
-                                        <v-text-field
-                                            ref="userPass"
-                                            v-model="user.password"
-                                            outlined
-                                            :label="$t('password')"
-                                            :hint="$t('password.enter')"
-                                            persistent-hint
-                                            :rules="rules.password"
-                                            type="password"
-                                        ></v-text-field>
-                                    </v-card-text>
-                                </v-form>
-                            </div>
-                        </v-expand-transition>
-                    </v-flex>
-                    <v-flex class="pt-3">
-                        <v-btn
-                            width="280"
-                            large
-                            :loading="signingIn"
-                            :color="!isEmailLogin ? '':'primary'"
-                            @click="onEmailLogin"
-                        >
-                            <template v-if="!isEmailLogin">
-                                <v-icon left>mdi-email</v-icon>
-                                <v-spacer></v-spacer>
-                                <div class="text-left" style="width: 200px;">Signup with Email</div>
-                            </template>
-                            <template v-else>LOGIN</template>
-                        </v-btn>
-                    </v-flex>
+                </v-card-text>
+                <v-card-text class="pb-1 pt-0">
+                    <span class="caption">Already have an account?&nbsp;</span>
+                    <span class="link caption" @click="navigateToLogin
+                    ">Login</span>
                 </v-card-text>
             </v-card>
         </v-layout>
@@ -137,6 +123,9 @@ export default Vue.extend({
         },
         navigateToHome() {
             this.$router.replace("/home");
+        },
+        navigateToLogin() {
+            this.$router.replace("/login");
         }
     },
     mounted() {

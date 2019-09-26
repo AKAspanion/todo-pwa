@@ -40,6 +40,15 @@ const router = new Router({
             },
         },
         {
+            path: '*',
+            name: 'notfound',
+            component: () => import('@/views/NotFound.vue'),
+            meta: {
+                requireAuth: true,
+                index: 4,
+            },
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('@/views/Login.vue'),
@@ -48,11 +57,6 @@ const router = new Router({
             path: '/signup',
             name: 'signup',
             component: () => import('@/views/Signup.vue'),
-        },
-        {
-            path: '*',
-            name: 'notfound',
-            component: () => import('@/views/NotFound.vue'),
         },
     ],
 });

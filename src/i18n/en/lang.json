@@ -2,5 +2,13 @@
     "todo": "TODO",
     "login": {
         "todo": "Log in to application"
+    },
+    "email": {
+        "label": "Email",
+        "enter": "Enter your email"
+    },
+    "password": {
+        "label": "Password",
+        "enter": "Enter your password"
     }
 }
