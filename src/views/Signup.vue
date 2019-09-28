@@ -1,12 +1,13 @@
 <template>
-    <div class="login-container">
+    <div class="signup-container">
         <v-layout row fill-height justify-center align-center class="pa-0 px-8">
-            <v-card outlined min-width="320px" max-width="400" class="pb-4">
+            <v-card outlined min-width="400px" max-width="400" class="pb-4">
                 <v-layout column wrap align-center class="pt-4">
-                    <div class="pt-4 title selectable" @click="navigateToHome">{{$t('todo')}}</div>
+                    <div class="pt-4 headline selectable" @click="navigateToHome">{{$t('todo')}}</div>
+                    <div class="pa-2 caption font-weight-light">{{$t('signup.todo')}}</div>
                 </v-layout>
-                <v-card-text>
-                    <v-form v-model="signInForm" @submit.prevent="onEmailLogin">
+                <v-card-text :style="{ maxWidth: '320px', textAlign: 'center', margin: '0 auto'}">
+                    <v-form v-model="signUpFrom" @submit.prevent="onEmailSignUp">
                         <v-card-text class="px-0 pb-0">
                             <v-text-field
                                 ref="userEmail"
@@ -30,7 +31,13 @@
                             ></v-text-field>
                         </v-card-text>
                         <v-card-actions class="px-0 py-4">
-                            <v-btn type="submit" block color="primary">Sign up</v-btn>
+                            <v-btn
+                                large
+                                type="submit"
+                                block
+                                color="primary"
+                                :disabled="!signUpFrom"
+                            >Sign up</v-btn>
                         </v-card-actions>
                     </v-form>
                 </v-card-text>
@@ -38,21 +45,21 @@
                 <v-card-text>
                     <v-flex>
                         <span class="pa-1">
-                            <v-btn icon>
-                                <v-icon color="blue">mdi-facebook</v-icon>
+                            <v-btn large icon>
+                                <v-icon color="#3b5998">mdi-facebook</v-icon>
                             </v-btn>
                         </span>
                         <span class="pa-1">
-                            <v-btn icon>
-                                <v-icon color="green">mdi-google</v-icon>
+                            <v-btn large icon>
+                                <v-icon color="#179c52">mdi-google</v-icon>
                             </v-btn>
                         </span>
                     </v-flex>
                 </v-card-text>
-                <v-card-text class="pb-1 pt-0">
+                <v-card-text class="pt-0 pb-7">
                     <span class="caption">Already have an account?&nbsp;</span>
-                    <span class="link caption" @click="navigateToLogin
-                    ">Login</span>
+                    <span class="link caption" @click="navigateToSignin
+                    ">Signin</span>
                 </v-card-text>
             </v-card>
         </v-layout>
@@ -65,12 +72,11 @@ import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
 export default Vue.extend({
+    name: "Signup",
     data() {
         return {
-            name: "Login",
-            signingIn: false,
-            signInForm: false,
-            isEmailLogin: false,
+            signingUp: false,
+            signUpFrom: false,
             rules: {
                 password: [(value: any) => !!value || "Password is required"],
                 emailRules: [
@@ -87,45 +93,37 @@ export default Vue.extend({
         };
     },
     methods: {
-        onEmailLogin() {
-            // TODO: create form
-            if (this.isEmailLogin) {
-                this.onSignIn();
-            } else {
-                this.isEmailLogin = true;
-            }
+        onGoogleSignUp() {
+            firebase.signUpWithGoogle();
         },
-        onGoogleLogin() {
-            firebase.signInWithGoogle();
+        onFacebookSignUp() {
+            firebase.signUpWithFacebook();
         },
-        onFacebookLogin() {
-            firebase.signInWithFacebook();
-        },
-        onSignIn() {
-            if (this.signInForm) {
-                this.signingIn = true;
+        onSignUpsign() {
+            if (this.signUpFrom) {
+                this.signingUp = true;
                 firebase
-                    .signInWithEmail(this.user)
+                    .signUpWithEmail(this.user)
                     .then((response: any) => {
-                        this.$store.dispatch("SHOW_SNACK", "Login Success!");
+                        this.$store.dispatch("SHOW_SNACK", "Signup Success!");
                         this.navigateToHome();
                     })
                     .catch((err: any) => {
                         this.$store.dispatch(
                             "SHOW_SNACK",
-                            err.message || "Error logging in!"
+                            err.message || "Error signing up!"
                         );
                     })
                     .then(() => {
-                        this.signingIn = false;
+                        this.signingUp = false;
                     });
             } else this.$store.dispatch("SHOW_SNACK", "Please give details");
         },
         navigateToHome() {
             this.$router.replace("/home");
         },
-        navigateToLogin() {
-            this.$router.replace("/login");
+        navigateToSignin() {
+            this.$router.replace("/signin");
         }
     },
     mounted() {
@@ -137,7 +135,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.login-container {
+.signup-container {
     height: 100vh;
 }
 </style>

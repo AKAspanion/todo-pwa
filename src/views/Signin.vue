@@ -1,37 +1,41 @@
 <template>
-    <div class="login-container">
+    <div class="signin-container">
         <v-layout row fill-height justify-center align-center class="pa-0 px-8">
-            <v-card outlined max-width="400px" class="pb-4">
+            <v-card outlined min-width="400px" class="pb-4">
                 <v-layout column wrap align-center class="pt-4">
-                    <div class="pt-4 title selectable" @click="navigateToHome">{{$t('todo')}}</div>
-                    <div class="pa-2 caption font-weight-light">{{$t('login.todo')}}</div>
+                    <div class="pt-4 headline selectable" @click="navigateToHome">{{$t('todo')}}</div>
+                    <div class="pa-2 caption font-weight-light">{{$t('signin.todo')}}</div>
                 </v-layout>
-                <v-card-text class="pb-0">
-                    <v-flex>
-                        <v-btn width="280" large dark color="primary" @click="onFacebookLogin">
+                <v-card-text class="pb-0 px-0">
+                    <v-flex class="px-0">
+                        <v-btn width="280" large dark color="#3b5998" @click="onFacebookSignin">
                             <v-icon left>mdi-facebook</v-icon>
                             <v-spacer></v-spacer>
-                            <div class="text-left" style="width: 200px;">Login with Facebook</div>
+                            <div class="text-left" style="width: 200px;">Signin with Facebook</div>
                         </v-btn>
                     </v-flex>
-                    <v-flex class="py-3">
-                        <v-btn width="280" large dark color="green" @click="onGoogleLogin">
+                    <v-flex class="py-3 px-0">
+                        <v-btn width="280" large dark color="#179c52" @click="onGoolgeSignin">
                             <v-icon left>mdi-google</v-icon>
                             <v-spacer></v-spacer>
-                            <div class="text-left" style="width: 200px;">Login with Google</div>
+                            <div class="text-left" style="width: 200px;">Signin with Google</div>
                         </v-btn>
                     </v-flex>
-                    <v-flex>
-                        <v-divider></v-divider>
+                    <v-flex class="px-0">
+                        <v-divider class="my-1"></v-divider>
                         <v-expand-transition>
-                            <div v-if="isEmailLogin">
+                            <div v-if="isEmailSignin">
                                 <v-form v-model="signInForm" @submit.prevent="onEmailLogin">
-                                    <v-card-text v-if="isEmailLogin" class="px-0 pb-0">
+                                    <v-card-text
+                                        :style="{ maxWidth: '280px', textAlign: 'center', margin: '0 auto'}"
+                                        v-if="isEmailSignin"
+                                        class="px-0 pb-0"
+                                    >
                                         <v-text-field
                                             ref="userEmail"
                                             v-model="user.email"
                                             outlined
-                                            :label="$t('email')"
+                                            :label="$t('email.label')"
                                             :hint="$t('email.enter')"
                                             persistent-hint
                                             :rules="rules.emailRules"
@@ -40,7 +44,7 @@
                                             ref="userPass"
                                             v-model="user.password"
                                             outlined
-                                            :label="$t('password')"
+                                            :label="$t('password.label')"
                                             :hint="$t('password.enter')"
                                             persistent-hint
                                             :rules="rules.password"
@@ -51,24 +55,25 @@
                             </div>
                         </v-expand-transition>
                     </v-flex>
-                    <v-flex class="pt-3">
+                    <v-flex class="pt-3 px-0">
                         <v-btn
                             width="280"
                             large
                             :loading="signingIn"
-                            :color="!isEmailLogin ? '':'primary'"
-                            @click="onEmailLogin"
+                            :color="!isEmailSignin ? '':'primary'"
+                            :disabled="!isEmailSignin ? false : !signInForm"
+                            @click="onEmailSignin"
                         >
-                            <template v-if="!isEmailLogin">
+                            <template v-if="!isEmailSignin">
                                 <v-icon left>mdi-email</v-icon>
                                 <v-spacer></v-spacer>
-                                <div class="text-left" style="width: 200px;">Login with Email</div>
+                                <div class="text-left" style="width: 200px;">Signin with Email</div>
                             </template>
                             <template v-else>LOGIN</template>
                         </v-btn>
                     </v-flex>
                 </v-card-text>
-                <v-card-text class="pb-1 pt-4">
+                <v-card-text class="pt-9 pb-7">
                     <span class="caption">Don't have an account?&nbsp;</span>
                     <span class="link caption" @click="navigateToSignup">Sign Up</span>
                 </v-card-text>
@@ -83,12 +88,12 @@ import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
 export default Vue.extend({
+    name: "Signin",
     data() {
         return {
-            name: "Login",
             signingIn: false,
             signInForm: false,
-            isEmailLogin: false,
+            isEmailSignin: false,
             rules: {
                 password: [(value: any) => !!value || "Password is required"],
                 emailRules: [
@@ -105,17 +110,17 @@ export default Vue.extend({
         };
     },
     methods: {
-        onEmailLogin() {
-            if (this.isEmailLogin) {
+        onEmailSignin() {
+            if (this.isEmailSignin) {
                 this.onSignIn();
             } else {
-                this.isEmailLogin = true;
+                this.isEmailSignin = true;
             }
         },
-        onGoogleLogin() {
+        onGoolgeSignin() {
             firebase.signInWithGoogle();
         },
-        onFacebookLogin() {
+        onFacebookSignin() {
             firebase.signInWithFacebook();
         },
         onSignIn() {
@@ -124,13 +129,13 @@ export default Vue.extend({
                 firebase
                     .signInWithEmail(this.user)
                     .then((response: any) => {
-                        this.$store.dispatch("SHOW_SNACK", "Login Success!");
+                        this.$store.dispatch("SHOW_SNACK", "Signin Success!");
                         this.navigateToHome();
                     })
                     .catch((err: any) => {
                         this.$store.dispatch(
                             "SHOW_SNACK",
-                            err.message || "Error logging in!"
+                            err.message || "Error signing in!"
                         );
                     })
                     .then(() => {
@@ -154,7 +159,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.login-container {
+.signin-container {
     height: 100vh;
 }
 </style>

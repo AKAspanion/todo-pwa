@@ -1,7 +1,12 @@
 {
     "todo": "TODO",
-    "login": {
-        "todo": "Log in to application"
+    "signin": {
+        "label": "Signin",
+        "todo": "Sign in to application"
+    },
+    "signup": {
+        "label": "Signup",
+        "todo": "Create an account"
     },
     "email": {
         "label": "Email",

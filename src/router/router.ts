@@ -49,9 +49,9 @@ const router = new Router({
             },
         },
         {
-            path: '/login',
-            name: 'login',
-            component: () => import('@/views/Login.vue'),
+            path: '/signin',
+            name: 'signin',
+            component: () => import('@/views/Signin.vue'),
         },
         {
             path: '/signup',
@@ -72,7 +72,7 @@ router.beforeEach((to, from, next) => {
                 store.dispatch('UNSET_USER');
                 store.dispatch('LOGOUT');
                 const nextObject: any = {
-                    path: '/login',
+                    path: '/signin',
                     redirect: from.fullPath,
                 };
                 next(nextObject);
