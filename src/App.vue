@@ -2,18 +2,21 @@
     <div id="app">
         <v-app id="ankit">
             <main-container></main-container>
+            <navbar></navbar>
         </v-app>
     </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import MainContainer from "@/components/MainContainer.vue"; // @ is an alias to /src
+import Navbar from "@/components/Navbar.vue";
+import MainContainer from "@/components/MainContainer.vue";
 import FirebaseWeb from "./firebase";
 const firebase = new FirebaseWeb();
 
 @Component({
     components: {
-        MainContainer
+        MainContainer,
+        Navbar
     }
 })
 export default class Home extends Vue {

@@ -40,6 +40,24 @@ const router = new Router({
             },
         },
         {
+            path: '/add',
+            name: 'add',
+            component: () => import('@/views/Add.vue'),
+            meta: {
+                requireAuth: true,
+                index: 4,
+            },
+        },
+        {
+            path: '/profile',
+            name: 'profile',
+            component: () => import('@/views/Profile.vue'),
+            meta: {
+                requireAuth: true,
+                index: 4,
+            },
+        },
+        {
             path: '*',
             name: 'notfound',
             component: () => import('@/views/NotFound.vue'),

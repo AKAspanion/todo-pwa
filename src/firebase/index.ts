@@ -27,6 +27,18 @@ class FirebaseWeb {
         return firebase.auth().signInWithEmailAndPassword(user.email, user.password);
     }
 
+    public signUpWithEmail = (user: any) => {
+        return firebase.auth().createUserWithEmailAndPassword(user.email, user.password);
+    }
+
+    public signUpWithFacebook = () => {
+        return this.signInWithFacebook();
+    }
+
+    public signUpWithGoogle = () => {
+        return this.signInWithGoogle();
+    }
+
     public signInWithFacebook = () => {
         let provider: any = null;
         provider = new firebase.auth.FacebookAuthProvider();

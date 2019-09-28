@@ -1,31 +1,19 @@
 <template>
     <div class="home">
-        <v-toolbar flat class="px-3" height="80">
-            <v-btn icon>
-                <v-icon>mdi-arrow-left</v-icon>
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn icon>
-                <v-avatar>
-                    <template v-if="currentUser.photoURL">
-                        <v-img :src="currentUser.photoURL"></v-img>
-                    </template>
-                    <template v-else>
-                        <v-icon>mdi-face</v-icon>
-                    </template>
-                </v-avatar>
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn icon>
-                <v-icon>mdi-dots-horizontal</v-icon>
-            </v-btn>
-        </v-toolbar>
-        <v-card flat tile height="calc(100vh - 80px)">
-            {{currentUser.displayName}}
-            <div class="py-3">
-                <v-btn @click="onSignoutClick">Signout</v-btn>
-            </div>
-        </v-card>
+        <topbar>
+            <template #left>
+                <span class="subtitle-1">TODO</span>
+            </template>
+            <template #center>
+                <v-chip small outlined>Home</v-chip>
+            </template>
+            <template #right>
+                <v-btn icon>
+                    <v-icon>mdi-dots-horizontal</v-icon>
+                </v-btn>
+            </template>
+        </topbar>
+        <v-card flat tile height="calc(100vh - 80px - 56px)"></v-card>
     </div>
 </template>
 
@@ -34,7 +22,13 @@ import Vue from "vue";
 import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
+import Topbar from "@/components/Topbar.vue";
+import { navigateToPath } from "@/util";
+
 export default Vue.extend({
+    components: {
+        Topbar
+    },
     data() {
         return {};
     },
@@ -43,24 +37,7 @@ export default Vue.extend({
             return this.$store.getters.user;
         }
     },
-    methods: {
-        onSignoutClick() {
-            this.logout();
-        },
-        logout() {
-            firebase
-                .signOut()
-                .then(() => {
-                    this.$store.dispatch("SHOW_SNACK", "Signout Succes!");
-                })
-                .catch(() => {
-                    this.$store.dispatch(
-                        "SHOW_SNACK",
-                        "Error Signing out. Please try later!"
-                    );
-                });
-        }
-    },
+    methods: {},
     mounted() {}
 });
 </script>

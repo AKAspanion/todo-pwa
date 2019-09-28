@@ -41,7 +41,7 @@ export default Vue.extend({
         }
     },
     mounted() {
-        // this.themeModel = true;
+        this.themeModel = true;
     }
 });
 </script>

@@ -35,6 +35,7 @@
                                 large
                                 type="submit"
                                 block
+                                :loading="signingUp"
                                 color="primary"
                                 :disabled="!signUpFrom"
                             >Sign up</v-btn>
@@ -45,12 +46,12 @@
                 <v-card-text>
                     <v-flex>
                         <span class="pa-1">
-                            <v-btn large icon>
+                            <v-btn large icon @click="onFacebookSignUp">
                                 <v-icon color="#3b5998">mdi-facebook</v-icon>
                             </v-btn>
                         </span>
                         <span class="pa-1">
-                            <v-btn large icon>
+                            <v-btn large icon @click="onGoogleSignUp">
                                 <v-icon color="#179c52">mdi-google</v-icon>
                             </v-btn>
                         </span>
@@ -99,7 +100,7 @@ export default Vue.extend({
         onFacebookSignUp() {
             firebase.signUpWithFacebook();
         },
-        onSignUpsign() {
+        onEmailSignUp() {
             if (this.signUpFrom) {
                 this.signingUp = true;
                 firebase
