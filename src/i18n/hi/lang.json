@@ -1,5 +1,6 @@
 {
     "todo": "TODO",
+    "signout": "Signout",
     "signin": {
         "label": "Signin",
         "todo": "Sign in to application"
@@ -10,6 +11,7 @@
     },
     "dark": {
         "label": "Dark",
+        "mode": "Dark mode",
         "toggle": "Toggle dark mode"
     },
     "light": {

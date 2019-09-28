@@ -40,6 +40,7 @@ const firebase = new FirebaseWeb();
 
 import Topbar from "@/components/Topbar.vue";
 import AppContainer from "@/components/AppContainer.vue";
+// @ts-ignore
 import { navigateToPath } from "@/util";
 export default Vue.extend({
     name: "Profile",
@@ -58,22 +59,6 @@ export default Vue.extend({
     methods: {
         navigateToHome() {
             navigateToPath("/home");
-        },
-        onSignoutClick() {
-            this.logout();
-        },
-        logout() {
-            firebase
-                .signOut()
-                .then(() => {
-                    this.$store.dispatch("SHOW_SNACK", "Signout Succes!");
-                })
-                .catch(() => {
-                    this.$store.dispatch(
-                        "SHOW_SNACK",
-                        "Error Signing out. Please try later!"
-                    );
-                });
         }
     }
 });

@@ -17,6 +17,7 @@ const store = new Vuex.Store({
         },
         loading: false,
         isLoggedIn: false,
+        isNavbar: false,
     },
     mutations: {
         setSnackBar(state, payload) {
@@ -31,6 +32,9 @@ const store = new Vuex.Store({
         setLogin(state, payload) {
             state.isLoggedIn = payload;
         },
+        setNavbar(state, payload) {
+            state.isNavbar = payload;
+        },
     },
     actions: {
         SHOW_SNACK({ commit }, payload) {
@@ -41,6 +45,9 @@ const store = new Vuex.Store({
         },
         LOADING({ commit }, payload) {
             commit("setLoading", payload);
+        },
+        SHOW_NAVBAR({ commit }, payload) {
+            commit("setNavbar", payload);
         },
         SET_USER({ commit }, payload) {
             const { uid, displayName, photoURL, email } = payload;
@@ -74,6 +81,9 @@ const store = new Vuex.Store({
         },
         loading(state) {
             return state.loading;
+        },
+        navbar(state) {
+            return state.isNavbar;
         },
         user(state) {
             return state.user;

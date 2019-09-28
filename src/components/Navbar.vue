@@ -1,5 +1,5 @@
 <template>
-    <v-bottom-navigation v-if="!is404" fixed grow v-model="navBar">
+    <v-bottom-navigation v-if="showNavbar" fixed grow v-model="navBar">
         <v-btn value="home" @click="navigateTo('/home')">
             <v-icon>mdi-view-grid</v-icon>
         </v-btn>
@@ -16,6 +16,7 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
+// @ts-ignore
 import { navigateToPath } from "@/util";
 export default Vue.extend({
     data() {
@@ -27,6 +28,9 @@ export default Vue.extend({
     computed: {
         currentUser() {
             return this.$store.getters.user;
+        },
+        showNavbar() {
+            return this.$store.getters.navbar;
         }
     },
     methods: {
@@ -36,10 +40,7 @@ export default Vue.extend({
     },
     mounted() {
         this.$router.afterEach((to, from) => {
-            this.navBar = to.name ? to.name : "search";
-            if (this.navBar === "notfound") {
-                this.is404 = true;
-            }
+            this.navBar = to.name ? to.name : "home";
         });
     }
 });

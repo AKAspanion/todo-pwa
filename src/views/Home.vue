@@ -14,35 +14,39 @@
                             <v-icon>mdi-dots-horizontal</v-icon>
                         </v-btn>
                     </template>
-                    <v-list>
-                        <v-list-item>
-                            <v-list-item-content class="text-left">
-                                <v-list-item-title>{{themeModel? $t('light.label'): $t('dark.label')}}</v-list-item-title>
-                                <v-list-item-subtitle>{{themeModel? $t('light.toggle'): $t('dark.toggle')}}</v-list-item-subtitle>
-                            </v-list-item-content>
-                            <v-list-item-action>
-                                <v-switch v-model="themeModel"></v-switch>
-                            </v-list-item-action>
-                        </v-list-item>
+                    <v-list min-width="300">
                         <v-list-item>
                             <v-list-item-content class="text-left">
                                 <v-list-item-title>{{$t('language.label')}}</v-list-item-title>
-                                <v-list-item-subtitle>{{$t('language.change')}}</v-list-item-subtitle>
                             </v-list-item-content>
                             <v-list-item-action>
-                                <v-btn-toggle
-                                    v-model="$i18n.locale"
-                                    mandatory
-                                    rounded
-                                    class="lnl-lang-btn"
-                                >
+                                <v-btn-toggle v-model="$i18n.locale" mandatory class="lnl-lang-btn">
                                     <v-btn
                                         v-for="(lang, i) in langs"
                                         :key="`Lang${i}`"
                                         :value="lang"
+                                        small
                                     >{{ lang }}</v-btn>
                                 </v-btn-toggle>
                             </v-list-item-action>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content class="text-left">
+                                <v-list-item-title>{{$t('dark.mode')}}</v-list-item-title>
+                            </v-list-item-content>
+                            <v-list-item-action class="mr-2">
+                                <v-switch v-model="themeModel"></v-switch>
+                            </v-list-item-action>
+                        </v-list-item>
+                        <v-list-item link @click="onSignoutClick">
+                            <v-list-item-content class="text-left">
+                                <v-list-item-title>{{$t('signout')}}</v-list-item-title>
+                            </v-list-item-content>
+                            <v-list-item-avatar>
+                                <v-avatar small size="36">
+                                    <v-icon>mdi-logout-variant</v-icon>
+                                </v-avatar>
+                            </v-list-item-avatar>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -59,6 +63,7 @@ const firebase = new FirebaseWeb();
 
 import Topbar from "@/components/Topbar.vue";
 import AppContainer from "@/components/AppContainer.vue";
+// @ts-ignore
 import { navigateToPath } from "@/util";
 
 export default Vue.extend({
@@ -84,7 +89,24 @@ export default Vue.extend({
             }
         }
     },
-    methods: {},
+    methods: {
+        onSignoutClick() {
+            this.logout();
+        },
+        logout() {
+            firebase
+                .signOut()
+                .then(() => {
+                    this.$store.dispatch("SHOW_SNACK", "Signout Succes!");
+                })
+                .catch(() => {
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        "Error Signing out. Please try later!"
+                    );
+                });
+        }
+    },
     mounted() {}
 });
 </script>

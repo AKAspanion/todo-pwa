@@ -23,6 +23,7 @@
 import Vue from "vue";
 import Topbar from "@/components/Topbar.vue";
 import AppContainer from "@/components/AppContainer.vue";
+// @ts-ignore
 import { navigateToPath } from "@/util";
 export default Vue.extend({
     components: {
