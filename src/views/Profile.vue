@@ -18,13 +18,14 @@
             </template>
         </topbar>
 
-        <app-container primary>
-            <div class="pt-3 pb-5">
+        <app-container primary elevated-bg>
+            <div class="pt-3 pb-6">
                 <v-avatar size="100">
                     <v-img :src="currentUser.photoURL"></v-img>
                 </v-avatar>
             </div>
             <div class="subtitle-2 white--text">{{currentUser.displayName}}</div>
+            <!-- <v-chip dark small label outlined>{{currentUser.email}}</v-chip> -->
             <div class="caption font-weight-light white--text">{{currentUser.email}}</div>
             <v-card-text>
                 <!-- <div class="pt-9">Hello</div> -->

@@ -6,9 +6,13 @@
                     <v-icon>mdi-arrow-left</v-icon>
                 </v-btn>
             </template>
-
             <template #center>
                 <v-chip small outlined>Add Task</v-chip>
+            </template>
+            <template #right>
+                <v-btn icon @click="navigateTo('/home')">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
             </template>
         </topbar>
         <app-container></app-container>

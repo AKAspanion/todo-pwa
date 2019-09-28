@@ -5,17 +5,50 @@
                 <span class="subtitle-1">TODO</span>
             </template>
             <template #center>
-                <v-chip small outlined>Home</v-chip>
+                <v-chip small outlined>{{$t('home.label')}}</v-chip>
             </template>
             <template #right>
-                <v-btn icon>
-                    <v-icon>mdi-dots-horizontal</v-icon>
-                </v-btn>
+                <v-menu z-index="50">
+                    <template #activator="{ on }">
+                        <v-btn icon v-on="on">
+                            <v-icon>mdi-dots-horizontal</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item>
+                            <v-list-item-content class="text-left">
+                                <v-list-item-title>{{themeModel? $t('light.label'): $t('dark.label')}}</v-list-item-title>
+                                <v-list-item-subtitle>{{themeModel? $t('light.toggle'): $t('dark.toggle')}}</v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-switch v-model="themeModel"></v-switch>
+                            </v-list-item-action>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content class="text-left">
+                                <v-list-item-title>{{$t('language.label')}}</v-list-item-title>
+                                <v-list-item-subtitle>{{$t('language.change')}}</v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-btn-toggle
+                                    v-model="$i18n.locale"
+                                    mandatory
+                                    rounded
+                                    class="lnl-lang-btn"
+                                >
+                                    <v-btn
+                                        v-for="(lang, i) in langs"
+                                        :key="`Lang${i}`"
+                                        :value="lang"
+                                    >{{ lang }}</v-btn>
+                                </v-btn-toggle>
+                            </v-list-item-action>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
             </template>
         </topbar>
-        <app-container>
-            
-        </app-container>
+        <app-container></app-container>
     </div>
 </template>
 
@@ -34,11 +67,21 @@ export default Vue.extend({
         AppContainer
     },
     data() {
-        return {};
+        return {
+            langs: ["en", "hi"]
+        };
     },
     computed: {
         currentUser() {
             return this.$store.getters.user;
+        },
+        themeModel: {
+            get() {
+                return this.$vuetify.theme.dark;
+            },
+            set(val: boolean) {
+                this.$vuetify.theme.dark = val;
+            }
         }
     },
     methods: {},

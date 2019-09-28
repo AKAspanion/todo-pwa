@@ -1,9 +1,9 @@
 <template>
     <div class="home">
         <v-card :dark="dark" flat tile height="calc(100vh - 80px - 56px)">
-            {{primaryColor}}
             <div class="content-wrapper">
-                <div class="content-bg" :class="primary? 'primary':''"></div>
+                <div v-if="elevatedBg" class="elevated-bg"></div>
+                <div class="content-bg" :class="[primary? 'primary':'']"></div>
                 <div class="content">
                     <slot></slot>
                 </div>
@@ -17,14 +17,9 @@ import Vue from "vue";
 
 export default Vue.extend({
     props: {
-        dark: {
-            type: Boolean,
-            default: false
-        },
-        primary: {
-            type: Boolean,
-            default: false
-        }
+        dark: [Boolean],
+        primary: [Boolean],
+        elevatedBg: [Boolean]
     }
 });
 </script>
@@ -34,15 +29,23 @@ export default Vue.extend({
     width: 100%;
     height: 100%;
 }
-.content-bg {
+.content-bg,
+.elevated-bg {
     width: 100%;
     height: 200px;
     position: absolute;
-    z-index: 10;
+    z-index: 3;
     border-bottom-right-radius: 32px;
     border-bottom-left-radius: 32px;
     top: 0;
     left: 0;
+}
+.elevated-bg {
+    top: 50px;
+    height: 150px;
+    z-index: 2;
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+        0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 .content {
     position: absolute;

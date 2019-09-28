@@ -21,14 +21,6 @@ export default Vue.extend({
         };
     },
     computed: {
-        themeModel: {
-            get() {
-                return this.$vuetify.theme.dark;
-            },
-            set(val: boolean) {
-                this.$vuetify.theme.dark = val;
-            }
-        },
         snackbar: {
             get() {
                 return this.$store.getters.snackBar;
@@ -40,9 +32,7 @@ export default Vue.extend({
             }
         }
     },
-    mounted() {
-        this.themeModel = true;
-    }
+    mounted() {}
 });
 </script>
 <style>
