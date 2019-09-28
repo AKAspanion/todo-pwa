@@ -1,6 +1,6 @@
 <template>
     <div>
-        <topbar>
+        <topbar dark primary>
             <template #left>
                 <v-btn icon @click="navigateToHome">
                     <v-icon>mdi-arrow-left</v-icon>
@@ -10,13 +10,26 @@
             <template #center>
                 <v-chip small outlined>Profile</v-chip>
             </template>
+
+            <template #right>
+                <v-btn icon @click="navigateToHome">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </template>
         </topbar>
-        <v-card flat tile height="calc(100vh - 80px)">
-            {{currentUser.displayName}}
-            <div class="py-3">
-                <v-btn @click="onSignoutClick">Signout</v-btn>
+
+        <app-container primary>
+            <div class="pt-3 pb-5">
+                <v-avatar size="100">
+                    <v-img :src="currentUser.photoURL"></v-img>
+                </v-avatar>
             </div>
-        </v-card>
+            <div class="subtitle-2 white--text">{{currentUser.displayName}}</div>
+            <div class="caption font-weight-light white--text">{{currentUser.email}}</div>
+            <v-card-text>
+                <!-- <div class="pt-9">Hello</div> -->
+            </v-card-text>
+        </app-container>
     </div>
 </template>
 <script lang="ts">
@@ -25,11 +38,13 @@ import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
 import Topbar from "@/components/Topbar.vue";
+import AppContainer from "@/components/AppContainer.vue";
 import { navigateToPath } from "@/util";
 export default Vue.extend({
     name: "Profile",
     components: {
-        Topbar
+        Topbar,
+        AppContainer
     },
     data() {
         return {};

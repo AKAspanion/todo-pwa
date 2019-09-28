@@ -11,16 +11,19 @@
                 <v-chip small outlined>Add Task</v-chip>
             </template>
         </topbar>
+        <app-container></app-container>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Topbar from "@/components/Topbar.vue";
+import AppContainer from "@/components/AppContainer.vue";
 import { navigateToPath } from "@/util";
 export default Vue.extend({
     components: {
-        Topbar
+        Topbar,
+        AppContainer
     },
     methods: {
         navigateTo(path: any) {

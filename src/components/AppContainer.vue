@@ -39,13 +39,16 @@ export default Vue.extend({
     height: 200px;
     position: absolute;
     z-index: 10;
-    border-bottom-right-radius: 28px;
-    border-bottom-left-radius: 28px;
+    border-bottom-right-radius: 32px;
+    border-bottom-left-radius: 32px;
     top: 0;
     left: 0;
 }
 .content {
     position: absolute;
+    text-align: center;
+    width: 100%;
+    height: 100%;
     z-index: 12;
 }
 </style>
