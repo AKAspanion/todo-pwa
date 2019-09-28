@@ -1,5 +1,5 @@
 <template>
-    <v-toolbar flat class="px-3" height="80">
+    <v-toolbar :dark="dark" :color="primary? 'primary':''" flat class="px-3" height="80">
         <slot name="left">
             <div class="fallback-content fallback-left"></div>
         </slot>
@@ -16,7 +16,17 @@
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
-    name: "Topbar"
+    name: "Topbar",
+    props: {
+        dark: {
+            type: Boolean,
+            default: false
+        },
+        primary: {
+            type: Boolean,
+            default: false
+        }
+    }
 });
 </script>
 <style scoped>
