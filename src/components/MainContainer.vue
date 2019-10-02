@@ -6,9 +6,9 @@
             <v-btn dark text @click="snackbar.model = false">Close</v-btn>
         </v-snackbar>
         <v-container fluid grid-list-md class="pa-0">
-            <transition :name="transitionName" mode="out-in">
-                <router-view :key="$route.fullPath"></router-view>
-            </transition>
+            <!-- <transition :name="transitionName" mode="out-in"> -->
+            <router-view :key="$route.fullPath"></router-view>
+            <!-- </transition> -->
         </v-container>
     </div>
 </template>

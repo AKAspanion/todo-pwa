@@ -123,7 +123,7 @@
                                     :key="tag.id"
                                     :value="tag.id"
                                     :color="tag.color"
-                                    v-for="tag in tags"
+                                    v-for="tag in types"
                                 >{{ tag.label }}</v-chip>
                             </v-chip-group>
                         </div>
@@ -153,7 +153,7 @@
                     <div class="pl-4 add-text subtitle-2">Status</div>
                     <v-spacer></v-spacer>
                     <v-btn-toggle v-model="task.status">
-                        <v-btn small left value="in_progress">
+                        <v-btn small left value="todo">
                             <v-icon x-small color="error">mdi-progress-clock</v-icon>
                             <span class="pl-1 error--text">in progress</span>
                         </v-btn>
@@ -163,7 +163,14 @@
                         </v-btn>
                     </v-btn-toggle>
                 </v-layout>
-                <v-btn color="primary" elevation="8" block height="52">ADD TASK</v-btn>
+                <v-btn
+                    block
+                    height="52"
+                    elevation="8"
+                    color="primary"
+                    @click="addTask"
+                    :loading="addTaskLoading"
+                >ADD TASK</v-btn>
                 <div class="pa-4"></div>
             </div>
         </app-container>
@@ -172,10 +179,20 @@
 
 <script lang="ts">
 import Vue from "vue";
+import FirebaseWeb from "../firebase";
+const firebase = new FirebaseWeb();
+
 import Topbar from "@/components/Topbar.vue";
 import AppContainer from "@/components/AppContainer.vue";
 // @ts-ignore
-import { navigateToPath, getReadableDate, get12FormatTime } from "@/util";
+import {
+    navigateToPath,
+    getReadableDate,
+    get12FormatTime,
+    getAllTasksForUser,
+    getAllTaskTypes,
+    parseTasksByStatus
+} from "@/util";
 export default Vue.extend({
     components: {
         Topbar,
@@ -187,31 +204,20 @@ export default Vue.extend({
             labelMenu: false,
             timeMenu: false,
             dateMenu: false,
+            pageLoading: false,
+            addTaskLoading: false,
             task: {
                 title: "",
                 date: new Date().toISOString().substr(0, 10),
                 time: new Date().toISOString().substr(11, 5),
-                status: "in_progress",
+                status: "todo",
                 description: "",
                 type: []
             },
             newTag: {
                 color: "#8E00FF"
             },
-            tags: [
-                {
-                    id: "1",
-                    color: "#0078ff",
-                    label: "Meeting"
-                },
-
-                {
-                    id: "2",
-                    color: "#ff0072",
-                    label: "Buisness"
-                }
-            ],
-            timePeriod: "AM"
+            types: []
         };
     },
     computed: {
@@ -225,6 +231,55 @@ export default Vue.extend({
     methods: {
         navigateTo(path: any) {
             navigateToPath(path);
+        },
+        addTask() {
+            this.addTaskLoading = true;
+            firebase
+                .addTask(this.$store.getters.user, this.task)
+                .then(() => {
+                    this.$store.dispatch("LANDING_VISITED", false);
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        "Task addedd succesfully"
+                    );
+                    this.navigateTo("/home");
+                })
+                .catch(err => {
+                    this.$store.dispatch("SHOW_SNACK", err);
+                })
+                .then(err => {
+                    this.addTaskLoading = false;
+                });
+        },
+        loadPage() {
+            return Promise.all([
+                getAllTasksForUser(this.$store.getters.user),
+                getAllTaskTypes()
+            ]);
+        }
+    },
+    mounted() {
+        if (!this.$store.getters.landingVisited) {
+            this.pageLoading = true;
+            this.loadPage()
+                .then(response => {
+                    this.$store.dispatch("SET_TASKS", response[0]);
+                    this.$store.dispatch("SET_TYPES", response[1]);
+                    this.$store.dispatch("LANDING_VISITED", true);
+                    this.types = response[1];
+                    return parseTasksByStatus(response[0]);
+                })
+                .then((tasksByStatus: any) => {
+                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                })
+                .catch(err => {
+                    this.$store.dispatch("SHOW_SNACK", err);
+                })
+                .then(() => {
+                    this.pageLoading = false;
+                });
+        } else {
+            this.types = this.$store.getters.types;
         }
     }
 });

@@ -25,6 +25,15 @@ class FirebaseWeb {
         return tasksRef.where('uid', '==', user.uid).get();
     }
 
+    public addTask = (user: any, task: any) => {
+        const tasksRef = firebase.firestore().collection('tasks');
+        return tasksRef.add({
+            uid: user.uid,
+            ...task,
+            type: task.type.map((e: any) => firebase.firestore().doc(`type/${e}`)),
+        });
+    }
+
     public authChangeListener(callback: any) {
         firebase.auth().onAuthStateChanged(callback);
     }

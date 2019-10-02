@@ -52,7 +52,30 @@
                 </v-menu>
             </template>
         </topbar>
-        <app-container>{{tasksByStatus}}{{pageLoading}}</app-container>
+        <app-container>
+            <v-card flat tile width="100%" class="px-7">
+                <template v-if="tasksByStatus.hasOwnProperty('todo')">
+                    <div class="overline text-left pb-3">Tasks</div>
+                    <task-card-list :task-list="tasksByStatus['todo']" class="pb-4"></task-card-list>
+                </template>
+                <!-- <template v-for="(task) in tasksByStatus['todo']">
+                    <div :key="task.id">
+                        <div v-for="(item, index) in Object.keys(task)" :key="index">{{task[item]}}</div>
+                    </div>
+                </template>-->
+                <template v-if="tasksByStatus.hasOwnProperty('done')">
+                    <div class="overline text-left pb-3">done</div>
+
+                    <task-card-list :task-list="tasksByStatus['done']" class="pb-4"></task-card-list>
+                </template>
+
+                <!-- <template v-for="(task) in tasksByStatus['done']">
+                    <div :key="task.id">
+                        <div v-for="(item, index) in Object.keys(task)" :key="index">{{task[item]}}</div>
+                    </div>
+                </template>-->
+            </v-card>
+        </app-container>
     </div>
 </template>
 
@@ -62,6 +85,7 @@ import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
 import Topbar from "@/components/Topbar.vue";
+import TaskCardList from "@/components/TaskCardList.vue";
 import AppContainer from "@/components/AppContainer.vue";
 // @ts-ignore
 import {
@@ -74,7 +98,8 @@ import {
 export default Vue.extend({
     components: {
         Topbar,
-        AppContainer
+        AppContainer,
+        TaskCardList
     },
     data() {
         return {
