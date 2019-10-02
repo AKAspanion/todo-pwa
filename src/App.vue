@@ -19,7 +19,7 @@ const firebase = new FirebaseWeb();
         Navbar
     }
 })
-export default class Home extends Vue {
+export default class App extends Vue {
     mounted() {
         // this.$store.dispatch("LOADING", false);
         if (!firebase.isAppInitialized) {

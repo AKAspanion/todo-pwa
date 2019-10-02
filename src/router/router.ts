@@ -15,7 +15,7 @@ const router = new Router({
         {
             path: '/',
             name: 'root',
-            component: () => import('@/views/Home.vue'),
+            component: () => import('@/views/TaskList.vue'),
             meta: {
                 requireAuth: true,
                 index: 1,
@@ -24,25 +24,16 @@ const router = new Router({
         {
             path: '/home',
             name: 'home',
-            component: () => import('@/views/Home.vue'),
+            component: () => import('@/views/TaskList.vue'),
             meta: {
                 requireAuth: true,
                 index: 2,
             },
         },
         {
-            path: '/about',
-            name: 'about',
-            component: () => import('@/views/About.vue'),
-            meta: {
-                requireAuth: true,
-                index: 4,
-            },
-        },
-        {
             path: '/add',
             name: 'add',
-            component: () => import('@/views/Add.vue'),
+            component: () => import('@/views/TaskAdd.vue'),
             meta: {
                 requireAuth: true,
                 index: 4,

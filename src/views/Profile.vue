@@ -18,7 +18,7 @@
             </template>
         </topbar>
 
-        <app-container primary elevated-bg>
+        <app-container coloured elevated-bg>
             <div class="pt-3 pb-6">
                 <v-avatar size="100">
                     <v-img :src="currentUser.photoURL"></v-img>
