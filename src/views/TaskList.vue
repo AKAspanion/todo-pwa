@@ -52,7 +52,7 @@
                 </v-menu>
             </template>
         </topbar>
-        <app-container></app-container>
+        <app-container>{{tasksByStatus}}{{pageLoading}}</app-container>
     </div>
 </template>
 
@@ -64,7 +64,12 @@ const firebase = new FirebaseWeb();
 import Topbar from "@/components/Topbar.vue";
 import AppContainer from "@/components/AppContainer.vue";
 // @ts-ignore
-import { navigateToPath } from "@/util";
+import {
+    navigateToPath,
+    getAllTasksForUser,
+    getAllTaskTypes,
+    parseTasksByStatus
+} from "@/util";
 
 export default Vue.extend({
     components: {
@@ -73,6 +78,9 @@ export default Vue.extend({
     },
     data() {
         return {
+            pageLoading: false,
+            tasksByStatus: {},
+            tasks: [],
             langs: ["en", "hi"]
         };
     },
@@ -105,9 +113,38 @@ export default Vue.extend({
                         "Error Signing out. Please try later!"
                     );
                 });
+        },
+        loadPage() {
+            return Promise.all([
+                getAllTasksForUser(this.currentUser),
+                getAllTaskTypes()
+            ]);
         }
     },
-    mounted() {}
+    mounted() {
+        if (!this.$store.getters.landingVisited) {
+            this.pageLoading = true;
+            this.loadPage()
+                .then(response => {
+                    this.$store.dispatch("SET_TASKS", response[0]);
+                    this.$store.dispatch("SET_TYPES", response[1]);
+                    this.$store.dispatch("LANDING_VISITED", true);
+                    return parseTasksByStatus(response[0]);
+                })
+                .then((tasksByStatus: any) => {
+                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    this.tasksByStatus = tasksByStatus;
+                })
+                .catch(err => {
+                    this.$store.dispatch("SHOW_SNACK", err);
+                })
+                .then(() => {
+                    this.pageLoading = false;
+                });
+        } else {
+            this.tasksByStatus = this.$store.getters.tasksByStatus;
+        }
+    }
 });
 </script>
 <style scoped>

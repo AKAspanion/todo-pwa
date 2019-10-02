@@ -18,6 +18,10 @@ const store = new Vuex.Store({
         loading: false,
         isLoggedIn: false,
         isNavbar: false,
+        tasksByStatus: {},
+        tasks: [],
+        types: [],
+        landingVisited: false,
     },
     mutations: {
         setSnackBar(state, payload) {
@@ -35,8 +39,42 @@ const store = new Vuex.Store({
         setNavbar(state, payload) {
             state.isNavbar = payload;
         },
+        setTasksByStatus(state, payload) {
+            state.tasksByStatus = payload;
+        },
+        setTasks(state, payload) {
+            state.tasks = payload;
+        },
+        setTypes(state, payload) {
+            state.types = payload;
+        },
+        landingVisited(state, payload) {
+            state.landingVisited = payload;
+        },
     },
     actions: {
+
+        SET_TASKS_BY_STATUS({
+            commit
+        }, payload) {
+            commit('setTasksByStatus', payload);
+        },
+        SET_TASKS({
+            commit
+        }, payload) {
+            commit('setTasks', payload);
+        },
+        SET_TYPES({
+            commit
+        }, payload) {
+            commit('setTypes', payload);
+        },
+
+        LANDING_VISITED({
+            commit
+        }, payload) {
+            commit('landingVisited', payload);
+        },
         SHOW_SNACK({ commit }, payload) {
             commit("setSnackBar", {
                 model: true,
@@ -90,6 +128,18 @@ const store = new Vuex.Store({
         },
         loggedIn(state) {
             return state.isLoggedIn;
+        },
+        tasksByStatus(state) {
+            return state.tasksByStatus;
+        },
+        tasks(state) {
+            return state.tasks;
+        },
+        types(state) {
+            return state.types;
+        },
+        landingVisited(state) {
+            return state.landingVisited;
         },
     },
 });

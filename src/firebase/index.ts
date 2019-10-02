@@ -15,6 +15,16 @@ class FirebaseWeb {
         return firebase.apps.length;
     }
 
+    public fetchAllTaskType = () => {
+        const typeRef = firebase.firestore().collection('type');
+        return typeRef.get();
+    }
+
+    public fetchTasksByUID = (user: any) => {
+        const tasksRef = firebase.firestore().collection('tasks');
+        return tasksRef.where('uid', '==', user.uid).get();
+    }
+
     public authChangeListener(callback: any) {
         firebase.auth().onAuthStateChanged(callback);
     }
