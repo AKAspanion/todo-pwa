@@ -1,6 +1,6 @@
 <template>
     <div>
-        <topbar primary dark>
+        <topbar>
             <template #left>
                 <v-btn icon @click="navigateTo('/home')">
                     <v-icon>mdi-arrow-left</v-icon>
@@ -15,164 +15,116 @@
                 </v-btn>
             </template>
         </topbar>
-        <app-container coloured elevated-bg bg-height="88px">
-            <div class="mx-4 px-3">
-                <v-layout row align-center justify-start ma-0 class="label-container pt-2 mb-n1">
-                    <v-text-field light solo flat v-model="task.title" placeholder="Name your task"></v-text-field>
-                </v-layout>
-                <v-layout row align-start justify-start ma-0 class="label-container pt-6 mb-n3">
-                    <div class="pt-2">
-                        <v-menu v-model="dateMenu" :close-on-content-click="false">
-                            <template #activator="{ on }">
-                                <v-btn small icon v-on="on">
-                                    <v-icon>mdi-calendar</v-icon>
-                                </v-btn>
-                            </template>
-                            <v-card>
-                                <v-date-picker
-                                    reactive
-                                    full-width
-                                    color="primary"
-                                    ref="datePicker"
-                                    v-model="task.date"
-                                    :locale="$i18n.locale"
-                                ></v-date-picker>
-                            </v-card>
-                        </v-menu>
-                    </div>
-                    <div class="add-text subtitle-2 full-width">
-                        <v-text-field
-                            readonly
-                            solo
-                            flat
-                            dense
-                            placeholder="Date"
-                            :value="readableDate"
-                            @click="dateMenu =! dateMenu"
-                        >{{readableDate}}</v-text-field>
-                    </div>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout row align-start justify-start ma-0 class="label-container mb-n3">
-                    <div class="pt-2">
-                        <v-menu v-model="timeMenu" :close-on-content-click="false">
-                            <template #activator="{ on }">
-                                <v-btn small icon v-on="on">
-                                    <v-icon>mdi-clock</v-icon>
-                                </v-btn>
-                            </template>
-                            <v-card>
-                                <v-time-picker
-                                    color="primary"
-                                    ref="timePicker"
-                                    class="pickerTime"
-                                    v-model="task.time"
-                                    :locale="$i18n.locale"
-                                ></v-time-picker>
-                            </v-card>
-                        </v-menu>
-                    </div>
-                    <div class="add-text subtitle-2 full-width">
-                        <v-text-field
-                            readonly
-                            solo
-                            flat
-                            dense
-                            placeholder="Time"
-                            :value="readableTime"
-                            @click="timeMenu =! timeMenu"
-                        ></v-text-field>
-                    </div>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout row align-start justify-start ma-0 class="label-container mb-2">
-                    <div class="pt-2">
-                        <v-menu v-model="labelMenu" :close-on-content-click="false">
-                            <template #activator="{ on }">
-                                <v-btn small icon v-on="on">
-                                    <v-icon>mdi-label</v-icon>
-                                </v-btn>
-                            </template>
-                            <v-card width="400">
-                                <v-card-text class="text-left">
-                                    <div class="subtitle-1 pb-2">Create new task type</div>
-                                    <v-text-field outlined dense label="Type"></v-text-field>
-                                    {{newTag.color}}
-                                    <v-color-picker
-                                        v-model="newTag.color"
-                                        hide-canvas
-                                        hide-inputs
-                                        hide-mode-switch
-                                        :show-swatches="false"
-                                    ></v-color-picker>
-                                </v-card-text>
-                                <v-card-actions class="pa-0 pr-4 pb-3">
-                                    <v-spacer></v-spacer>
-                                    <v-btn color="primary">Add</v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-menu>
-                    </div>
-                    <div class="add-text subtitle-2 full-width">
-                        <v-text-field value="Task type" solo flat dense readonly></v-text-field>
-                        <div class="pl-3 mt-n7">
-                            <v-chip-group multiple v-model="task.type">
-                                <v-chip
-                                    label
-                                    outlined
-                                    :key="tag.id"
-                                    :value="tag.id"
-                                    :color="tag.color"
-                                    v-for="tag in types"
-                                >{{ tag.label }}</v-chip>
-                            </v-chip-group>
-                        </div>
-                    </div>
-                </v-layout>
-                <v-layout row align-start justify-start ma-0 class="label-container">
-                    <div class="pt-2">
-                        <v-icon>mdi-file-document-edit</v-icon>
-                    </div>
-                    <div class="pl-1 add-text subtitle-2 full-width">
-                        <v-text-field value="Description" solo flat dense readonly></v-text-field>
-                        <div class="pl-3 mt-n5">
+        <app-container class="task-add-container">
+            <v-form v-model="addTaskForm">
+                <v-card flat tile height="calc(100vh - 80px - 80px)" class="mx-4 px-3 pt-3">
+                    <v-layout column fill-height justify-space-between class="ma-0">
+                        <div>
+                            <v-text-field
+                                dense
+                                outlined
+                                prepend-inner-icon="mdi-format-title"
+                                v-model="task.title"
+                                placeholder="Name your task"
+                                class="mb-n2"
+                            ></v-text-field>
+                            <v-menu v-model="timeMenu" :close-on-content-click="false">
+                                <template #activator="{ on }">
+                                    <v-text-field
+                                        dense
+                                        v-on="on"
+                                        outlined
+                                        class="mb-n2"
+                                        prepend-inner-icon="mdi-clock-outline"
+                                        :value="readableTime()"
+                                    ></v-text-field>
+                                </template>
+                                <v-card>
+                                    <v-time-picker
+                                        color="primary"
+                                        ref="timePicker"
+                                        class="pickerTime"
+                                        v-model="task.time"
+                                        :locale="$i18n.locale"
+                                    ></v-time-picker>
+                                </v-card>
+                            </v-menu>
+                            <v-menu v-model="dateMenu" :close-on-content-click="false">
+                                <template #activator="{ on }">
+                                    <v-text-field
+                                        dense
+                                        v-on="on"
+                                        outlined
+                                        class="mb-n2"
+                                        prepend-inner-icon="mdi-calendar-outline"
+                                        :value="readableDate()"
+                                    ></v-text-field>
+                                </template>
+                                <v-card>
+                                    <v-date-picker
+                                        reactive
+                                        full-width
+                                        color="primary"
+                                        ref="datePicker"
+                                        v-model="task.date"
+                                        :locale="$i18n.locale"
+                                    ></v-date-picker>
+                                </v-card>
+                            </v-menu>
+                            <v-autocomplete
+                                v-model="task.type"
+                                :items="types"
+                                item-text="label"
+                                return-object
+                                small-chips
+                                label
+                                outlined
+                                dense
+                                multiple
+                                class="mb-n2"
+                                prepend-inner-icon="mdi-label-outline"
+                                placeholder="Task type"
+                            ></v-autocomplete>
                             <v-textarea
                                 v-model="task.description"
                                 auto-grow
                                 outlined
                                 dense
-                                placeholder="A detailed description of the task."
+                                class="mb-n2"
+                                prepend-inner-icon="mdi-card-text-outline"
+                                placeholder="A detailed description of the task"
                             ></v-textarea>
+                            <v-layout
+                                row
+                                align-center
+                                justify-start
+                                ma-0
+                                mt-3
+                                class="label-container pb-5"
+                            >
+                                <v-spacer></v-spacer>
+                                <v-btn-toggle dense block v-model="task.status">
+                                    <v-btn left value="todo">
+                                        <span class="pl-1 error--text font-weight-bold">todo</span>
+                                    </v-btn>
+                                    <v-btn value="done">
+                                        <span class="pl-1 success--text font-weight-bold">done</span>
+                                    </v-btn>
+                                </v-btn-toggle>
+                                <v-spacer></v-spacer>
+                            </v-layout>
                         </div>
-                    </div>
-                </v-layout>
-                <v-layout row align-center justify-start ma-0 class="label-container mb-8">
-                    <div>
-                        <v-icon>mdi-finance</v-icon>
-                    </div>
-                    <div class="pl-4 add-text subtitle-2">Status</div>
-                    <v-spacer></v-spacer>
-                    <v-btn-toggle v-model="task.status">
-                        <v-btn small left value="todo">
-                            <v-icon x-small color="error">mdi-progress-clock</v-icon>
-                            <span class="pl-1 error--text">in progress</span>
-                        </v-btn>
-                        <v-btn small value="done">
-                            <v-icon x-small color="success">mdi-progress-check</v-icon>
-                            <span class="pl-1 success--text">done</span>
-                        </v-btn>
-                    </v-btn-toggle>
-                </v-layout>
-                <v-btn
-                    block
-                    height="52"
-                    elevation="8"
-                    color="primary"
-                    @click="addTask"
-                    :loading="addTaskLoading"
-                >ADD TASK</v-btn>
-                <div class="pa-4"></div>
-            </div>
+
+                        <v-btn
+                            large
+                            rounded
+                            color="primary"
+                            @click="onAddTaskSubmit"
+                            :loading="addTaskLoading"
+                        >ADD TASK</v-btn>
+                    </v-layout>
+                </v-card>
+            </v-form>
         </app-container>
     </div>
 </template>
@@ -192,6 +144,7 @@ import {
     getAllTasksForUser,
     getAllTaskTypes,
     parseTasksByStatus
+    // @ts-ignore
 } from "@/util";
 export default Vue.extend({
     components: {
@@ -200,7 +153,7 @@ export default Vue.extend({
     },
     data() {
         return {
-            showTitleField: false,
+            addTaskForm: false,
             labelMenu: false,
             timeMenu: false,
             dateMenu: false,
@@ -220,17 +173,27 @@ export default Vue.extend({
             types: []
         };
     },
-    computed: {
+    methods: {
+        navigateTo(path: any) {
+            navigateToPath(path);
+        },
         readableDate() {
+            const { date } = this.task;
             return getReadableDate(this.task.date);
         },
         readableTime() {
             return get12FormatTime(this.task.time);
-        }
-    },
-    methods: {
-        navigateTo(path: any) {
-            navigateToPath(path);
+        },
+        onAddTaskSubmit() {
+            if (this.task.title.trim() === "") {
+                this.$store.dispatch("SHOW_SNACK", "Won't name your task?");
+                return;
+            }
+            if (this.task.description.trim() === "") {
+                this.$store.dispatch("SHOW_SNACK", "Won't give description?");
+                return;
+            }
+            this.addTask();
         },
         addTask() {
             this.addTaskLoading = true;
@@ -293,16 +256,24 @@ export default Vue.extend({
     min-width: 10px;
 }
 .add-text {
-    padding-top: 2.5px;
     font-size: 16px !important;
 }
 .full-width {
     width: calc(100% - 28px);
 }
-textarea {
-    margin-top: 0 !important;
+.task-add-container >>> textarea {
+    margin-top: 4px !important;
+}
+.task-add-container >>> .v-text-field__slot {
+    padding-left: 6px;
+}
+.task-add-container >>> .v-select__slot {
+    padding-left: 6px;
 }
 .pickerTime >>> .v-time-picker-title {
     justify-content: center !important;
+}
+.pt-2px {
+    padding-top: 3px;
 }
 </style>

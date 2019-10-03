@@ -67,4 +67,7 @@ export default Vue.extend({
 .app-contain {
     overflow-y: scroll;
 }
+.app-contain::-webkit-scrollbar {
+    width: 0em;
+}
 </style>

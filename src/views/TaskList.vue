@@ -93,6 +93,7 @@ import {
     getAllTasksForUser,
     getAllTaskTypes,
     parseTasksByStatus
+    // @ts-ignore
 } from "@/util";
 
 export default Vue.extend({
