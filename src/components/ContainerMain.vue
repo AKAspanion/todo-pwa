@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="main-container">
         <v-progress-linear v-if="loading" indeterminate class="fixed-progress"></v-progress-linear>
         <v-snackbar v-model="snackbar.model" bottom :timeout="5000">
             {{ snackbar.text }}
@@ -61,5 +61,8 @@ body {
 .slide-right-enter {
     opacity: 0;
     transform: translate(-2em, 0);
+}
+.main-container::-webkit-scrollbar {
+    width: 0em;
 }
 </style>

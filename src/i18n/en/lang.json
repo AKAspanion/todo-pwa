@@ -2,12 +2,20 @@
     "todo": "TODO",
     "signout": "Signout",
     "signin": {
-        "label": "Signin",
+        "label": "Sign in",
         "todo": "Sign in to application"
     },
     "signup": {
         "label": "Signup",
         "todo": "Create an account"
+    },
+    "name": {
+        "first": "First name",
+        "last": "Last name",
+        "enter": {
+            "first": "Enter your first name",
+            "last": "Enter your last name"
+        }
     },
     "dark": {
         "label": "Dark",
@@ -20,11 +28,15 @@
     },
     "email": {
         "label": "Email",
-        "enter": "Enter your email"
+        "enter": "Enter your email address"
     },
     "password": {
         "label": "Password",
-        "enter": "Enter your password"
+        "confirm": "Confirm",
+        "enter": {
+            "passEnter": "Enter your password",
+            "passConfirm": "Confirm your password"
+        }
     },
     "language": {
         "label": "Language",
@@ -32,5 +44,20 @@
     },
     "home": {
         "label": "Home"
+    },
+    "errors": {
+        "password": {
+            "required": "Password is required",
+            "confirmPass": "Password must match",
+            "invalid": "Use 8 or more characters with a mix of letters, numbers and symbols"
+        },
+        "email": {
+            "invalid": "Email entered is not valid"
+        },
+        "spaces": {
+            "field": "Only white spaces not allowed",
+            "password": "Password can't have white spaces",
+            "email": "Email can't have white spaces"
+        }
     }
 }

@@ -1,33 +1,60 @@
 <template>
     <div class="signup-container">
         <v-layout row fill-height justify-center align-center class="pa-0 px-8">
-            <v-card outlined min-width="400px" max-width="400" class="pb-4">
+            <v-card outlined min-width="400px" max-width="400" class="mt-2">
                 <v-layout column wrap align-center class="pt-4">
                     <div class="pt-4 headline selectable" @click="navigateToHome">{{$t('todo')}}</div>
                     <div class="pa-2 caption font-weight-light">{{$t('signup.todo')}}</div>
                 </v-layout>
                 <v-card-text :style="{ maxWidth: '320px', textAlign: 'center', margin: '0 auto'}">
-                    <v-form v-model="signUpFrom" @submit.prevent="onEmailSignUp">
+                    <v-form
+                        lazy-validation
+                        ref="formSignUp"
+                        v-model="signUpFrom"
+                        @submit.prevent="onEmailSignUp"
+                    >
                         <v-card-text class="px-0 pb-0">
                             <v-text-field
-                                ref="userEmail"
+                                ref="userFirstName"
+                                v-model="user.firstName"
+                                v-bind="textFieldAttributes"
+                                :label="$t('name.first')"
+                                :hint="$t('name.enter.first')"
+                                :rules="[rules.empty.firstName, rules.nospace.field]"
+                            ></v-text-field>
+                            <v-text-field
+                                v-model="user.lastName"
+                                v-bind="textFieldAttributes"
+                                :label="$t('name.last')"
+                                :hint="$t('name.enter.last')"
+                                :rules="[rules.empty.lastName, rules.nospace.field]"
+                            ></v-text-field>
+                            <v-text-field
                                 v-model="user.email"
-                                outlined
+                                v-bind="textFieldAttributes"
                                 :label="$t('email.label')"
                                 :hint="$t('email.enter')"
-                                persistent-hint
-                                :rules="rules.emailRules"
+                                :rules="[rules.empty.email, rules.nospace.email, rules.email]"
                             ></v-text-field>
-                            <div class="pa-1"></div>
                             <v-text-field
-                                ref="userPass"
                                 v-model="user.password"
-                                outlined
+                                v-bind="textFieldAttributes"
                                 :label="$t('password.label')"
-                                :hint="$t('password.enter')"
-                                persistent-hint
-                                :rules="rules.password"
-                                type="password"
+                                :hint="$t('password.enter.passEnter')"
+                                :rules="[rules.empty.password, rules.nospace.password, rules.password]"
+                                :append-icon="seePass ? 'mdi-eye-off':'mdi-eye'"
+                                :type="seePass? '':'password'"
+                                @click:append="seePass = !seePass"
+                            ></v-text-field>
+                            <v-text-field
+                                v-model="user.confirm"
+                                v-bind="textFieldAttributes"
+                                :label="$t('password.confirm')"
+                                :hint="$t('password.enter.passConfirm')"
+                                :append-icon="seePass ? 'mdi-eye-off':'mdi-eye'"
+                                :type="seePass? '':'password'"
+                                @click:append="seePass = !seePass"
+                                :rules="[rules.empty.confirm, rules.nospace.password, rules.confirmPassword]"
                             ></v-text-field>
                         </v-card-text>
                         <v-card-actions class="px-0 py-4">
@@ -59,8 +86,7 @@
                 </v-card-text>
                 <v-card-text class="pt-0 pb-7">
                     <span class="caption">Already have an account?&nbsp;</span>
-                    <span class="link caption" @click="navigateToSignin
-                    ">Signin</span>
+                    <span class="link caption" @click="navigateToSignin">{{$t('signin.label')}}</span>
                 </v-card-text>
             </v-card>
         </v-layout>
@@ -76,20 +102,55 @@ export default Vue.extend({
     name: "Signup",
     data() {
         return {
+            seePass: false,
             signingUp: false,
             signUpFrom: false,
             rules: {
-                password: [(value: any) => !!value || "Password is required"],
-                emailRules: [
-                    (v: any) => !!v || "E-mail is required",
-                    (v: any) =>
-                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-                        "E-mail must be valid"
-                ]
+                empty: {
+                    firstName: (v: any) => !!v || this.$t("name.enter.first"),
+                    lastName: (v: any) => !!v || this.$t("name.enter.last"),
+                    email: (v: any) => !!v || this.$t("email.enter"),
+                    password: (v: any) =>
+                        !!v || this.$t("password.enter.passEnter"),
+                    confirm: (v: any) =>
+                        !!v || this.$t("password.enter.passConfirm")
+                },
+                nospace: {
+                    field: (v: any) =>
+                        (v && v.trim() !== "") ||
+                        this.$t("errors.spaces.field"),
+                    password: (v: any) =>
+                        (v && !/\s/g.test(v)) ||
+                        this.$t("errors.spaces.password"),
+                    email: (v: any) =>
+                        (v && !/\s/g.test(v)) || this.$t("errors.spaces.email")
+                },
+                password: (v: any) =>
+                    (v &&
+                        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
+                            v
+                        )) ||
+                    this.$t("errors.password.invalid"),
+                confirmPassword: (v: any) =>
+                    (v && v === this.user.password) ||
+                    this.$t("errors.password.confirmPass"),
+                email: (v: any) =>
+                    (v &&
+                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
+                            v
+                        )) ||
+                    this.$t("errors.email.invalid")
             },
             user: {
                 email: "",
-                password: ""
+                password: "",
+                confirm: "",
+                firstName: "",
+                lastName: ""
+            },
+            textFieldAttributes: {
+                dense: true,
+                outlined: true
             }
         };
     },
@@ -101,12 +162,22 @@ export default Vue.extend({
             firebase.signUpWithFacebook();
         },
         onEmailSignUp() {
-            if (this.signUpFrom) {
+            let signUpValidator: any = this.$refs.formSignUp;
+            if (
+                signUpValidator &&
+                signUpValidator.validate() &&
+                this.signUpFrom
+            ) {
                 this.signingUp = true;
                 firebase
                     .signUpWithEmail(this.user)
                     .then((response: any) => {
                         this.$store.dispatch("SHOW_SNACK", "Signup Success!");
+                        return firebase.updateUserProfile({
+                            displayName: `${this.user.firstName} ${this.user.lastName}`
+                        });
+                    })
+                    .then(() => {
                         this.navigateToHome();
                     })
                     .catch((err: any) => {
@@ -118,7 +189,8 @@ export default Vue.extend({
                     .then(() => {
                         this.signingUp = false;
                     });
-            } else this.$store.dispatch("SHOW_SNACK", "Please give details");
+            }
+            // else this.$store.dispatch("SHOW_SNACK", "Please give details");
         },
         navigateToHome() {
             this.$router.replace("/home");
@@ -131,6 +203,12 @@ export default Vue.extend({
         if (firebase.getUser()) {
             this.navigateToHome();
         }
+        this.$nextTick(() => {
+            setTimeout(() => {
+                let firstName: any = this.$refs.userFirstName;
+                firstName.focus();
+            }, 300);
+        });
     }
 });
 </script>
@@ -138,5 +216,11 @@ export default Vue.extend({
 <style scoped>
 .signup-container {
     height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.signup-container::-webkit-scrollbar {
+    width: 0em;
 }
 </style>

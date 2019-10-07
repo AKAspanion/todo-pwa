@@ -42,12 +42,17 @@ class FirebaseWeb {
         firebase.initializeApp(this.firebaseConfig);
     }
 
+    public updateUserProfile = (updatedUser: any) => {
+        const user: any = firebase.auth().currentUser;
+        return user.updateProfile(updatedUser);
+    }
+
     public signInWithEmail = (user: any) => {
-        return firebase.auth().signInWithEmailAndPassword(user.email, user.password);
+        return firebase.auth().signInWithEmailAndPassword(user.email.trim(), user.password.trim());
     }
 
     public signUpWithEmail = (user: any) => {
-        return firebase.auth().createUserWithEmailAndPassword(user.email, user.password);
+        return firebase.auth().createUserWithEmailAndPassword(user.email.trim(), user.password.trim());
     }
 
     public signUpWithFacebook = () => {

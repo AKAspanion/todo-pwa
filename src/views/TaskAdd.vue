@@ -80,11 +80,26 @@
                                 label
                                 outlined
                                 dense
+                                filled
                                 multiple
                                 class="mb-n2"
                                 prepend-inner-icon="mdi-label-outline"
                                 placeholder="Task type"
-                            ></v-autocomplete>
+                            >
+                                <template v-slot:selection="data">
+                                    <v-chip
+                                        v-bind="data.attrs"
+                                        :input-value="data.selected"
+                                        close
+                                        small
+                                        label
+                                        :text-color="getTextColorByBg(data.item)"
+                                        :color="data.item.color"
+                                        @click="data.select"
+                                        @click:close="removeChipSelection(data.item)"
+                                    >{{ data.item.label }}</v-chip>
+                                </template>
+                            </v-autocomplete>
                             <v-textarea
                                 v-model="task.description"
                                 auto-grow
@@ -219,6 +234,9 @@ export default Vue.extend({
                 getAllTasksForUser(this.$store.getters.user),
                 getAllTaskTypes()
             ]);
+        },
+        getTextColorByBg(item: any) {
+            return "#fff";
         }
     },
     mounted() {

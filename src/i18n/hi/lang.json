@@ -9,6 +9,14 @@
         "label": "Signup",
         "todo": "Create an account"
     },
+    "name": {
+        "first": "First name",
+        "last": "Last name",
+        "enter": {
+            "first": "Enter your first name",
+            "last": "Enter your first name"
+        }
+    },
     "dark": {
         "label": "Dark",
         "mode": "Dark mode",
@@ -24,7 +32,11 @@
     },
     "password": {
         "label": "Password",
-        "enter": "Enter your password"
+        "confirm": "Confirm",
+        "enter": {
+            "passEnter": "Enter your password",
+            "passConfirm": "Confirm your password"
+        }
     },
     "language": {
         "label": "Language",
@@ -32,5 +44,12 @@
     },
     "home": {
         "label": "Home"
+    },
+    "errors": {
+        "password": {
+            "required": "Password is required",
+            "confirmPass": "Confirmation is required",
+            "invalid": "Use 8 or more characters with a mix of letters, numbers and symbols"
+        }
     }
 }
