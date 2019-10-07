@@ -59,31 +59,21 @@
                     <task-card-list
                         :task-list="tasksByStatus['todo']"
                         @check="onTaskCheck"
+                        @delete="onTaskDelete"
                         :disabled="tasksUpdating"
                         class="pb-4"
                     ></task-card-list>
                 </template>
-                <!-- <template v-for="(task) in tasksByStatus['todo']">
-                    <div :key="task.id">
-                        <div v-for="(item, index) in Object.keys(task)" :key="index">{{task[item]}}</div>
-                    </div>
-                </template>-->
                 <template v-if="tasksByStatus.hasOwnProperty('done')">
                     <div class="overline text-left pb-3">done</div>
-
                     <task-card-list
                         :task-list="tasksByStatus['done']"
                         class="pb-4"
                         :disabled="tasksUpdating"
+                        @delete="onTaskDelete"
                         @uncheck="onTaskUncheck"
                     ></task-card-list>
                 </template>
-
-                <!-- <template v-for="(task) in tasksByStatus['done']">
-                    <div :key="task.id">
-                        <div v-for="(item, index) in Object.keys(task)" :key="index">{{task[item]}}</div>
-                    </div>
-                </template>-->
             </v-card>
         </container-app>
     </div>
@@ -103,6 +93,7 @@ import {
     getAllTasksForUser,
     getAllTaskTypes,
     updateTasks,
+    deleteTasks,
     parseTasksByStatus
     // @ts-ignore
 } from "@/util";
@@ -135,6 +126,9 @@ export default Vue.extend({
         }
     },
     methods: {
+        onTaskDelete(task: any) {
+            this.deleteTask(task);
+        },
         onTaskUncheck(task: any) {
             this.updateTasks(task.id, {
                 status: "todo"
@@ -144,6 +138,31 @@ export default Vue.extend({
             this.updateTasks(task.id, {
                 status: "done"
             });
+        },
+        deleteTask(task: any) {
+            this.tasksUpdating = true;
+            this.$store.dispatch("LOADING", true);
+            firebase
+                .deleteTask(task)
+                .then(() => {
+                    return deleteTasks(task.id, this.$store.getters.tasks);
+                })
+                .then(tasks => {
+                    this.$store.dispatch("SET_TASKS", tasks);
+                    return parseTasksByStatus(tasks);
+                })
+                .then((tasksByStatus: any) => {
+                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    this.tasksByStatus = tasksByStatus;
+                    this.$store.dispatch("SHOW_SNACK", "Task deleted");
+                })
+                .catch(err => {
+                    console.log(err.message);
+                })
+                .finally(() => {
+                    this.tasksUpdating = false;
+                    this.$store.dispatch("LOADING", false);
+                });
         },
         updateTasks(taskId: any, updatedTask: any) {
             this.tasksUpdating = true;

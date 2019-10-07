@@ -40,10 +40,15 @@ class FirebaseWeb {
     }
 
     public updateTask = (taskId: any, updatedTask: any) => {
-        const typeRef = firebase.firestore().collection('tasks').doc(taskId);
-        return typeRef.update({
+        const tasksRef = firebase.firestore().collection('tasks').doc(taskId);
+        return tasksRef.update({
             ...updatedTask,
         });
+    }
+
+    public deleteTask = (task: any) => {
+        const tasksRef = firebase.firestore().collection('tasks').doc(task.id);
+        return tasksRef.delete();
     }
 
     public authChangeListener(callback: any) {

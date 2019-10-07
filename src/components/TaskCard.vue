@@ -6,6 +6,21 @@
         :class="task.status === 'done' ? 'done-task dark':''"
         :color="getRandom()"
     >
+        <v-dialog v-model="deleteModal" persistent>
+            <v-card class="text-left">
+                <v-card-title>Delete</v-card-title>
+                <v-card-text>Are you sure you want to delete this task?</v-card-text>
+                <v-card-actions class="px-4 pb-4">
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" small text @click.stop="deleteModal = false">Cancel</v-btn>
+                    <v-btn
+                        color="primary"
+                        small
+                        @click.stop="$emit('delete', task); deleteModal = false;"
+                    >Delete</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-layout column fill-height justify-space-between class="ma-0">
             <div>
                 <v-card-text class="pb-3">
@@ -93,7 +108,7 @@
                             :disabled="disabled"
                             :x-small="$vuetify.breakpoint.xsOnly"
                             :small="$vuetify.breakpoint.smAndUp"
-                            @click.stop="$emit('delete', task)"
+                            @click.stop="deleteModal = true"
                         >
                             <v-icon
                                 :x-small="$vuetify.breakpoint.xsOnly"
@@ -120,6 +135,11 @@ export default Vue.extend({
             type: Boolean,
             default: false
         }
+    },
+    data() {
+        return {
+            deleteModal: false
+        };
     },
     methods: {
         getRandom() {
