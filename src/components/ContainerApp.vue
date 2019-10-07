@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <v-card :dark="dark" flat tile height="calc(100vh - 80px - 56px)" class="app-contain">
+        <v-card :dark="dark" flat tile height="calc(100vh - 80px - 56px)">
             <div class="content-wrapper">
                 <div
                     v-if="elevatedBg"
@@ -40,6 +40,8 @@ export default Vue.extend({
     position: relative;
     width: 100%;
     height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 .content-bg,
 .elevated-bg {
@@ -64,10 +66,7 @@ export default Vue.extend({
     height: 100%;
     z-index: 12;
 }
-.app-contain {
-    overflow-y: scroll;
-}
-.app-contain::-webkit-scrollbar {
+.content-wrapper::-webkit-scrollbar {
     width: 0em;
 }
 </style>

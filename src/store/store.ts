@@ -53,10 +53,23 @@ const store = new Vuex.Store({
         },
     },
     actions: {
-
+        RESET_STORE({ commit }) {
+            commit('setTasksByStatus', {});
+            commit('setTasks', []);
+            commit('landingVisited', false);
+            commit("setUser", {
+                uid: '',
+                displayName: '',
+                photoURL: '',
+                email: '',
+            });
+            commit("setLogin", false);
+            localStorage.setItem('isLoggedIn', JSON.stringify(false));
+        },
         SET_TASKS_BY_STATUS({
             commit
         }, payload) {
+            console.log(payload);
             commit('setTasksByStatus', payload);
         },
         SET_TASKS({

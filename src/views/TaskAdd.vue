@@ -15,131 +15,204 @@
                 </v-btn>
             </template>
         </bar-top>
-        <container-app class="task-add-container">
-            <v-form v-model="addTaskForm">
-                <v-card flat tile height="calc(100vh - 80px - 80px)" class="mx-4 px-3 pt-3">
-                    <v-layout column fill-height justify-space-between class="ma-0">
-                        <div>
-                            <v-text-field
-                                dense
-                                outlined
-                                prepend-inner-icon="mdi-format-title"
-                                v-model="task.title"
-                                placeholder="Name your task"
-                                class="mb-n2"
-                            ></v-text-field>
-                            <v-menu v-model="timeMenu" :close-on-content-click="false">
-                                <template #activator="{ on }">
-                                    <v-text-field
-                                        dense
-                                        v-on="on"
-                                        outlined
-                                        class="mb-n2"
-                                        prepend-inner-icon="mdi-clock-outline"
-                                        :value="readableTime()"
-                                    ></v-text-field>
-                                </template>
-                                <v-card>
-                                    <v-time-picker
-                                        color="primary"
-                                        ref="timePicker"
-                                        class="pickerTime"
-                                        v-model="task.time"
-                                        :locale="$i18n.locale"
-                                    ></v-time-picker>
-                                </v-card>
-                            </v-menu>
-                            <v-menu v-model="dateMenu" :close-on-content-click="false">
-                                <template #activator="{ on }">
-                                    <v-text-field
-                                        dense
-                                        v-on="on"
-                                        outlined
-                                        class="mb-n2"
-                                        prepend-inner-icon="mdi-calendar-outline"
-                                        :value="readableDate()"
-                                    ></v-text-field>
-                                </template>
-                                <v-card>
-                                    <v-date-picker
-                                        reactive
-                                        full-width
-                                        color="primary"
-                                        ref="datePicker"
-                                        v-model="task.date"
-                                        :locale="$i18n.locale"
-                                    ></v-date-picker>
-                                </v-card>
-                            </v-menu>
-                            <v-autocomplete
-                                v-model="task.type"
-                                :items="types"
-                                item-text="label"
-                                return-object
-                                small-chips
-                                label
-                                outlined
-                                dense
-                                filled
-                                multiple
-                                class="mb-n2"
-                                prepend-inner-icon="mdi-label-outline"
-                                placeholder="Task type"
-                            >
-                                <template v-slot:selection="data">
-                                    <v-chip
-                                        v-bind="data.attrs"
-                                        :input-value="data.selected"
-                                        close
-                                        small
-                                        label
-                                        :text-color="getTextColorByBg(data.item)"
-                                        :color="data.item.color"
-                                        @click="data.select"
-                                        @click:close="removeChipSelection(data.item)"
-                                    >{{ data.item.label }}</v-chip>
-                                </template>
-                            </v-autocomplete>
-                            <v-textarea
-                                v-model="task.description"
-                                auto-grow
-                                outlined
-                                dense
-                                class="mb-n2"
-                                prepend-inner-icon="mdi-card-text-outline"
-                                placeholder="A detailed description of the task"
-                            ></v-textarea>
-                            <v-layout
-                                row
-                                align-center
-                                justify-start
-                                ma-0
-                                mt-3
-                                class="label-container pb-5"
-                            >
-                                <v-spacer></v-spacer>
-                                <v-btn-toggle dense block v-model="task.status">
-                                    <v-btn left value="todo">
-                                        <span class="pl-1 error--text font-weight-bold">todo</span>
-                                    </v-btn>
-                                    <v-btn value="done">
-                                        <span class="pl-1 success--text font-weight-bold">done</span>
-                                    </v-btn>
-                                </v-btn-toggle>
-                                <v-spacer></v-spacer>
-                            </v-layout>
-                        </div>
+        <container-app>
+            <v-card flat tile class="mx-3 pt-3 pb-3 task-add-container">
+                <v-form
+                    v-model="addTaskForm"
+                    ref="formAddTask"
+                    lazy-validation
+                    @submit.prevent="onAddTaskSubmit"
+                >
+                    <v-container grid-list-lg fluid>
+                        <v-layout row wrap fill-height justify-space-between class="ma-0">
+                            <v-flex xs12 sm12 md4 class="py-0">
+                                <v-text-field
+                                    ref="titleField"
+                                    v-bind="textFieldAttributes"
+                                    prepend-inner-icon="mdi-format-title"
+                                    v-model="task.title"
+                                    hint="Name your task"
+                                    placeholder="Name your task"
+                                    :rules="[rules.empty.title]"
+                                ></v-text-field>
+                            </v-flex>
 
-                        <v-btn
-                            large
-                            rounded
-                            color="primary"
-                            @click="onAddTaskSubmit"
-                            :loading="addTaskLoading"
-                        >ADD TASK</v-btn>
-                    </v-layout>
-                </v-card>
-            </v-form>
+                            <v-flex xs12 sm6 md4 class="py-0">
+                                <v-menu v-model="timeMenu" :close-on-content-click="false">
+                                    <template #activator="{ on }">
+                                        <v-text-field
+                                            v-on="on"
+                                            readonly
+                                            v-bind="textFieldAttributes"
+                                            hint="Choose time"
+                                            placeholder="Select time"
+                                            prepend-inner-icon="mdi-clock-outline"
+                                            :value="readableTime()"
+                                            :rules="[rules.empty.title]"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-card>
+                                        <v-time-picker
+                                            color="primary"
+                                            ref="timePicker"
+                                            class="pickerTime"
+                                            v-model="task.time"
+                                            :locale="$i18n.locale"
+                                            :ampm-in-title="$vuetify.breakpoint.mdAndUp"
+                                            :landscape="$vuetify.breakpoint.mdAndUp"
+                                        ></v-time-picker>
+                                    </v-card>
+                                </v-menu>
+                            </v-flex>
+
+                            <v-flex xs12 sm6 md4 class="py-0">
+                                <v-menu v-model="dateMenu" :close-on-content-click="false">
+                                    <template #activator="{ on }">
+                                        <v-text-field
+                                            v-on="on"
+                                            readonly
+                                            hint="Choose date"
+                                            placeholder="Select date"
+                                            v-bind="textFieldAttributes"
+                                            prepend-inner-icon="mdi-calendar-outline"
+                                            :rules="[rules.empty.title]"
+                                            :value="readableDate()"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-card>
+                                        <v-date-picker
+                                            reactive
+                                            full-width
+                                            color="primary"
+                                            ref="datePicker"
+                                            v-model="task.date"
+                                            :locale="$i18n.locale"
+                                            :landscape="$vuetify.breakpoint.mdAndUp"
+                                        ></v-date-picker>
+                                    </v-card>
+                                </v-menu>
+                            </v-flex>
+                            <v-flex xs12 class="py-0">
+                                <v-autocomplete
+                                    v-model="task.type"
+                                    :items="types"
+                                    item-text="label"
+                                    return-object
+                                    small-chips
+                                    multiple
+                                    :rules="[rules.empty.type]"
+                                    v-bind="textFieldAttributes"
+                                    :loading="taskTypesLoading"
+                                    :search-input.sync="typeSearch"
+                                    prepend-inner-icon="mdi-label-outline"
+                                    placeholder="Task type"
+                                    hint="Choose a task type"
+                                >
+                                    <template #selection="data">
+                                        <v-chip
+                                            v-bind="data.attrs"
+                                            :input-value="data.selected"
+                                            label
+                                            :small="$vuetify.breakpoint.xsOnly"
+                                            :text-color="getTextColorByBg(data.item)"
+                                            :color="data.item.color"
+                                            @click="data.select"
+                                        >{{ data.item.label }}</v-chip>
+                                    </template>
+                                    <template #item="data">
+                                        <template v-if="typeof data.item !== 'object'">
+                                            <v-list-item-content v-text="data.item"></v-list-item-content>
+                                        </template>
+                                        <template v-else>
+                                            <v-list-item-avatar
+                                                size="24"
+                                                :color="data.item.color"
+                                                @click="typeSearch = ''"
+                                            ></v-list-item-avatar>
+                                            <v-list-item-content
+                                                class="text-left"
+                                                @click="typeSearch = ''"
+                                            >
+                                                <v-list-item-title v-html="data.item.label"></v-list-item-title>
+                                            </v-list-item-content>
+                                        </template>
+                                    </template>
+                                    <template #no-data>
+                                        <v-card flat tile class="py-2">
+                                            <div style="margin: 0 auto; width: 300px;">
+                                                <v-card-text>
+                                                    <div class="pb-4">
+                                                        Create a new task type
+                                                        <v-chip
+                                                            label
+                                                            :small="$vuetify.breakpoint.xsOnly"
+                                                            class="ml-2"
+                                                            :color="newTypeColor"
+                                                            :text-color="getTextColorByBg()"
+                                                        >{{typeSearch}}</v-chip>
+                                                    </div>
+                                                    <v-color-picker
+                                                        v-model="newTypeColor"
+                                                        hide-canvas
+                                                        hide-inputs
+                                                        hide-swatches
+                                                    ></v-color-picker>
+                                                </v-card-text>
+                                                <v-card-actions>
+                                                    <v-spacer></v-spacer>
+                                                    <v-btn
+                                                        color="primary"
+                                                        @click="onAddTaskTypeSubmit"
+                                                    >Create</v-btn>
+                                                    <v-spacer></v-spacer>
+                                                </v-card-actions>
+                                            </div>
+                                        </v-card>
+                                    </template>
+                                </v-autocomplete>
+                            </v-flex>
+
+                            <v-flex xs12 class="py-0 text-area">
+                                <v-textarea
+                                    v-model="task.description"
+                                    auto-grow
+                                    v-bind="textFieldAttributes"
+                                    :rules="[rules.empty.desc]"
+                                    prepend-inner-icon="mdi-card-text-outline"
+                                    placeholder="A detailed description of the task"
+                                    hint="Enter a description"
+                                ></v-textarea>
+                            </v-flex>
+
+                            <v-flex xs12 class="py-0">
+                                <v-layout
+                                    row
+                                    align-center
+                                    justify-start
+                                    class="label-container ma-0 pb-5 my-3"
+                                >
+                                    <!-- <v-spacer></v-spacer> -->
+                                    <v-btn-toggle dense block v-model="task.status">
+                                        <v-btn left value="todo">
+                                            <span class="pl-1 error--text font-weight-bold">todo</span>
+                                        </v-btn>
+                                        <v-btn value="done">
+                                            <span class="pl-1 success--text font-weight-bold">done</span>
+                                        </v-btn>
+                                    </v-btn-toggle>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        type="submit"
+                                        color="primary"
+                                        :disabled="!addTaskForm"
+                                        :loading="addTaskLoading"
+                                    >ADD TASK</v-btn>
+                                </v-layout>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-form>
+            </v-card>
         </container-app>
     </div>
 </template>
@@ -174,6 +247,9 @@ export default Vue.extend({
             dateMenu: false,
             pageLoading: false,
             addTaskLoading: false,
+            newTypeColor: "#8E00FF",
+            typeSearch: "",
+            taskTypesLoading: false,
             task: {
                 title: "",
                 date: new Date().toISOString().substr(0, 10),
@@ -185,7 +261,43 @@ export default Vue.extend({
             newTag: {
                 color: "#8E00FF"
             },
-            types: []
+            types: [],
+            textFieldAttributes: {
+                dense: !this.$vuetify.breakpoint.mdAndUp,
+                outlined: true
+            },
+            rules: {
+                empty: {
+                    title: (v: any) => !!v || "Enter a title",
+                    desc: (v: any) => !!v || "Enter a description",
+                    type: (v: any) => v.length !== 0 || "Choose a task type"
+                },
+                nospace: {
+                    field: (v: any) =>
+                        (v && v.trim() !== "") ||
+                        this.$t("errors.spaces.field"),
+                    password: (v: any) =>
+                        (v && !/\s/g.test(v)) ||
+                        this.$t("errors.spaces.password"),
+                    email: (v: any) =>
+                        (v && !/\s/g.test(v)) || this.$t("errors.spaces.email")
+                },
+                password: (v: any) =>
+                    (v &&
+                        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
+                            v
+                        )) ||
+                    this.$t("errors.password.invalid"),
+                confirmPassword: (v: any) =>
+                    (v && v === this.user.password) ||
+                    this.$t("errors.password.confirmPass"),
+                email: (v: any) =>
+                    (v &&
+                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
+                            v
+                        )) ||
+                    this.$t("errors.email.invalid")
+            }
         };
     },
     methods: {
@@ -200,15 +312,46 @@ export default Vue.extend({
             return get12FormatTime(this.task.time);
         },
         onAddTaskSubmit() {
-            if (this.task.title.trim() === "") {
-                this.$store.dispatch("SHOW_SNACK", "Won't name your task?");
+            let addTaskValidator: any = this.$refs.formAddTask;
+            if (
+                addTaskValidator &&
+                addTaskValidator.validate() &&
+                this.addTaskForm
+            ) {
+                this.addTask();
+            }
+        },
+        onAddTaskTypeSubmit() {
+            if (this.typeSearch.trim() === "") {
                 return;
             }
-            if (this.task.description.trim() === "") {
-                this.$store.dispatch("SHOW_SNACK", "Won't give description?");
+            if (this.newTypeColor.trim() === "") {
                 return;
             }
-            this.addTask();
+            this.addTaskType();
+        },
+        addTaskType() {
+            this.taskTypesLoading = true;
+            let newTaskType = {
+                label: this.typeSearch.trim(),
+                color: this.newTypeColor.trim()
+            };
+            firebase
+                .addTaskType(newTaskType)
+                .then(() => {
+                    this.$store.dispatch("LANDING_VISITED", false);
+                    this.$store.dispatch("SET_TYPES", [
+                        newTaskType,
+                        ...this.types
+                    ]);
+                    this.types = this.$store.getters.types;
+                })
+                .catch(err => {
+                    this.$store.dispatch("SHOW_SNACK", err);
+                })
+                .finally(() => {
+                    this.taskTypesLoading = false;
+                });
         },
         addTask() {
             this.addTaskLoading = true;
@@ -242,6 +385,7 @@ export default Vue.extend({
     mounted() {
         if (!this.$store.getters.landingVisited) {
             this.pageLoading = true;
+            this.taskTypesLoading = true;
             this.loadPage()
                 .then(response => {
                     this.$store.dispatch("SET_TASKS", response[0]);
@@ -256,12 +400,19 @@ export default Vue.extend({
                 .catch(err => {
                     this.$store.dispatch("SHOW_SNACK", err);
                 })
-                .then(() => {
+                .finally(() => {
                     this.pageLoading = false;
+                    this.taskTypesLoading = false;
                 });
         } else {
             this.types = this.$store.getters.types;
         }
+        this.$nextTick(() => {
+            setTimeout(() => {
+                let title: any = this.$refs.titleField;
+                title.focus();
+            }, 300);
+        });
     }
 });
 </script>
@@ -285,11 +436,20 @@ export default Vue.extend({
 .task-add-container >>> .v-text-field__slot {
     padding-left: 6px;
 }
+.task-add-container >>> .v-text-field__slot input {
+    margin-top: 0 !important;
+}
+.text-area >>> .v-input__prepend-inner {
+    margin-top: 7px !important;
+}
 .task-add-container >>> .v-select__slot {
     padding-left: 6px;
 }
 .pickerTime >>> .v-time-picker-title {
     justify-content: center !important;
+}
+.pickerTime {
+    width: 100%;
 }
 .pt-2px {
     padding-top: 3px;

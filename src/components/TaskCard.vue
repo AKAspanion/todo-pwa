@@ -18,14 +18,16 @@
                     <div>
                         <v-chip
                             label
-                            x-small
                             light
                             color="white"
-                            class="mr-3"
+                            class="mr-2 mb-1"
                             :text-color="tag.color"
                             :key="tag.id"
                             :value="tag.id"
+                            :title="tag.label"
                             v-for="tag in task.type"
+                            :x-small="$vuetify.breakpoint.xsOnly"
+                            :small="$vuetify.breakpoint.smAndUp"
                         >{{ tag.label }}</v-chip>
                     </div>
                 </v-card-text>

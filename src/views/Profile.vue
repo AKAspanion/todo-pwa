@@ -20,8 +20,15 @@
 
         <container-app coloured elevated-bg>
             <div class="pt-3 pb-6">
-                <v-avatar size="100">
-                    <v-img :src="currentUser.photoURL"></v-img>
+                <v-avatar size="100" color="white">
+                    <template v-if="currentUser.photoURL">
+                        <v-img :src="currentUser.photoURL"></v-img>
+                    </template>
+                    <template v-else>
+                        <div
+                            class="display-1 font-weight-medium"
+                        >{{getInitials(currentUser.displayName)}}</div>
+                    </template>
                 </v-avatar>
             </div>
             <div class="subtitle-2 white--text">{{currentUser.displayName}}</div>
@@ -41,7 +48,7 @@ const firebase = new FirebaseWeb();
 import BarTop from "@/components/BarTop.vue";
 import ContainerApp from "@/components/ContainerApp.vue";
 // @ts-ignore
-import { navigateToPath } from "@/util";
+import { navigateToPath, getInitials } from "@/util";
 export default Vue.extend({
     name: "Profile",
     components: {
@@ -59,6 +66,9 @@ export default Vue.extend({
     methods: {
         navigateToHome() {
             navigateToPath("/home");
+        },
+        getInitials(name: any) {
+            return getInitials(name);
         }
     }
 });

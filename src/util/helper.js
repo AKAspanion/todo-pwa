@@ -10,6 +10,11 @@ export const navigateToPath = (path) => {
         .catch(err => {})
 }
 
+export const getInitials = (name) => {
+    let initials = name.match(/\b\w/g) || [];
+    return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+}
+
 export const getAllTasksForUser = (user) => {
     return new Promise((resolve, reject) => {
         firebase

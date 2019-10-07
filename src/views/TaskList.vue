@@ -131,6 +131,7 @@ export default Vue.extend({
             firebase
                 .signOut()
                 .then(() => {
+                    this.$store.dispatch("RESET_STORE");
                     this.$store.dispatch("SHOW_SNACK", "Signout Succes!");
                 })
                 .catch(() => {
