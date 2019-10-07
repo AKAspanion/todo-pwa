@@ -48,7 +48,7 @@ export default Vue.extend({
 <style scoped>
 .nav-bar {
     position: fixed;
-    z-index: 100;
+    z-index: 1000;
     width: 100%;
     bottom: 0;
     height: 56px;

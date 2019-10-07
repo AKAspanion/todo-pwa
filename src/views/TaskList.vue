@@ -56,7 +56,12 @@
             <v-card flat tile width="100%" class="px-7">
                 <template v-if="tasksByStatus.hasOwnProperty('todo')">
                     <div class="overline text-left pb-3">Tasks</div>
-                    <task-card-list :task-list="tasksByStatus['todo']" class="pb-4"></task-card-list>
+                    <task-card-list
+                        :task-list="tasksByStatus['todo']"
+                        @check="onTaskCheck"
+                        :disabled="tasksUpdating"
+                        class="pb-4"
+                    ></task-card-list>
                 </template>
                 <!-- <template v-for="(task) in tasksByStatus['todo']">
                     <div :key="task.id">
@@ -66,7 +71,12 @@
                 <template v-if="tasksByStatus.hasOwnProperty('done')">
                     <div class="overline text-left pb-3">done</div>
 
-                    <task-card-list :task-list="tasksByStatus['done']" class="pb-4"></task-card-list>
+                    <task-card-list
+                        :task-list="tasksByStatus['done']"
+                        class="pb-4"
+                        :disabled="tasksUpdating"
+                        @uncheck="onTaskUncheck"
+                    ></task-card-list>
                 </template>
 
                 <!-- <template v-for="(task) in tasksByStatus['done']">
@@ -92,6 +102,7 @@ import {
     navigateToPath,
     getAllTasksForUser,
     getAllTaskTypes,
+    updateTasks,
     parseTasksByStatus
     // @ts-ignore
 } from "@/util";
@@ -105,8 +116,8 @@ export default Vue.extend({
     data() {
         return {
             pageLoading: false,
+            tasksUpdating: false,
             tasksByStatus: {},
-            tasks: [],
             langs: ["en", "hi"]
         };
     },
@@ -124,6 +135,45 @@ export default Vue.extend({
         }
     },
     methods: {
+        onTaskUncheck(task: any) {
+            this.updateTasks(task.id, {
+                status: "todo"
+            });
+        },
+        onTaskCheck(task: any) {
+            this.updateTasks(task.id, {
+                status: "done"
+            });
+        },
+        updateTasks(taskId: any, updatedTask: any) {
+            this.tasksUpdating = true;
+            this.$store.dispatch("LOADING", true);
+            firebase
+                .updateTask(taskId, updatedTask)
+                .then(() => {
+                    return updateTasks(
+                        taskId,
+                        updatedTask,
+                        this.$store.getters.tasks
+                    );
+                })
+                .then(tasks => {
+                    this.$store.dispatch("SET_TASKS", tasks);
+                    return parseTasksByStatus(tasks);
+                })
+                .then((tasksByStatus: any) => {
+                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    this.tasksByStatus = tasksByStatus;
+                    this.$store.dispatch("SHOW_SNACK", "Task updated");
+                })
+                .catch(err => {
+                    console.log(err.message);
+                })
+                .finally(() => {
+                    this.tasksUpdating = false;
+                    this.$store.dispatch("LOADING", false);
+                });
+        },
         onSignoutClick() {
             this.logout();
         },

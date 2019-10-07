@@ -60,6 +60,26 @@ export const parseTasksByStatus = (tasks) => {
     });
 }
 
+export const updateTasks = (taskId, updatedTask, tasks) => {
+    return new Promise(resolve => {
+        let updatedTaskList = [];
+        for (let i = 0; i < tasks.length; i++) {
+            let currentTask = tasks[i];
+            if (currentTask.id === taskId) {
+                updatedTaskList.push({
+                    ...currentTask,
+                    ...updatedTask
+                });
+            } else {
+                updatedTaskList.push({
+                    ...currentTask
+                });
+            }
+        }
+        resolve(updatedTaskList);
+    });
+}
+
 const parseAllTypes = (snapshot) => {
     return new Promise((resolve) => {
         let types = [];

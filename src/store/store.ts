@@ -69,7 +69,6 @@ const store = new Vuex.Store({
         SET_TASKS_BY_STATUS({
             commit
         }, payload) {
-            console.log(payload);
             commit('setTasksByStatus', payload);
         },
         SET_TASKS({

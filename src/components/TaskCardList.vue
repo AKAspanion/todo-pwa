@@ -3,7 +3,16 @@
         <v-layout row wrap fill-height>
             <template v-for="(task, index) in taskList">
                 <v-flex xs6 :key="index">
-                    <task-card :task="task"></task-card>
+                    <task-card
+                        :task="task"
+                        :class="disabled?'disabled-list':''"
+                        :disabled="disabled"
+                        @type-select="(v) => $emit('type-select', v)"
+                        @uncheck="(v) => $emit('uncheck', v)"
+                        @delete="(v) => $emit('delete', v)"
+                        @check="(v) => $emit('check', v)"
+                        @edit="(v) => $emit('edit', v)"
+                    ></task-card>
                 </v-flex>
             </template>
         </v-layout>
@@ -20,7 +29,17 @@ export default Vue.extend({
         taskList: {
             type: Array,
             required: true
+        },
+        disabled: {
+            type: Boolean,
+            default: false
         }
     }
 });
 </script>
+<style scoped>
+.disabled-list {
+    pointer-events: none;
+    cursor: default;
+}
+</style>

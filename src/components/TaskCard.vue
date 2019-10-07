@@ -9,8 +9,33 @@
         <v-layout column fill-height justify-space-between class="ma-0">
             <div>
                 <v-card-text class="pb-3">
-                    <div class="body-2 font-weight-bold pb-1 white--text">{{task.title}}</div>
-                    <div class="caption task-desc white--text">{{task.description}}</div>
+                    <v-layout row wrap align-start justify-space-between class="ma-0">
+                        <div style="width: calc(100% - 36px)">
+                            <div class="body-2 font-weight-bold pb-1 white--text overflow-text">
+                                <v-tooltip bottom max-width="50%" nudge-top="4">
+                                    <template #activator="{ on }">
+                                        <span v-on="on">{{task.title}}</span>
+                                    </template>
+                                    <span>{{task.title}}</span>
+                                </v-tooltip>
+                            </div>
+                            <div class="caption task-desc white--text">{{task.description}}</div>
+                        </div>
+                        <div class="mr-n1">
+                            <v-btn
+                                icon
+                                :disabled="disabled"
+                                :x-small="$vuetify.breakpoint.xsOnly"
+                                :small="$vuetify.breakpoint.smAndUp"
+                                @click.stop="task.status === 'todo' ? $emit('check', task): $emit('uncheck', task)"
+                            >
+                                <v-icon
+                                    :x-small="$vuetify.breakpoint.xsOnly"
+                                    :small="$vuetify.breakpoint.smAndUp"
+                                >{{task.status === 'todo' ? 'mdi-check': 'mdi-close'}}</v-icon>
+                            </v-btn>
+                        </div>
+                    </v-layout>
                 </v-card-text>
             </div>
             <div>
@@ -25,9 +50,11 @@
                             :key="tag.id"
                             :value="tag.id"
                             :title="tag.label"
+                            :disabled="disabled"
                             v-for="tag in task.type"
                             :x-small="$vuetify.breakpoint.xsOnly"
                             :small="$vuetify.breakpoint.smAndUp"
+                            @click.stop="$emit('type-select', tag)"
                         >{{ tag.label }}</v-chip>
                     </div>
                 </v-card-text>
@@ -47,8 +74,31 @@
                     </v-tooltip>
                     <v-spacer></v-spacer>
                     <div>
-                        <v-btn icon x-small>
-                            <v-icon x-small>mdi-pencil</v-icon>
+                        <v-btn
+                            icon
+                            :disabled="disabled"
+                            :x-small="$vuetify.breakpoint.xsOnly"
+                            :small="$vuetify.breakpoint.smAndUp"
+                            @click.stop="$emit('edit', task)"
+                        >
+                            <v-icon
+                                :x-small="$vuetify.breakpoint.xsOnly"
+                                :small="$vuetify.breakpoint.smAndUp"
+                            >mdi-pencil</v-icon>
+                        </v-btn>
+                    </div>
+                    <div>
+                        <v-btn
+                            icon
+                            :disabled="disabled"
+                            :x-small="$vuetify.breakpoint.xsOnly"
+                            :small="$vuetify.breakpoint.smAndUp"
+                            @click.stop="$emit('delete', task)"
+                        >
+                            <v-icon
+                                :x-small="$vuetify.breakpoint.xsOnly"
+                                :small="$vuetify.breakpoint.smAndUp"
+                            >mdi-delete</v-icon>
                         </v-btn>
                     </div>
                 </v-card-actions>
@@ -65,6 +115,10 @@ export default Vue.extend({
         task: {
             type: Object,
             required: true
+        },
+        disabled: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {

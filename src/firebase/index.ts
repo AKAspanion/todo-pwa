@@ -25,19 +25,24 @@ class FirebaseWeb {
         return tasksRef.where('uid', '==', user.uid).get();
     }
 
-
     public addTaskType = (type: any) => {
         const typeRef = firebase.firestore().collection('type');
         return typeRef.add(type);
     }
 
     public addTask = (user: any, task: any) => {
-        console.log(task);
         const tasksRef = firebase.firestore().collection('tasks');
         return tasksRef.add({
             uid: user.uid,
             ...task,
             type: task.type.map((e: any) => firebase.firestore().doc(`type/${e.id}`)),
+        });
+    }
+
+    public updateTask = (taskId: any, updatedTask: any) => {
+        const typeRef = firebase.firestore().collection('tasks').doc(taskId);
+        return typeRef.update({
+            ...updatedTask,
         });
     }
 
