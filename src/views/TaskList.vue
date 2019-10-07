@@ -91,7 +91,7 @@ import ContainerApp from "@/components/ContainerApp.vue";
 import {
     navigateToPath,
     getAllTasksForUser,
-    getAllTaskTypes,
+    getAllTaskTypesForUser,
     updateTasks,
     deleteTasks,
     parseTasksByStatus
@@ -213,7 +213,7 @@ export default Vue.extend({
         loadPage() {
             return Promise.all([
                 getAllTasksForUser(this.currentUser),
-                getAllTaskTypes()
+                getAllTaskTypesForUser(this.currentUser)
             ]);
         }
     },

@@ -132,6 +132,7 @@ export default Vue.extend({
                         )) ||
                     this.$t("errors.password.invalid"),
                 confirmPassword: (v: any) =>
+                    // @ts-ignore
                     (v && v === this.user.password) ||
                     this.$t("errors.password.confirmPass"),
                 email: (v: any) =>

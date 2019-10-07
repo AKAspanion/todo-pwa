@@ -15,9 +15,9 @@ class FirebaseWeb {
         return firebase.apps.length;
     }
 
-    public fetchAllTaskType = () => {
-        const typeRef = firebase.firestore().collection('type');
-        return typeRef.get();
+    public fetchAllTaskTypeByUID = (user: any) => {
+        const typeRef = firebase.firestore().collection('types');
+        return typeRef.where('uid', '==', user.uid).get();
     }
 
     public fetchTasksByUID = (user: any) => {
@@ -25,9 +25,12 @@ class FirebaseWeb {
         return tasksRef.where('uid', '==', user.uid).get();
     }
 
-    public addTaskType = (type: any) => {
-        const typeRef = firebase.firestore().collection('type');
-        return typeRef.add(type);
+    public addTaskType = (user: any, type: any) => {
+        const typeRef = firebase.firestore().collection('types');
+        return typeRef.add({
+            uid: user.uid,
+            ...type,
+        });
     }
 
     public addTask = (user: any, task: any) => {
@@ -35,7 +38,7 @@ class FirebaseWeb {
         return tasksRef.add({
             uid: user.uid,
             ...task,
-            type: task.type.map((e: any) => firebase.firestore().doc(`type/${e.id}`)),
+            type: task.type.map((e: any) => firebase.firestore().doc(`types/${e.id}`)),
         });
     }
 

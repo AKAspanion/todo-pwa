@@ -22,6 +22,15 @@ const router = new Router({
             },
         },
         {
+            path: '/index',
+            name: 'index',
+            component: () => import('@/views/TaskList.vue'),
+            meta: {
+                requireAuth: true,
+                index: 1,
+            },
+        },
+        {
             path: '/home',
             name: 'home',
             component: () => import('@/views/TaskList.vue'),

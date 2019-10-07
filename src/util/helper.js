@@ -31,10 +31,10 @@ export const getAllTasksForUser = (user) => {
     })
 }
 
-export const getAllTaskTypes = () => {
+export const getAllTaskTypesForUser = (user) => {
     return new Promise((resolve, reject) => {
         firebase
-            .fetchAllTaskType()
+            .fetchAllTaskTypeByUID(user)
             .then(snapshot => {
                 return parseAllTypes(snapshot);
             })

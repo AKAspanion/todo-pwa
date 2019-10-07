@@ -162,6 +162,7 @@
                                                     <v-spacer></v-spacer>
                                                     <v-btn
                                                         color="primary"
+                                                        :disabled="!(typeSearch && typeSearch.trim() !== '')"
                                                         @click="onAddTaskTypeSubmit"
                                                     >Create</v-btn>
                                                     <v-spacer></v-spacer>
@@ -230,7 +231,7 @@ import {
     getReadableDate,
     get12FormatTime,
     getAllTasksForUser,
-    getAllTaskTypes,
+    getAllTaskTypesForUser,
     parseTasksByStatus
     // @ts-ignore
 } from "@/util";
@@ -289,6 +290,7 @@ export default Vue.extend({
                         )) ||
                     this.$t("errors.password.invalid"),
                 confirmPassword: (v: any) =>
+                    // @ts-ignore
                     (v && v === this.user.password) ||
                     this.$t("errors.password.confirmPass"),
                 email: (v: any) =>
@@ -337,11 +339,14 @@ export default Vue.extend({
                 color: this.newTypeColor.trim()
             };
             firebase
-                .addTaskType(newTaskType)
-                .then(() => {
+                .addTaskType(this.$store.getters.user, newTaskType)
+                .then(response => {
                     this.$store.dispatch("LANDING_VISITED", false);
                     this.$store.dispatch("SET_TYPES", [
-                        newTaskType,
+                        {
+                            id: response.id,
+                            ...newTaskType
+                        },
                         ...this.types
                     ]);
                     this.types = this.$store.getters.types;
@@ -375,7 +380,7 @@ export default Vue.extend({
         loadPage() {
             return Promise.all([
                 getAllTasksForUser(this.$store.getters.user),
-                getAllTaskTypes()
+                getAllTaskTypesForUser(this.$store.getters.user)
             ]);
         },
         getTextColorByBg(item: any) {
