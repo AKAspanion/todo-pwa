@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <topbar>
+        <bar-top>
             <template #left>
                 <span class="subtitle-1">TODO</span>
             </template>
@@ -51,8 +51,8 @@
                     </v-list>
                 </v-menu>
             </template>
-        </topbar>
-        <app-container>
+        </bar-top>
+        <container-app>
             <v-card flat tile width="100%" class="px-7">
                 <template v-if="tasksByStatus.hasOwnProperty('todo')">
                     <div class="overline text-left pb-3">Tasks</div>
@@ -75,7 +75,7 @@
                     </div>
                 </template>-->
             </v-card>
-        </app-container>
+        </container-app>
     </div>
 </template>
 
@@ -84,9 +84,9 @@ import Vue from "vue";
 import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
-import Topbar from "@/components/Topbar.vue";
+import BarTop from "@/components/BarTop.vue";
 import TaskCardList from "@/components/TaskCardList.vue";
-import AppContainer from "@/components/AppContainer.vue";
+import ContainerApp from "@/components/ContainerApp.vue";
 // @ts-ignore
 import {
     navigateToPath,
@@ -98,8 +98,8 @@ import {
 
 export default Vue.extend({
     components: {
-        Topbar,
-        AppContainer,
+        BarTop,
+        ContainerApp,
         TaskCardList
     },
     data() {

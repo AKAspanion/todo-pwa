@@ -1,6 +1,6 @@
 <template>
     <div>
-        <topbar>
+        <bar-top>
             <template #left>
                 <v-btn icon @click="navigateTo('/home')">
                     <v-icon>mdi-arrow-left</v-icon>
@@ -14,8 +14,8 @@
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
             </template>
-        </topbar>
-        <app-container class="task-add-container">
+        </bar-top>
+        <container-app class="task-add-container">
             <v-form v-model="addTaskForm">
                 <v-card flat tile height="calc(100vh - 80px - 80px)" class="mx-4 px-3 pt-3">
                     <v-layout column fill-height justify-space-between class="ma-0">
@@ -125,7 +125,7 @@
                     </v-layout>
                 </v-card>
             </v-form>
-        </app-container>
+        </container-app>
     </div>
 </template>
 
@@ -134,8 +134,8 @@ import Vue from "vue";
 import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
-import Topbar from "@/components/Topbar.vue";
-import AppContainer from "@/components/AppContainer.vue";
+import BarTop from "@/components/BarTop.vue";
+import ContainerApp from "@/components/ContainerApp.vue";
 // @ts-ignore
 import {
     navigateToPath,
@@ -148,8 +148,8 @@ import {
 } from "@/util";
 export default Vue.extend({
     components: {
-        Topbar,
-        AppContainer
+        BarTop,
+        ContainerApp
     },
     data() {
         return {

@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
-    name: "Topbar",
+    name: "BarTop",
     props: {
         dark: {
             type: Boolean,

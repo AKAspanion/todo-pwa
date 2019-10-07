@@ -1,5 +1,5 @@
 <template>
-    <v-bottom-navigation v-if="showNavbar" fixed grow v-model="navBar">
+    <v-bottom-navigation v-if="showBarNav" fixed grow v-model="navBar">
         <v-btn value="home" @click="navigateTo('/home')">
             <v-icon>mdi-view-grid</v-icon>
         </v-btn>
@@ -29,8 +29,8 @@ export default Vue.extend({
         currentUser() {
             return this.$store.getters.user;
         },
-        showNavbar() {
-            return this.$store.getters.navbar;
+        showBarNav() {
+            return this.$store.getters.barnav;
         }
     },
     methods: {

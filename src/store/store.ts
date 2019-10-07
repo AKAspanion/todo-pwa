@@ -17,7 +17,7 @@ const store = new Vuex.Store({
         },
         loading: false,
         isLoggedIn: false,
-        isNavbar: false,
+        isBarNav: false,
         tasksByStatus: {},
         tasks: [],
         types: [],
@@ -36,8 +36,8 @@ const store = new Vuex.Store({
         setLogin(state, payload) {
             state.isLoggedIn = payload;
         },
-        setNavbar(state, payload) {
-            state.isNavbar = payload;
+        setBarNav(state, payload) {
+            state.isBarNav = payload;
         },
         setTasksByStatus(state, payload) {
             state.tasksByStatus = payload;
@@ -85,7 +85,7 @@ const store = new Vuex.Store({
             commit("setLoading", payload);
         },
         SHOW_NAVBAR({ commit }, payload) {
-            commit("setNavbar", payload);
+            commit("setBarNav", payload);
         },
         SET_USER({ commit }, payload) {
             const { uid, displayName, photoURL, email } = payload;
@@ -120,8 +120,8 @@ const store = new Vuex.Store({
         loading(state) {
             return state.loading;
         },
-        navbar(state) {
-            return state.isNavbar;
+        barnav(state) {
+            return state.isBarNav;
         },
         user(state) {
             return state.user;

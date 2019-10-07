@@ -1,6 +1,6 @@
 <template>
     <div>
-        <topbar dark primary>
+        <bar-top dark primary>
             <template #left>
                 <v-btn icon @click="navigateToHome">
                     <v-icon>mdi-arrow-left</v-icon>
@@ -16,9 +16,9 @@
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
             </template>
-        </topbar>
+        </bar-top>
 
-        <app-container coloured elevated-bg>
+        <container-app coloured elevated-bg>
             <div class="pt-3 pb-6">
                 <v-avatar size="100">
                     <v-img :src="currentUser.photoURL"></v-img>
@@ -30,7 +30,7 @@
             <v-card-text>
                 <!-- <div class="pt-9">Hello</div> -->
             </v-card-text>
-        </app-container>
+        </container-app>
     </div>
 </template>
 <script lang="ts">
@@ -38,15 +38,15 @@ import Vue from "vue";
 import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
-import Topbar from "@/components/Topbar.vue";
-import AppContainer from "@/components/AppContainer.vue";
+import BarTop from "@/components/BarTop.vue";
+import ContainerApp from "@/components/ContainerApp.vue";
 // @ts-ignore
 import { navigateToPath } from "@/util";
 export default Vue.extend({
     name: "Profile",
     components: {
-        Topbar,
-        AppContainer
+        BarTop,
+        ContainerApp
     },
     data() {
         return {};
