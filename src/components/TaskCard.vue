@@ -285,7 +285,7 @@ export default Vue.extend({
                 return "#808080";
             }
         },
-        getTextColorForBg(color) {
+        getTextColorForBg(color: any) {
             return getTextColorByBg(color);
         },
         getCalendarDate() {

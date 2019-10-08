@@ -36,7 +36,6 @@
                                     :rules="[rules.empty.title]"
                                 ></v-text-field>
                             </v-flex>
-
                             <v-flex xs12 sm6 md4 class="py-0">
                                 <v-menu v-model="timeMenu" :close-on-content-click="false">
                                     <template #activator="{ on }">
@@ -114,7 +113,7 @@
                                             :input-value="data.selected"
                                             label
                                             :small="$vuetify.breakpoint.xsOnly"
-                                            :text-color="getTextColorByBg(data.item)"
+                                            :text-color="getTextColor(data.item.color)"
                                             :color="data.item.color"
                                             @click="data.select"
                                         >{{ data.item.label }}</v-chip>
@@ -140,17 +139,19 @@
                                     <template #no-data>
                                         <v-card flat tile class="py-2">
                                             <div style="margin: 0 auto; width: 300px;">
+                                                <div class="pt-1 pb-3 subtitle-1">No task found</div>
+                                                <v-divider></v-divider>
                                                 <v-card-text>
-                                                    <div class="pb-4">
-                                                        Create a new task type
-                                                        <v-chip
-                                                            label
-                                                            :small="$vuetify.breakpoint.xsOnly"
-                                                            class="ml-2"
-                                                            :color="newTypeColor"
-                                                            :text-color="getTextColorByBg()"
-                                                        >{{typeSearch}}</v-chip>
-                                                    </div>
+                                                    <div
+                                                        class="pb-3"
+                                                    >Give a name in the field and choose a color to create a new one</div>
+                                                    <v-chip
+                                                        label
+                                                        :small="$vuetify.breakpoint.xsOnly"
+                                                        class="mb-3"
+                                                        :color="newTypeColor"
+                                                        :text-color="getTextColor(newTypeColor)"
+                                                    >{{typeSearch}}</v-chip>
                                                     <v-color-picker
                                                         v-model="newTypeColor"
                                                         hide-canvas
@@ -232,7 +233,8 @@ import {
     get12FormatTime,
     getAllTasksForUser,
     getAllTaskTypesForUser,
-    parseTasksByStatus
+    parseTasksByStatus,
+    getTextColorByBg
     // @ts-ignore
 } from "@/util";
 export default Vue.extend({
@@ -258,9 +260,6 @@ export default Vue.extend({
                 status: "todo",
                 description: "",
                 type: []
-            },
-            newTag: {
-                color: "#8E00FF"
             },
             types: [],
             textFieldAttributes: {
@@ -383,8 +382,8 @@ export default Vue.extend({
                 getAllTaskTypesForUser(this.$store.getters.user)
             ]);
         },
-        getTextColorByBg(item: any) {
-            return "#fff";
+        getTextColor(color: any) {
+            return getTextColorByBg(color);
         }
     },
     mounted() {

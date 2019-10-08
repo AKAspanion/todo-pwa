@@ -61,7 +61,8 @@ export const getAllTaskTypesForUser = (user) => {
             .then(types => {
                 resolve(types);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.log(err);
                 reject("Error getting task types. Please try later!")
             })
     })
