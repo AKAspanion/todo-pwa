@@ -19,11 +19,20 @@
                 </template>
             </template>
             <template v-else>
-                <v-card outlined class="mx-2 text-left pa-4" width="100%">
-                    <div class="subtitle-2">{{noDataObject.title}}</div>
-                    <div class="caption">{{noDataObject.caption}}</div>
-                    <slot name="no-data"></slot>
-                </v-card>
+                <template v-if="loading">
+                    <template v-for="i in 2">
+                        <v-flex xs6 :key="i">
+                            <task-card :task="{}" :loading="true"></task-card>
+                        </v-flex>
+                    </template>
+                </template>
+                <template v-else>
+                    <v-card outlined class="mx-2 text-left pa-4" width="100%">
+                        <div class="subtitle-2">{{noDataObject.title}}</div>
+                        <div class="caption">{{noDataObject.caption}}</div>
+                        <slot name="no-data"></slot>
+                    </v-card>
+                </template>
             </template>
         </v-layout>
     </v-container>

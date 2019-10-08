@@ -57,6 +57,7 @@
                 <div class="overline text-left pb-3">todo</div>
                 <task-card-list
                     :task-list="tasksByStatus['todo']"
+                    :loading="pageLoading"
                     @check="onTaskCheck"
                     @delete="onTaskDelete"
                     :disabled="tasksUpdating"
@@ -76,6 +77,7 @@
                 <task-card-list
                     :task-list="tasksByStatus['done']"
                     class="pb-4"
+                    :loading="pageLoading"
                     :disabled="tasksUpdating"
                     @delete="onTaskDelete"
                     @uncheck="onTaskUncheck"

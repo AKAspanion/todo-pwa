@@ -4,11 +4,12 @@
             <v-card class="text-left">
                 <v-card-title>Delete</v-card-title>
                 <v-card-text>Are you sure you want to delete this task?</v-card-text>
-                <v-card-actions class="px-4 pb-4">
+                <v-card-actions class="px-6 pb-6">
                     <v-spacer></v-spacer>
                     <v-btn color="primary" small text @click.stop="deleteModal = false">Cancel</v-btn>
                     <v-btn
-                        color="primary"
+                        class="primary"
+                        text
                         small
                         @click.stop="$emit('delete', task); deleteModal = false;"
                     >Delete</v-btn>
