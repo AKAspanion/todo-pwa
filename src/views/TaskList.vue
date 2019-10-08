@@ -2,7 +2,7 @@
     <div class="home">
         <bar-top>
             <template #left>
-                <span class="subtitle-1">TODO</span>
+                <span class="subtitle-1">TASK</span>
             </template>
             <template #center>
                 <v-chip small outlined>{{$t('home.label')}}</v-chip>
@@ -54,26 +54,33 @@
         </bar-top>
         <container-app>
             <v-card flat tile width="100%" class="px-7">
-                <template v-if="tasksByStatus.hasOwnProperty('todo')">
-                    <div class="overline text-left pb-3">Tasks</div>
-                    <task-card-list
-                        :task-list="tasksByStatus['todo']"
-                        @check="onTaskCheck"
-                        @delete="onTaskDelete"
-                        :disabled="tasksUpdating"
-                        class="pb-4"
-                    ></task-card-list>
-                </template>
-                <template v-if="tasksByStatus.hasOwnProperty('done')">
-                    <div class="overline text-left pb-3">done</div>
-                    <task-card-list
-                        :task-list="tasksByStatus['done']"
-                        class="pb-4"
-                        :disabled="tasksUpdating"
-                        @delete="onTaskDelete"
-                        @uncheck="onTaskUncheck"
-                    ></task-card-list>
-                </template>
+                <div class="overline text-left pb-3">todo</div>
+                <task-card-list
+                    :task-list="tasksByStatus['todo']"
+                    @check="onTaskCheck"
+                    @delete="onTaskDelete"
+                    :disabled="tasksUpdating"
+                    :no-data-object="{title: 'No task todo', caption: 'Create a task and it will appear here'}"
+                    class="pb-4"
+                >
+                    <template #no-data>
+                        <v-btn
+                            text
+                            class="mt-2 font-weight-bold primary"
+                            small
+                            @click="navigateTo('/add')"
+                        >Create</v-btn>
+                    </template>
+                </task-card-list>
+                <div class="overline text-left pb-3">done</div>
+                <task-card-list
+                    :task-list="tasksByStatus['done']"
+                    class="pb-4"
+                    :disabled="tasksUpdating"
+                    @delete="onTaskDelete"
+                    @uncheck="onTaskUncheck"
+                    :no-data-object="{title: 'No task done', caption: 'Complete a task and it will appear here'}"
+                ></task-card-list>
             </v-card>
         </container-app>
     </div>
@@ -108,7 +115,10 @@ export default Vue.extend({
         return {
             pageLoading: false,
             tasksUpdating: false,
-            tasksByStatus: {},
+            tasksByStatus: {
+                todo: [],
+                done: []
+            },
             langs: ["en", "hi"]
         };
     },
@@ -215,6 +225,9 @@ export default Vue.extend({
                 getAllTasksForUser(this.currentUser),
                 getAllTaskTypesForUser(this.currentUser)
             ]);
+        },
+        navigateTo(path: any) {
+            navigateToPath(path);
         }
     },
     mounted() {

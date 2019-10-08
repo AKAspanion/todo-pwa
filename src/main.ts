@@ -6,6 +6,8 @@ import vuetify from './vuetify/vuetify';
 import i18n from './i18n/i18n';
 import './registerServiceWorker';
 
+import './assets/style.css';
+
 Vue.config.productionTip = false;
 
 new Vue({

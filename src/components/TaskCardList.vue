@@ -1,19 +1,29 @@
 <template>
     <v-container fill-height grid-list-lg fluid pa-0>
         <v-layout row wrap fill-height>
-            <template v-for="(task, index) in taskList">
-                <v-flex xs6 :key="index">
-                    <task-card
-                        :task="task"
-                        :class="disabled?'disabled-list':''"
-                        :disabled="disabled"
-                        @type-select="(v) => $emit('type-select', v)"
-                        @uncheck="(v) => $emit('uncheck', v)"
-                        @delete="(v) => $emit('delete', v)"
-                        @check="(v) => $emit('check', v)"
-                        @edit="(v) => $emit('edit', v)"
-                    ></task-card>
-                </v-flex>
+            <template v-if="taskList.length">
+                <template v-for="(task, index) in taskList">
+                    <v-flex xs6 :key="index">
+                        <task-card
+                            :task="task"
+                            :loading="loading"
+                            :disabled="disabled"
+                            :class="disabled?'disabled-list':''"
+                            @type-select="(v) => $emit('type-select', v)"
+                            @uncheck="(v) => $emit('uncheck', v)"
+                            @delete="(v) => $emit('delete', v)"
+                            @check="(v) => $emit('check', v)"
+                            @edit="(v) => $emit('edit', v)"
+                        ></task-card>
+                    </v-flex>
+                </template>
+            </template>
+            <template v-else>
+                <v-card outlined class="mx-2 text-left pa-4" width="100%">
+                    <div class="subtitle-2">{{noDataObject.title}}</div>
+                    <div class="caption">{{noDataObject.caption}}</div>
+                    <slot name="no-data"></slot>
+                </v-card>
             </template>
         </v-layout>
     </v-container>
@@ -30,9 +40,22 @@ export default Vue.extend({
             type: Array,
             required: true
         },
+        loading: {
+            type: Boolean,
+            default: false
+        },
         disabled: {
             type: Boolean,
             default: false
+        },
+        noDataObject: {
+            type: Object,
+            default: () => {
+                return {
+                    title: "No data found",
+                    caption: "Perform some action to populate data"
+                };
+            }
         }
     }
 });
