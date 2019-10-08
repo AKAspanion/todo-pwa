@@ -1,21 +1,11 @@
 <template>
-    <v-card dark height="100%" class="text-left" :color="getBgColor()">
-        <v-dialog v-model="deleteModal" persistent max-width="400">
-            <v-card class="text-left">
-                <v-card-title>Delete</v-card-title>
-                <v-card-text>Are you sure you want to delete this task?</v-card-text>
-                <v-card-actions class="px-6 pb-6">
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" small text @click.stop="deleteModal = false">Cancel</v-btn>
-                    <v-btn
-                        class="primary"
-                        text
-                        small
-                        @click.stop="$emit('delete', task); deleteModal = false;"
-                    >Delete</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+    <v-card
+        :light="getTextColor() !== '#ffffff' ? true : false"
+        :dark="getTextColor() === '#ffffff' ? true : false"
+        height="100%"
+        class="text-left"
+        :color="getBgColor()"
+    >
         <template v-if="loading">
             <v-layout column fill-height justify-space-between class="ma-0">
                 <div>
@@ -69,10 +59,65 @@
             <v-layout column fill-height justify-space-between class="ma-0">
                 <v-card-text class="pb-3">
                     <v-layout row wrap align-start justify-space-between class="ma-0">
-                        <div style="width: calc(100% - 36px)">
+                        <div :style="!isEdit && !isDelete?'width: calc(100% - 36px)':'width: 100%'">
+                            <!-- Editing part -->
+                            <div v-if="isEdit">
+                                <v-text-field v-model="localTask.title" solo dense></v-text-field>
+                            </div>
+                            <div v-if="isEdit" class="mt-n3">
+                                <v-textarea v-model="localTask.description" auto-grow solo dense></v-textarea>
+                            </div>
+                            <div v-if="isEdit" class="mt-n3 mb-n5">
+                                <v-select
+                                    :items="$store.getters.types"
+                                    item-text="label"
+                                    solo
+                                    return-object
+                                    small-chips
+                                    multiple
+                                    mandatory
+                                    :dense="$vuetify.breakpoint.xsOnly"
+                                    v-model="localTask.type"
+                                >
+                                    <template #selection="data">
+                                        <v-chip
+                                            label
+                                            v-bind="data.attrs"
+                                            @click="data.select"
+                                            :color="data.item.color"
+                                            :input-value="data.selected"
+                                            :small="$vuetify.breakpoint.xsOnly"
+                                            :text-color="getTextColorForBg(data.item.color)"
+                                        >{{ data.item.label }}</v-chip>
+                                    </template>
+                                    <template #item="data">
+                                        <template v-if="typeof data.item !== 'object'">
+                                            <v-list-item-content v-text="data.item"></v-list-item-content>
+                                        </template>
+                                        <template v-else>
+                                            <v-list-item-avatar size="24" :color="data.item.color"></v-list-item-avatar>
+                                            <v-list-item-content class="text-left">
+                                                <v-list-item-title v-html="data.item.label"></v-list-item-title>
+                                            </v-list-item-content>
+                                        </template>
+                                    </template>
+                                </v-select>
+                            </div>
+                            <!-- delete part -->
                             <div
-                                class="body-2 font-weight-bold pb-1 overflow-text"
+                                v-if="isDelete"
+                                class="body-2 font-weight-bold pb-1 px-1"
                                 :class="getTextColor() !== '#ffffff' ? 'black--text':'white--text'"
+                            >Delete this task?</div>
+                            <!-- Non edit/delete part -->
+                            <div
+                                v-if="!isEdit && !isDelete"
+                                class="font-weight-bold pb-1 overflow-text"
+                                :style="$vuetify.breakpoint.xsOnly ? 'min-height: 24px;':'min-height: 28px;'"
+                                :class="[
+                                    $vuetify.breakpoint.xsOnly ? 'body-2':'body-1',
+                                    getTextColor() !== '#ffffff' ? 'black--text':'white--text'
+                                ]"
                             >
                                 <v-tooltip bottom max-width="50%" nudge-top="4">
                                     <template #activator="{ on }">
@@ -85,32 +130,36 @@
                                 </v-tooltip>
                             </div>
                             <div
-                                class="caption task-desc"
+                                v-if="!isEdit && !isDelete"
+                                class="task-desc"
                                 :class="[
-                                        task.status == 'done' ? 'line-through-text':'', 
-                                        getTextColor() !== '#ffffff' ? 'black--text':'white--text'
-                                    ]"
+                                    $vuetify.breakpoint.xsOnly ? 'caption':'body-2',
+                                    task.status == 'done' ? 'line-through-text':'', 
+                                    getTextColor() !== '#ffffff' ? 'black--text':'white--text'
+                                ]"
                             >{{task.description}}</div>
                         </div>
-                        <div class="mr-n1" style="margin-top: -2px !important">
+                        <div
+                            v-if="!isEdit && !isDelete"
+                            class="mr-n1"
+                            style="margin-top: -2px !important"
+                        >
                             <v-btn
                                 icon
                                 :disabled="disabled"
-                                :x-small="$vuetify.breakpoint.xsOnly"
-                                :small="$vuetify.breakpoint.smAndUp"
+                                :small="$vuetify.breakpoint.xsOnly"
                                 :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 @click.stop="task.status === 'todo' ? $emit('check', task): $emit('uncheck', task)"
                             >
                                 <v-icon
-                                    :x-small="$vuetify.breakpoint.xsOnly"
-                                    :small="$vuetify.breakpoint.smAndUp"
+                                    :small="$vuetify.breakpoint.xsOnly"
                                 >{{task.status === 'todo' ? 'mdi-check': 'mdi-close'}}</v-icon>
                             </v-btn>
                         </div>
                     </v-layout>
                 </v-card-text>
                 <div>
-                    <v-card-text class="pb-3">
+                    <v-card-text v-if="!isEdit && !isDelete" class="pb-3">
                         <div>
                             <v-chip
                                 label
@@ -120,62 +169,77 @@
                                 :title="tag.label"
                                 :disabled="disabled"
                                 v-for="tag in task.type"
-                                :x-small="$vuetify.breakpoint.xsOnly"
-                                :small="$vuetify.breakpoint.smAndUp"
+                                :small="$vuetify.breakpoint.xsOnly"
                                 @click.stop="$emit('type-select', tag)"
                                 :text-color="task.status == 'done' ? '#808080':tag.color"
-                                :color="getTextColor() === '#ffffff' ? 'white':'black'"
+                                :color="getTextColorForBg(tag.color)"
                             >{{ tag.label }}</v-chip>
                         </div>
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions class="pl-4 pr-3">
-                        <div>
+                        <div v-if="!isEdit && !isDelete">
                             <v-icon
-                                small
+                                :small="$vuetify.breakpoint.xsOnly"
                                 :color="getTextColor() === '#ffffff' ? 'white':'black'"
                             >mdi-clock</v-icon>
                         </div>
-                        <v-tooltip bottom>
+                        <v-tooltip v-if="!isEdit && !isDelete" bottom>
                             <template #activator="{ on }">
                                 <div
                                     v-on="on"
-                                    class="pl-1 caption task-time overflow-text"
-                                    :class="getTextColor() !== '#ffffff' ? 'black--text':'white--text'"
+                                    class="task-time overflow-text"
+                                    :class="[
+                                        $vuetify.breakpoint.xsOnly ? 'pl-1 caption':'pl-2 body-2',
+                                        getTextColor() !== '#ffffff' ? 'black--text':'white--text'
+                                    ]"
                                 >{{getCalendarDate()}}</div>
                             </template>
                             <span>{{getCalendarDate()}}</span>
                         </v-tooltip>
-                        <v-spacer></v-spacer>
-                        <div>
+                        <v-spacer v-if="!isEdit && !isDelete"></v-spacer>
+                        <div v-if="!isEdit && !isDelete">
                             <v-btn
                                 icon
                                 v-if="task.status == 'todo'"
                                 :disabled="disabled"
-                                :x-small="$vuetify.breakpoint.xsOnly"
-                                :small="$vuetify.breakpoint.smAndUp"
-                                @click.stop="$emit('edit', task)"
+                                :small="$vuetify.breakpoint.xsOnly"
+                                @click.stop="onModalCancel(); isEdit = true"
                                 :color="getTextColor() === '#ffffff' ? 'white':'black'"
                             >
-                                <v-icon
-                                    :x-small="$vuetify.breakpoint.xsOnly"
-                                    :small="$vuetify.breakpoint.smAndUp"
-                                >mdi-pencil</v-icon>
+                                <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-pencil</v-icon>
                             </v-btn>
                         </div>
-                        <div>
+                        <div v-if="!isEdit && !isDelete">
                             <v-btn
                                 icon
                                 :disabled="disabled"
-                                :x-small="$vuetify.breakpoint.xsOnly"
-                                :small="$vuetify.breakpoint.smAndUp"
-                                @click.stop="deleteModal = true"
+                                :small="$vuetify.breakpoint.xsOnly"
+                                @click.stop="isDelete = true"
                                 :color="getTextColor() === '#ffffff' ? 'white':'black'"
                             >
-                                <v-icon
-                                    :x-small="$vuetify.breakpoint.xsOnly"
-                                    :small="$vuetify.breakpoint.smAndUp"
-                                >mdi-delete</v-icon>
+                                <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-delete</v-icon>
+                            </v-btn>
+                        </div>
+                        <div v-if="isEdit || isDelete" class="ml-n1">
+                            <v-btn
+                                icon
+                                :disabled="disabled"
+                                @click.stop="onModalCancel();isEdit = false; isDelete = false;"
+                                :color="getTextColor() === '#ffffff' ? 'white':'black'"
+                            >
+                                <v-icon>mdi-close</v-icon>
+                            </v-btn>
+                        </div>
+                        <v-spacer v-if="isEdit || isDelete"></v-spacer>
+                        <div v-if="isEdit || isDelete" class="mr-n1">
+                            <v-btn
+                                icon
+                                :disabled="disabled"
+                                @click.stop="onModalCheck(); isEdit = false; isDelete = false;"
+                                :color="getTextColor() === '#ffffff' ? 'white':'black'"
+                            >
+                                <v-icon>mdi-check</v-icon>
                             </v-btn>
                         </div>
                     </v-card-actions>
@@ -205,7 +269,9 @@ export default Vue.extend({
     },
     data() {
         return {
-            deleteModal: false
+            isDelete: false,
+            isEdit: false,
+            localTask: {}
         };
     },
     methods: {
@@ -219,8 +285,24 @@ export default Vue.extend({
                 return "#808080";
             }
         },
+        getTextColorForBg(color) {
+            return getTextColorByBg(color);
+        },
         getCalendarDate() {
             return getCalendarDate(this.task.date + "T" + this.task.time);
+        },
+        onModalCheck() {
+            if (this.isDelete && !this.isEdit) {
+                this.$emit("delete", this.task);
+            }
+            if (!this.isDelete && this.isEdit) {
+                this.$emit("edit", this.localTask);
+            }
+        },
+        onModalCancel() {
+            this.localTask = {
+                ...this.task
+            };
         }
     }
 });

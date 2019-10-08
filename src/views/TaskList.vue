@@ -58,6 +58,7 @@
                 <task-card-list
                     :task-list="tasksByStatus['todo']"
                     :loading="pageLoading"
+                    @edit="onTaskEdit"
                     @check="onTaskCheck"
                     @delete="onTaskDelete"
                     :disabled="tasksUpdating"
@@ -138,6 +139,24 @@ export default Vue.extend({
         }
     },
     methods: {
+        onTaskEdit(task: any) {
+            if (this.isTaskValid(task)) {
+                let { title, date, time, status, description, type } = task;
+                this.updateTasks(task.id, {
+                    title,
+                    date,
+                    time,
+                    status,
+                    description,
+                    type
+                });
+            } else {
+                this.$store.dispatch(
+                    "SHOW_SNACK",
+                    "You gave invalid task details"
+                );
+            }
+        },
         onTaskDelete(task: any) {
             this.deleteTask(task);
         },
@@ -230,6 +249,13 @@ export default Vue.extend({
         },
         navigateTo(path: any) {
             navigateToPath(path);
+        },
+        isTaskValid(task: any) {
+            return (
+                task.title.trim() !== "" &&
+                task.description.trim() !== "" &&
+                task.type.length
+            );
         }
     },
     mounted() {

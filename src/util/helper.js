@@ -44,7 +44,8 @@ export const getAllTasksForUser = (user) => {
             .then(tasks => {
                 resolve(tasks);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.log(err);
                 reject("Error getting tasks. Please try later!")
             })
     })

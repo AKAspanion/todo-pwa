@@ -3,7 +3,7 @@
         <v-layout row wrap fill-height>
             <template v-if="taskList.length">
                 <template v-for="(task, index) in taskList">
-                    <v-flex xs6 :key="index">
+                    <v-flex xs6 lg4 :key="index">
                         <task-card
                             :task="task"
                             :loading="loading"

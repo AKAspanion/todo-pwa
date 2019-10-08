@@ -45,7 +45,7 @@ const router = new Router({
             component: () => import('@/views/TaskAdd.vue'),
             meta: {
                 requireAuth: true,
-                index: 4,
+                index: 3,
             },
         },
         {
@@ -54,12 +54,13 @@ const router = new Router({
             component: () => import('@/views/Profile.vue'),
             meta: {
                 requireAuth: true,
-                index: 4,
+                index: 3,
             },
         },
         {
             path: '*',
             name: 'notfound',
+            redirect: '/',
             component: () => import('@/views/NotFound.vue'),
             meta: {
                 requireAuth: true,

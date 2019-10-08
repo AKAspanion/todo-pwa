@@ -44,9 +44,16 @@ class FirebaseWeb {
 
     public updateTask = (taskId: any, updatedTask: any) => {
         const tasksRef = firebase.firestore().collection('tasks').doc(taskId);
-        return tasksRef.update({
-            ...updatedTask,
-        });
+        if (updatedTask.hasOwnProperty('type')) {
+            return tasksRef.update({
+                ...updatedTask,
+                type: updatedTask.type.map((e: any) => firebase.firestore().doc(`types/${e.id}`)),
+            });
+        } else {
+            return tasksRef.update({
+                ...updatedTask,
+            });
+        }
     }
 
     public deleteTask = (task: any) => {
