@@ -2,7 +2,9 @@
     <div class="home">
         <bar-top>
             <template #left>
-                <span class="subtitle-1">TASK</span>
+                <v-avatar>
+                    <v-icon color="primary">mdi-check-all</v-icon>
+                </v-avatar>
             </template>
             <template #center>
                 <v-chip small outlined>{{$t('home.label')}}</v-chip>
@@ -13,7 +15,7 @@
         </bar-top>
         <container-app>
             <v-card flat tile width="100%" class="px-7">
-                <div class="overline text-left pb-3">todo</div>
+                <div class="overline text-left pb-3">{{$t('todo')}}</div>
                 <task-card-list
                     :task-list="tasksByStatus['todo']"
                     :loading="pageLoading"
@@ -21,7 +23,10 @@
                     @check="onTaskCheck"
                     @delete="onTaskDelete"
                     :disabled="tasksUpdating"
-                    :no-data-object="{title: 'No task todo', caption: 'Create a task and it will appear here'}"
+                    :no-data-object="{
+                        title: $t('no-task.todo.title'), 
+                        caption: $t('no-task.todo.caption')
+                    }"
                     class="pb-4"
                 >
                     <template #no-data>
@@ -30,10 +35,10 @@
                             class="mt-2 font-weight-bold primary"
                             small
                             @click="navigateTo('/add')"
-                        >Create</v-btn>
+                        >{{$t('create')}}</v-btn>
                     </template>
                 </task-card-list>
-                <div class="overline text-left pb-3">done</div>
+                <div class="overline text-left pb-3">{{$t('done')}}</div>
                 <task-card-list
                     :task-list="tasksByStatus['done']"
                     class="pb-4"
@@ -41,7 +46,10 @@
                     :disabled="tasksUpdating"
                     @delete="onTaskDelete"
                     @uncheck="onTaskUncheck"
-                    :no-data-object="{title: 'No task done', caption: 'Complete a task and it will appear here'}"
+                    :no-data-object="{
+                        title: $t('no-task.done.title'), 
+                        caption: $t('no-task.done.caption')
+                    }"
                 ></task-card-list>
             </v-card>
         </container-app>
@@ -105,7 +113,7 @@ export default Vue.extend({
             } else {
                 this.$store.dispatch(
                     "SHOW_SNACK",
-                    "You gave invalid task details"
+                    this.$t("toasts.error.task.invalid")
                 );
             }
         },
@@ -137,10 +145,16 @@ export default Vue.extend({
                 .then((tasksByStatus: any) => {
                     this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
                     this.tasksByStatus = tasksByStatus;
-                    this.$store.dispatch("SHOW_SNACK", "Task deleted");
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        this.$t("toasts.success.task.delete")
+                    );
                 })
                 .catch(err => {
-                    console.log(err.message);
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        this.$t("toasts.error.task.delete")
+                    );
                 })
                 .finally(() => {
                     this.tasksUpdating = false;
@@ -166,10 +180,16 @@ export default Vue.extend({
                 .then((tasksByStatus: any) => {
                     this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
                     this.tasksByStatus = tasksByStatus;
-                    this.$store.dispatch("SHOW_SNACK", "Task updated");
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        this.$t("toasts.success.task.edit")
+                    );
                 })
                 .catch(err => {
-                    console.log(err.message);
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        this.$t("toasts.error.task.edit")
+                    );
                 })
                 .finally(() => {
                     this.tasksUpdating = false;

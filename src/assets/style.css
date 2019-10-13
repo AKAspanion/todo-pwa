@@ -1,3 +1,7 @@
+.selectable {
+    cursor: pointer;
+}
+
 .overflow-text {
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -64,5 +68,49 @@
 
     100% {
         background-position: 1000px 0;
+    }
+}
+
+@-webkit-keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@-webkit-keyframes heartbeat {
+    0% {
+        -webkit-transform: scale(1) translate(0, 1px);
+        transform: scale(1) translate(0, 1px);
+    }
+
+    20% {
+        -webkit-transform: scale(1.5) translate(0, 1px);
+        transform: scale(1.5) translate(0, 1px);
+    }
+
+    100% {
+        -webkit-transform: scale(1) translate(0, 1px);
+        transform: scale(1) translate(0, 1px);
+    }
+}
+
+@keyframes heartbeat {
+    0% {
+        -webkit-transform: scale(1) translate(0, 1px);
+        transform: scale(1) translate(0, 1px);
+    }
+
+    20% {
+        -webkit-transform: scale(1.5) translate(0, 1px);
+        transform: scale(1.5) translate(0, 1px);
+    }
+
+    100% {
+        -webkit-transform: scale(1) translate(0, 1px);
+        transform: scale(1) translate(0, 1px);
     }
 }

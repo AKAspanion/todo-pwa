@@ -7,7 +7,7 @@
                 </v-btn>
             </template>
             <template #center>
-                <v-chip small outlined>Profile</v-chip>
+                <v-chip small outlined>{{$t('profile')}}</v-chip>
             </template>
             <template #right>
                 <container-menu></container-menu>

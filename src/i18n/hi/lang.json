@@ -1,55 +1,102 @@
 {
-    "todo": "TODO",
-    "signout": "Signout",
+    "todo": "करने के लिए",
+    "done": "किया हुआ",
+    "label": "लेबल",
+    "create": "बनाएँ",
+    "options": "ऑप्शन",
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "signout": "साइन आउट",
     "signin": {
-        "label": "Signin",
-        "todo": "Sign in to application"
+        "label": "साइन इन",
+        "todo": "साइन इन टू एप्लीकेशन"
     },
     "signup": {
-        "label": "Signup",
-        "todo": "Create an account"
+        "label": "साइन अप",
+        "todo": "खाता बनाएं"
     },
     "name": {
-        "first": "First name",
-        "last": "Last name",
+        "first": "पहला नाम",
+        "last": "उपनाम",
         "enter": {
-            "first": "Enter your first name",
-            "last": "Enter your first name"
+            "first": "अपना पहला नाम दर्ज करें",
+            "last": "अपना उपनाम दर्ज करें"
         }
     },
     "dark": {
-        "label": "Dark",
-        "mode": "Dark mode",
-        "toggle": "Toggle dark mode"
+        "label": "डार्क",
+        "mode": "डार्क मोड",
+        "toggle": "डार्क मोड को टॉगल करें"
     },
     "light": {
-        "label": "Light",
-        "toggle": "Toggle light mode"
+        "label": "लाइट",
+        "toggle": "लाइट मोड को टॉगल करें"
     },
     "email": {
-        "label": "Email",
-        "enter": "Enter your email"
+        "label": "ईमेल",
+        "enter": "अपना ईमेल पता दर्ज करें"
     },
     "password": {
-        "label": "Password",
-        "confirm": "Confirm",
+        "label": "पासवर्ड",
+        "confirm": "पुष्टि करें",
         "enter": {
-            "passEnter": "Enter your password",
-            "passConfirm": "Confirm your password"
+            "passEnter": "अपना पासवर्ड डालें",
+            "passConfirm": "अपने पासवर्ड की पुष्टि करें"
         }
     },
     "language": {
-        "label": "Language",
-        "change": "Change UI language"
+        "label": "भाषा",
+        "change": "UI की भाषा बदलें"
     },
     "home": {
-        "label": "Home"
+        "label": "होम"
     },
-    "errors": {
-        "password": {
-            "required": "Password is required",
-            "confirmPass": "Confirmation is required",
-            "invalid": "Use 8 or more characters with a mix of letters, numbers and symbols"
+    "task": {
+        "add": "कार्य बनाएँ",
+        "title-placeholder": "अपने कार्य को नाम दें",
+        "desc-placeholder": "कार्य का विस्तृत विवरण"
+    },
+    "no-task": {
+        "todo": {
+            "title": "कोई कार्य नहीं है",
+            "caption": "एक कार्य बनाएँ और वो यहाँ दिखाई देगा"
+        },
+        "done": {
+            "title": "कोई कार्य नहीं हुआ",
+            "caption": "एक कार्य पूरा करें और वो यहाँ दिखाई देगा"
+        }
+    },
+    "toast": {
+        "success": {
+            "task": {
+                "delete": "कार्य सफलतापूर्वक हटा दिया गया",
+                "edit": "कार्य सफलतापूर्वक अपडेट किया गया"
+            }
+        },
+        "error": {
+            "task": {
+                "invalid": "आपने अमान्य कार्य विवरण दिया",
+                "delete": "कार्य हटाने में त्रुटि",
+                "edit": "कार्य अपडेट करने में त्रुटि"
+            }
+        },
+        "rule": {
+            "password": {
+                "required": "पासवर्ड की आवश्यकता है",
+                "confirmPass": "पासवर्ड अवश्य मेल खाना चाहिए",
+                "invalid": "अक्षरों, संख्याओं और प्रतीकों के मिश्रण के साथ 8 या अधिक वर्णों का उपयोग करें"
+            },
+            "email": {
+                "invalid": "दर्ज किया गया ईमेल मान्य नहीं है"
+            },
+            "space": {
+                "field": "केवल सफेद रिक्त स्थान की अनुमति नहीं है",
+                "password": "पासवर्ड में सफेद स्थान नहीं हो सकते",
+                "email": "ईमेल में सफेद स्थान नहीं हो सकते"
+            },
+            "empty": {
+                "title": "कार्य का शीर्षक दर्ज करें"
+            }
         }
     }
 }

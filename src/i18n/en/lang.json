@@ -1,5 +1,11 @@
 {
-    "todo": "TODO",
+    "todo": "TO DO",
+    "done": "Done",
+    "label": "Label",
+    "create": "Create",
+    "options": "Options",
+    "profile": "Profile",
+    "settings": "Settings",
     "signout": "Signout",
     "signin": {
         "label": "Sign in",
@@ -45,19 +51,52 @@
     "home": {
         "label": "Home"
     },
-    "errors": {
-        "password": {
-            "required": "Password is required",
-            "confirmPass": "Password must match",
-            "invalid": "Use 8 or more characters with a mix of letters, numbers and symbols"
+    "task": {
+        "add": "Add Task",
+        "title-placeholder": "Name your task",
+        "desc-placeholder": "A detailed description of the task"
+    },
+    "no-task": {
+        "todo": {
+            "title": "No task todo",
+            "caption": "Create a task and it will appear here"
         },
-        "email": {
-            "invalid": "Email entered is not valid"
+        "done": {
+            "title": "No task done",
+            "caption": "Complete a task and it will appear here"
+        }
+    },
+    "toast": {
+        "success": {
+            "task": {
+                "delete": "Task deleted successfully",
+                "edit": "Task updated successfully"
+            }
         },
-        "spaces": {
-            "field": "Only white spaces not allowed",
-            "password": "Password can't have white spaces",
-            "email": "Email can't have white spaces"
+        "error": {
+            "task": {
+                "invalid": "You gave invalid task details",
+                "delete": "Error deleting task",
+                "edit": "Task updating task"
+            }
+        },
+        "rule": {
+            "password": {
+                "required": "Password is required",
+                "confirmPass": "Password must match",
+                "invalid": "Use 8 or more characters with a mix of letters, numbers and symbols"
+            },
+            "email": {
+                "invalid": "Email entered is not valid"
+            },
+            "space": {
+                "field": "Only white spaces not allowed",
+                "password": "Password can't have white spaces",
+                "email": "Email can't have white spaces"
+            },
+            "empty": {
+                "title": "Enter task's title"
+            }
         }
     }
 }

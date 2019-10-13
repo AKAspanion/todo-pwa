@@ -343,7 +343,7 @@ export default Vue.extend({
     line-height: 1.2em !important;
 }
 .task-time {
-    padding-top: 2px;
+    padding-top: 3px;
 }
 .task-container >>> textarea {
     font-size: 14px !important;

@@ -1,6 +1,6 @@
 <template>
     <div class="main-container">
-        <v-progress-linear v-if="loading" indeterminate class="fixed-progress"></v-progress-linear>
+        <v-progress-linear v-if="loading" indeterminate class="fixed-progress" height="3"></v-progress-linear>
         <v-snackbar v-model="snackbar.model" bottom :timeout="5000">
             {{ snackbar.text }}
             <v-btn dark text @click="snackbar.model = false">Close</v-btn>

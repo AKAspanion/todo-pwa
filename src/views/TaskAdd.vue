@@ -7,7 +7,7 @@
                 </v-btn>
             </template>
             <template #center>
-                <v-chip small outlined>Add Task</v-chip>
+                <v-chip small outlined>{{$t('task.add')}}</v-chip>
             </template>
             <template #right>
                 <container-menu></container-menu>
@@ -29,7 +29,7 @@
                                     v-bind="textFieldAttributes"
                                     prepend-inner-icon="mdi-format-title"
                                     v-model="task.title"
-                                    placeholder="Name your task"
+                                    :placeholder="$t('task.title-placeholder')"
                                     :rules="[rules.empty.title, rules.nospace.field]"
                                 ></v-text-field>
                             </v-flex>
@@ -43,7 +43,6 @@
                                             placeholder="Select time"
                                             prepend-inner-icon="mdi-clock-outline"
                                             :value="readableTime()"
-                                            :rules="[rules.empty.title]"
                                         ></v-text-field>
                                     </template>
                                     <v-card>
@@ -69,7 +68,6 @@
                                             placeholder="Select date"
                                             v-bind="textFieldAttributes"
                                             prepend-inner-icon="mdi-calendar-outline"
-                                            :rules="[rules.empty.title]"
                                             :value="readableDate()"
                                         ></v-text-field>
                                     </template>
@@ -133,7 +131,7 @@
                                     auto-grow
                                     v-bind="textFieldAttributes"
                                     prepend-inner-icon="mdi-card-text-outline"
-                                    placeholder="A detailed description of the task"
+                                    :placeholder="$t('task.desc-placeholder')"
                                 ></v-textarea>
                             </v-flex>
 
@@ -142,15 +140,18 @@
                                     row
                                     align-center
                                     justify-start
-                                    class="label-container ma-0 pb-5 my-3"
+                                    class="label-container ma-0 pb-5"
                                 >
-                                    <!-- <v-spacer></v-spacer> -->
                                     <v-btn-toggle dense block v-model="task.status">
                                         <v-btn left value="todo">
-                                            <span class="pl-1 error--text font-weight-bold">todo</span>
+                                            <span
+                                                class="pl-1 error--text font-weight-bold"
+                                            >{{$t('todo')}}</span>
                                         </v-btn>
                                         <v-btn value="done">
-                                            <span class="pl-1 success--text font-weight-bold">done</span>
+                                            <span
+                                                class="pl-1 success--text font-weight-bold"
+                                            >{{$t('done')}}</span>
                                         </v-btn>
                                     </v-btn-toggle>
                                     <v-spacer></v-spacer>
@@ -159,7 +160,7 @@
                                         color="primary"
                                         :disabled="!addTaskForm"
                                         :loading="addTaskLoading"
-                                    >ADD TASK</v-btn>
+                                    >{{$t('task.add')}}</v-btn>
                                 </v-layout>
                             </v-flex>
                         </v-layout>
@@ -222,36 +223,13 @@ export default Vue.extend({
             },
             rules: {
                 empty: {
-                    title: (v: any) => !!v || "Enter a title",
-                    desc: (v: any) => !!v || "Enter a description",
-                    type: (v: any) => v.length !== 0 || "Choose a task type"
+                    title: (v: any) => !!v || this.$t("toast.rule.empty.title")
                 },
                 nospace: {
                     field: (v: any) =>
                         (v && v.trim() !== "") ||
-                        this.$t("errors.spaces.field"),
-                    password: (v: any) =>
-                        (v && !/\s/g.test(v)) ||
-                        this.$t("errors.spaces.password"),
-                    email: (v: any) =>
-                        (v && !/\s/g.test(v)) || this.$t("errors.spaces.email")
-                },
-                password: (v: any) =>
-                    (v &&
-                        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
-                            v
-                        )) ||
-                    this.$t("errors.password.invalid"),
-                confirmPassword: (v: any) =>
-                    // @ts-ignore
-                    (v && v === this.user.password) ||
-                    this.$t("errors.password.confirmPass"),
-                email: (v: any) =>
-                    (v &&
-                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
-                            v
-                        )) ||
-                    this.$t("errors.email.invalid")
+                        this.$t("toast.rule.space.field")
+                }
             }
         };
     },

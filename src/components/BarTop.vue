@@ -1,16 +1,16 @@
 <template>
     <v-toolbar :dark="dark" :color="primary? 'primary':''" flat class="px-3" height="80">
-        <slot name="left">
-            <div class="fallback-content fallback-left"></div>
-        </slot>
+        <div class="fallback-content fallback-left">
+            <slot name="left"></slot>
+        </div>
         <v-spacer></v-spacer>
-        <slot name="center">
-            <div class="fallback-content"></div>
-        </slot>
+        <div class="fallback-content">
+            <slot name="center"></slot>
+        </div>
         <v-spacer></v-spacer>
-        <slot name="right">
-            <div class="fallback-content fallback-right"></div>
-        </slot>
+        <div class="fallback-content fallback-right">
+            <slot name="right"></slot>
+        </div>
     </v-toolbar>
 </template>
 <script lang="ts">
@@ -31,8 +31,7 @@ export default Vue.extend({
 </script>
 <style scoped>
 .fallback-content {
-    width: 48px;
-    height: 48px;
+    min-width: 48px;
 }
 .fallback-left {
     margin-left: -12px;
