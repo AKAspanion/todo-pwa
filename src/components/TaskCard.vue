@@ -82,7 +82,7 @@
                                         dense
                                     ></v-textarea>
                                 </div>
-                                <div v-if="isEdit" class="mt-n3 mb-n5">
+                                <!-- <div v-if="isEdit" class="mt-n3 mb-n5">
                                     <v-select
                                         :items="$store.getters.types"
                                         item-text="label"
@@ -120,7 +120,7 @@
                                             </template>
                                         </template>
                                     </v-select>
-                                </div>
+                                </div>-->
                                 <!-- delete part -->
                                 <div
                                     v-if="isDelete"

@@ -93,34 +93,43 @@
                                         justify-start
                                         align-center
                                         row
-                                        class="ma-0 type-layout"
+                                        class="ma-0 type-layout label-container"
                                     >
                                         <v-icon
                                             class="pr-3"
                                             style="margin-left: -2px;"
                                         >mdi-label-outline</v-icon>
-                                        <div style="width: calc(100% - 36px)">
-                                            <v-chip-group
-                                                v-model="taskTypes"
-                                                multiple
-                                                dark
-                                                return-object
-                                            >
-                                                <v-chip
-                                                    filter
-                                                    label
+                                        <template v-if="taskTypesLoading">
+                                            <div class="animate label-shimmer"></div>
+                                        </template>
+                                        <template v-else>
+                                            <div style="width: calc(100% - 36px)">
+                                                <v-chip-group
+                                                    v-model="taskTypes"
+                                                    multiple
                                                     dark
-                                                    :color="tag.color"
-                                                    v-for="(tag, index) in types"
-                                                    :key="tag.id"
-                                                    @focus="onChipFocus(true)"
-                                                    @blur="onChipFocus(false)"
-                                                    @keyup.enter="updateTaskModel(index)"
-                                                    :text-color="getTextColor(tag.color)"
-                                                    :small="$vuetify.breakpoint.xsOnly"
-                                                >{{ tag.label }}</v-chip>
-                                            </v-chip-group>
-                                        </div>
+                                                    return-object
+                                                >
+                                                    <v-chip
+                                                        filter
+                                                        label
+                                                        dark
+                                                        :color="tag.color"
+                                                        v-for="(tag, index) in types"
+                                                        :key="tag.id"
+                                                        @focus="onChipFocus(true)"
+                                                        @blur="onChipFocus(false)"
+                                                        @keyup.enter="updateTaskModel(index)"
+                                                        :text-color="getTextColor(tag.color)"
+                                                        :small="$vuetify.breakpoint.xsOnly"
+                                                    >{{ tag.label }}</v-chip>
+                                                </v-chip-group>
+                                                <div
+                                                    v-if="!types.length"
+                                                    class="overflow-text mt-n2 caption text-left warning--text"
+                                                >{{$t('label.no-label')}}</div>
+                                            </div>
+                                        </template>
                                     </v-layout>
                                 </div>
                             </v-flex>
@@ -136,12 +145,7 @@
                             </v-flex>
 
                             <v-flex xs12 class="py-0">
-                                <v-layout
-                                    row
-                                    align-center
-                                    justify-start
-                                    class="label-container ma-0 pb-5"
-                                >
+                                <v-layout row align-center justify-start class="ma-0 pb-5">
                                     <v-btn-toggle dense block v-model="task.status">
                                         <v-btn left value="todo">
                                             <span
@@ -223,12 +227,11 @@ export default Vue.extend({
             },
             rules: {
                 empty: {
-                    title: (v: any) => !!v || this.$t("toast.rule.empty.title")
+                    title: (v: any) => !!v || this.$t("rule.empty.title")
                 },
                 nospace: {
                     field: (v: any) =>
-                        (v && v.trim() !== "") ||
-                        this.$t("toast.rule.space.field")
+                        (v && v.trim() !== "") || this.$t("rule.space.field")
                 }
             }
         };
@@ -301,41 +304,6 @@ export default Vue.extend({
             ) {
                 this.addTask();
             }
-        },
-        onAddTaskTypeSubmit() {
-            if (this.typeSearch.trim() === "") {
-                return;
-            }
-            if (this.newTypeColor.trim() === "") {
-                return;
-            }
-            this.addTaskType();
-        },
-        addTaskType() {
-            this.taskTypesLoading = true;
-            let newTaskType = {
-                label: this.typeSearch.trim(),
-                color: this.newTypeColor.trim()
-            };
-            firebase
-                .addTaskType(this.$store.getters.user, newTaskType)
-                .then(response => {
-                    this.$store.dispatch("LANDING_VISITED", false);
-                    this.$store.dispatch("SET_TYPES", [
-                        {
-                            id: response.id,
-                            ...newTaskType
-                        },
-                        ...this.types
-                    ]);
-                    this.types = this.$store.getters.types;
-                })
-                .catch(err => {
-                    this.$store.dispatch("SHOW_SNACK", err);
-                })
-                .finally(() => {
-                    this.taskTypesLoading = false;
-                });
         },
         addTask() {
             this.addTaskLoading = true;

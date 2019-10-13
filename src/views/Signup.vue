@@ -1,12 +1,15 @@
 <template>
     <div class="signup-container">
         <v-layout row fill-height justify-center align-center class="pa-0 px-8">
-            <v-card outlined min-width="400px" max-width="400" class="mt-2">
+            <v-card outlined class="mt-2 pb-8 px-8">
                 <v-layout column wrap align-center class="pt-4">
-                    <div class="pt-4 headline selectable" @click="navigateToHome">{{$t('todo')}}</div>
-                    <div class="pa-2 caption font-weight-light">{{$t('signup.todo')}}</div>
+                    <div
+                        class="pt-4 headline selectable"
+                        @click="navigateToHome"
+                    >{{$t('task-manager')}}</div>
+                    <div class="pa-2 caption font-weight-light">{{$t('sign-up.desc')}}</div>
                 </v-layout>
-                <v-card-text :style="{ maxWidth: '320px', textAlign: 'center', margin: '0 auto'}">
+                <v-card-text :style="{ maxWidth: '420px', textAlign: 'center', margin: '0 auto'}">
                     <v-form
                         lazy-validation
                         ref="formSignUp"
@@ -14,48 +17,41 @@
                         @submit.prevent="onEmailSignUp"
                     >
                         <v-card-text class="px-0 pb-0">
-                            <v-text-field
-                                ref="userFirstName"
-                                v-model="user.firstName"
-                                v-bind="textFieldAttributes"
-                                :label="$t('name.first')"
-                                :hint="$t('name.enter.first')"
-                                :rules="[rules.empty.firstName, rules.nospace.field]"
-                            ></v-text-field>
-                            <v-text-field
-                                v-model="user.lastName"
-                                v-bind="textFieldAttributes"
-                                :label="$t('name.last')"
-                                :hint="$t('name.enter.last')"
-                                :rules="[rules.empty.lastName, rules.nospace.field]"
-                            ></v-text-field>
-                            <v-text-field
-                                v-model="user.email"
-                                v-bind="textFieldAttributes"
-                                :label="$t('email.label')"
-                                :hint="$t('email.enter')"
-                                :rules="[rules.empty.email, rules.nospace.email, rules.email]"
-                            ></v-text-field>
-                            <v-text-field
-                                v-model="user.password"
-                                v-bind="textFieldAttributes"
-                                :label="$t('password.label')"
-                                :hint="$t('password.enter.passEnter')"
-                                :rules="[rules.empty.password, rules.nospace.password, rules.password]"
-                                :append-icon="seePass ? 'mdi-eye-off':'mdi-eye'"
-                                :type="seePass? '':'password'"
-                                @click:append="seePass = !seePass"
-                            ></v-text-field>
-                            <v-text-field
-                                v-model="user.confirm"
-                                v-bind="textFieldAttributes"
-                                :label="$t('password.confirm')"
-                                :hint="$t('password.enter.passConfirm')"
-                                :append-icon="seePass ? 'mdi-eye-off':'mdi-eye'"
-                                :type="seePass? '':'password'"
-                                @click:append="seePass = !seePass"
-                                :rules="[rules.empty.confirm, rules.nospace.password, rules.confirmPassword]"
-                            ></v-text-field>
+                            <v-layout row wrap>
+                                <v-flex xs12 class="py-0">
+                                    <v-text-field
+                                        ref="userEmail"
+                                        v-model="user.email"
+                                        v-bind="textFieldAttributes"
+                                        :label="$t('email.label')"
+                                        :rules="[rules.empty.email, rules.nospace.email, rules.email]"
+                                    ></v-text-field>
+                                </v-flex>
+
+                                <v-flex xs12 sm6 class="py-0">
+                                    <v-text-field
+                                        v-model="user.password"
+                                        v-bind="textFieldAttributes"
+                                        :label="$t('password.label')"
+                                        :rules="[rules.empty.password, rules.nospace.password, rules.password]"
+                                        :append-icon="seePass ? 'mdi-eye-off':'mdi-eye'"
+                                        :type="seePass? '':'password'"
+                                        @click:append="seePass = !seePass"
+                                    ></v-text-field>
+                                </v-flex>
+
+                                <v-flex xs12 sm6 class="py-0">
+                                    <v-text-field
+                                        v-model="user.confirm"
+                                        v-bind="textFieldAttributes"
+                                        :label="$t('password.confirm')"
+                                        :append-icon="seePass ? 'mdi-eye-off':'mdi-eye'"
+                                        :type="seePass? '':'password'"
+                                        @click:append="seePass = !seePass"
+                                        :rules="[rules.empty.confirm, rules.nospace.password, rules.confirmPassword]"
+                                    ></v-text-field>
+                                </v-flex>
+                            </v-layout>
                         </v-card-text>
                         <v-card-actions class="px-0 py-4">
                             <v-btn
@@ -65,11 +61,11 @@
                                 :loading="signingUp"
                                 color="primary"
                                 :disabled="!signUpFrom"
-                            >Sign up</v-btn>
+                            >{{$t('sign-up.label')}}</v-btn>
                         </v-card-actions>
                     </v-form>
                 </v-card-text>
-                <v-flex class="overline py-0">OR</v-flex>
+                <v-flex class="overline py-0">{{$t('sign-up.or')}}</v-flex>
                 <v-card-text>
                     <v-flex>
                         <span class="pa-1">
@@ -85,9 +81,17 @@
                     </v-flex>
                 </v-card-text>
                 <v-card-text class="pt-0 pb-7">
-                    <span class="caption">Already have an account?&nbsp;</span>
-                    <span class="link caption" @click="navigateToSignin">{{$t('signin.label')}}</span>
+                    <span class="caption">{{$t('sign-up.has-account')}}&nbsp;</span>
+                    <span class="link caption" @click="navigateToSignin">{{$t('sign-in.label')}}</span>
                 </v-card-text>
+                <v-btn-toggle v-model="langModel" mandatory>
+                    <v-btn
+                        v-for="(lang, i) in langs"
+                        :key="`Lang${i}`"
+                        :value="lang"
+                        x-small
+                    >{{ lang }}</v-btn>
+                </v-btn-toggle>
             </v-card>
         </v-layout>
     </div>
@@ -105,55 +109,61 @@ export default Vue.extend({
             seePass: false,
             signingUp: false,
             signUpFrom: false,
+            langs: ["en", "hi"],
             rules: {
                 empty: {
-                    firstName: (v: any) => !!v || this.$t("name.enter.first"),
-                    lastName: (v: any) => !!v || this.$t("name.enter.last"),
                     email: (v: any) => !!v || this.$t("email.enter"),
                     password: (v: any) =>
-                        !!v || this.$t("password.enter.passEnter"),
+                        !!v || this.$t("password.enter.pass-enter"),
                     confirm: (v: any) =>
-                        !!v || this.$t("password.enter.passConfirm")
+                        !!v || this.$t("password.enter.pass-confirm")
                 },
                 nospace: {
-                    field: (v: any) =>
-                        (v && v.trim() !== "") ||
-                        this.$t("errors.spaces.field"),
                     password: (v: any) =>
-                        (v && !/\s/g.test(v)) ||
-                        this.$t("errors.spaces.password"),
+                        (v && !/\s/g.test(v)) || this.$t("rule.space.password"),
                     email: (v: any) =>
-                        (v && !/\s/g.test(v)) || this.$t("errors.spaces.email")
+                        (v && !/\s/g.test(v)) || this.$t("rule.space.email")
                 },
                 password: (v: any) =>
                     (v &&
                         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
                             v
                         )) ||
-                    this.$t("errors.password.invalid"),
+                    this.$t("rule.password.invalid"),
                 confirmPassword: (v: any) =>
                     // @ts-ignore
                     (v && v === this.user.password) ||
-                    this.$t("errors.password.confirmPass"),
+                    this.$t("rule.password.confirm-pass"),
                 email: (v: any) =>
                     (v &&
                         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
                             v
                         )) ||
-                    this.$t("errors.email.invalid")
+                    this.$t("rule.email.invalid")
             },
             user: {
                 email: "",
                 password: "",
-                confirm: "",
-                firstName: "",
-                lastName: ""
+                confirm: ""
             },
             textFieldAttributes: {
-                dense: true,
+                dense: this.$vuetify.breakpoint.xsOnly,
                 outlined: true
             }
         };
+    },
+    computed: {
+        langModel: {
+            get() {
+                return this.$i18n.locale;
+            },
+            set(val: string) {
+                this.$i18n.locale = val;
+                if (this.$refs.formSignUp)
+                    this.$refs.formSignUp.resetValidation();
+                localStorage.setItem("lang", this.$i18n.locale);
+            }
+        }
     },
     methods: {
         onGoogleSignUp() {
@@ -171,20 +181,21 @@ export default Vue.extend({
             ) {
                 this.signingUp = true;
                 firebase
-                    .signUpWithEmail(this.user)
-                    .then((response: any) => {
-                        this.$store.dispatch("SHOW_SNACK", "Signup Success!");
-                        return firebase.updateUserProfile({
-                            displayName: `${this.user.firstName} ${this.user.lastName}`
-                        });
+                    .signUpWithEmail({
+                        email: this.user.email,
+                        password: this.user.password
                     })
-                    .then(() => {
+                    .then((response: any) => {
+                        this.$store.dispatch(
+                            "SHOW_SNACK",
+                            this.$t("toast.success.sign-up")
+                        );
                         this.navigateToHome();
                     })
                     .catch((err: any) => {
                         this.$store.dispatch(
                             "SHOW_SNACK",
-                            err.message || "Error signing up!"
+                            this.$t("toast.error.sign-up")
                         );
                     })
                     .then(() => {
@@ -201,12 +212,13 @@ export default Vue.extend({
         }
     },
     mounted() {
+        this.langModel = localStorage.getItem("lang") == "hi" ? "hi" : "en";
         if (firebase.getUser()) {
             this.navigateToHome();
         }
         this.$nextTick(() => {
             setTimeout(() => {
-                let firstName: any = this.$refs.userFirstName;
+                let firstName: any = this.$refs.userEmail;
                 firstName.focus();
             }, 300);
         });

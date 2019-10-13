@@ -1,27 +1,30 @@
 {
+    "task-manager": "Task Manager",
     "todo": "TO DO",
     "done": "Done",
-    "label": "Label",
+    "label": {
+        "label": "Label",
+        "create": "Create a new label type",
+        "no-label": "No label available, create one in profile page"
+    },
     "create": "Create",
     "options": "Options",
     "profile": "Profile",
     "settings": "Settings",
-    "signout": "Signout",
-    "signin": {
+    "sign-out": "Sign out",
+    "sign-in": {
         "label": "Sign in",
-        "todo": "Sign in to application"
+        "desc": "Sign in to application",
+        "facebook": "Sign in with Facebook",
+        "google": "Sign in with Google",
+        "email": "Sign in with Email",
+        "no-account": "Don't have an account?"
     },
-    "signup": {
-        "label": "Signup",
-        "todo": "Create an account"
-    },
-    "name": {
-        "first": "First name",
-        "last": "Last name",
-        "enter": {
-            "first": "Enter your first name",
-            "last": "Enter your last name"
-        }
+    "sign-up": {
+        "label": "Sign up",
+        "desc": "Create an account",
+        "or": "OR",
+        "has-account": "Already have an account?"
     },
     "dark": {
         "label": "Dark",
@@ -40,8 +43,8 @@
         "label": "Password",
         "confirm": "Confirm",
         "enter": {
-            "passEnter": "Enter your password",
-            "passConfirm": "Confirm your password"
+            "pass-enter": "Enter your password",
+            "pass-confirm": "Confirm your password"
         }
     },
     "language": {
@@ -71,32 +74,41 @@
             "task": {
                 "delete": "Task deleted successfully",
                 "edit": "Task updated successfully"
-            }
+            },
+            "sign-in": "Sign in success",
+            "sign-up": "Sign up success",
+            "sign-out": "Sign out success",
+            "label": "Label created successfully"
         },
         "error": {
             "task": {
                 "invalid": "You gave invalid task details",
                 "delete": "Error deleting task",
                 "edit": "Task updating task"
-            }
+            },
+            "sign-in": "Sign in failure",
+            "sign-up": "Sign up failure",
+            "sign-out": "Sign out failure",
+            "label": "Error creating label"
+        }
+    },
+    "rule": {
+        "password": {
+            "required": "Password is required",
+            "confirm-pass": "Password must match",
+            "invalid": "Use 8 or more characters with a mix of letters, numbers and symbols"
         },
-        "rule": {
-            "password": {
-                "required": "Password is required",
-                "confirmPass": "Password must match",
-                "invalid": "Use 8 or more characters with a mix of letters, numbers and symbols"
-            },
-            "email": {
-                "invalid": "Email entered is not valid"
-            },
-            "space": {
-                "field": "Only white spaces not allowed",
-                "password": "Password can't have white spaces",
-                "email": "Email can't have white spaces"
-            },
-            "empty": {
-                "title": "Enter task's title"
-            }
+        "email": {
+            "required": "Email is required",
+            "invalid": "Email entered is not valid"
+        },
+        "space": {
+            "field": "Only white spaces not allowed",
+            "password": "Password can't have white spaces",
+            "email": "Email can't have white spaces"
+        },
+        "empty": {
+            "title": "Enter task's title"
         }
     }
 }

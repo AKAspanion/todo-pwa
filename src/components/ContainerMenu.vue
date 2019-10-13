@@ -20,7 +20,7 @@
             </v-list-item>-->
             <v-list-item link @click="onSignoutClick">
                 <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('signout')}}</v-list-item-title>
+                    <v-list-item-title>{{$t('sign-out')}}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-avatar>
                     <v-avatar small size="36">
@@ -109,12 +109,15 @@ export default Vue.extend({
                 .signOut()
                 .then(() => {
                     this.$store.dispatch("RESET_STORE");
-                    this.$store.dispatch("SHOW_SNACK", "Signout Succes!");
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        this.$t("toast.success.sign-out")
+                    );
                 })
                 .catch(() => {
                     this.$store.dispatch(
                         "SHOW_SNACK",
-                        "Error Signing out. Please try later!"
+                        this.$t("toast.error.sign-out")
                     );
                 });
         }

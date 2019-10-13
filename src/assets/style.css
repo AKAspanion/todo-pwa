@@ -32,6 +32,12 @@
     border-radius: 12px;
 }
 
+.label-shimmer {
+    width: 50px;
+    height: 24px;
+    border-radius: 4px;
+}
+
 .icon-shimmer {
     height: 24px;
     width: 24px;

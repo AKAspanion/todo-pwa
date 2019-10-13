@@ -3,7 +3,7 @@
         <bar-top>
             <template #left>
                 <v-avatar>
-                    <v-icon color="primary">mdi-check-all</v-icon>
+                    <v-icon>mdi-check-all</v-icon>
                 </v-avatar>
             </template>
             <template #center>
@@ -113,7 +113,7 @@ export default Vue.extend({
             } else {
                 this.$store.dispatch(
                     "SHOW_SNACK",
-                    this.$t("toasts.error.task.invalid")
+                    this.$t("toast.error.task.invalid")
                 );
             }
         },
@@ -147,13 +147,13 @@ export default Vue.extend({
                     this.tasksByStatus = tasksByStatus;
                     this.$store.dispatch(
                         "SHOW_SNACK",
-                        this.$t("toasts.success.task.delete")
+                        this.$t("toast.success.task.delete")
                     );
                 })
                 .catch(err => {
                     this.$store.dispatch(
                         "SHOW_SNACK",
-                        this.$t("toasts.error.task.delete")
+                        this.$t("toast.error.task.delete")
                     );
                 })
                 .finally(() => {
@@ -182,13 +182,13 @@ export default Vue.extend({
                     this.tasksByStatus = tasksByStatus;
                     this.$store.dispatch(
                         "SHOW_SNACK",
-                        this.$t("toasts.success.task.edit")
+                        this.$t("toast.success.task.edit")
                     );
                 })
                 .catch(err => {
                     this.$store.dispatch(
                         "SHOW_SNACK",
-                        this.$t("toasts.error.task.edit")
+                        this.$t("toast.error.task.edit")
                     );
                 })
                 .finally(() => {
