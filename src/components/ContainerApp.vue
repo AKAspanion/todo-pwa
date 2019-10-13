@@ -38,6 +38,7 @@ export default Vue.extend({
 <style scoped>
 .content-wrapper {
     position: relative;
+    z-index: 0;
     width: 100%;
     height: 100%;
     overflow-x: hidden;
@@ -65,6 +66,7 @@ export default Vue.extend({
     width: 100%;
     height: 100%;
     z-index: 12;
+    z-index: 5;
 }
 .content-wrapper::-webkit-scrollbar {
     width: 0em;

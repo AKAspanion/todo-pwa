@@ -10,9 +10,7 @@
                 <v-chip small outlined>Add Task</v-chip>
             </template>
             <template #right>
-                <v-btn icon @click="navigateTo('/home')">
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
+                <container-menu></container-menu>
             </template>
         </bar-top>
         <container-app>
@@ -179,6 +177,7 @@ const firebase = new FirebaseWeb();
 
 import BarTop from "@/components/BarTop.vue";
 import ContainerApp from "@/components/ContainerApp.vue";
+import ContainerMenu from "@/components/ContainerMenu.vue";
 // @ts-ignore
 import {
     navigateToPath,
@@ -193,7 +192,8 @@ import {
 export default Vue.extend({
     components: {
         BarTop,
-        ContainerApp
+        ContainerApp,
+        ContainerMenu
     },
     data() {
         return {

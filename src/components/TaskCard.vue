@@ -1,7 +1,7 @@
 <template>
     <v-hover #default="{ hover }">
         <v-card
-            :elevation="hover ? 8 : 2"
+            :elevation="hover && $vuetify.breakpoint.smAndUp? 8 : 2"
             :light="getTextColor() !== '#ffffff' ? true : false"
             :dark="getTextColor() === '#ffffff' ? true : false"
             height="100%"
@@ -60,7 +60,13 @@
             <template v-else>
                 <v-layout column fill-height justify-space-between class="ma-0">
                     <v-card-text class="pb-3">
-                        <v-layout row wrap align-start justify-space-between class="ma-0">
+                        <v-layout
+                            row
+                            wrap
+                            align-start
+                            justify-space-between
+                            class="ma-0 task-container"
+                        >
                             <div
                                 :style="!isEdit && !isDelete?'width: calc(100% - 36px)':'width: 100%'"
                             >
@@ -145,10 +151,10 @@
                                     v-if="!isEdit && !isDelete"
                                     class="task-desc"
                                     :class="[
-                                    $vuetify.breakpoint.xsOnly ? 'caption':'body-2',
-                                    task.status == 'done' ? 'line-through-text':'', 
-                                    getTextColor() !== '#ffffff' ? 'black--text':'white--text'
-                                ]"
+                                        $vuetify.breakpoint.xsOnly ? 'caption':'body-2',
+                                        task.status == 'done' ? 'line-through-text':'', 
+                                        getTextColor() !== '#ffffff' ? 'black--text':'white--text'
+                                    ]"
                                 >{{task.description}}</div>
                             </div>
                             <div
@@ -333,9 +339,27 @@ export default Vue.extend({
     background: red;
 }
 .task-desc {
-    line-height: 1em !important;
+    white-space: pre-wrap;
+    line-height: 1.2em !important;
 }
 .task-time {
     padding-top: 2px;
+}
+.task-container >>> textarea {
+    font-size: 14px !important;
+    margin-top: 4px !important;
+}
+.task-container >>> input {
+    font-size: 14px !important;
+}
+
+@media only screen and (max-width: 600px) {
+    .task-container >>> textarea {
+        font-size: 12px !important;
+        margin-top: 2px !important;
+    }
+    .task-container >>> input {
+        font-size: 14px !important;
+    }
 }
 </style>

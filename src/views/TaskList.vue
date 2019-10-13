@@ -8,48 +8,7 @@
                 <v-chip small outlined>{{$t('home.label')}}</v-chip>
             </template>
             <template #right>
-                <v-menu z-index="50">
-                    <template #activator="{ on }">
-                        <v-btn icon v-on="on">
-                            <v-icon>mdi-dots-horizontal</v-icon>
-                        </v-btn>
-                    </template>
-                    <v-list min-width="300">
-                        <v-list-item>
-                            <v-list-item-content class="text-left">
-                                <v-list-item-title>{{$t('language.label')}}</v-list-item-title>
-                            </v-list-item-content>
-                            <v-list-item-action>
-                                <v-btn-toggle v-model="$i18n.locale" mandatory class="lnl-lang-btn">
-                                    <v-btn
-                                        v-for="(lang, i) in langs"
-                                        :key="`Lang${i}`"
-                                        :value="lang"
-                                        small
-                                    >{{ lang }}</v-btn>
-                                </v-btn-toggle>
-                            </v-list-item-action>
-                        </v-list-item>
-                        <v-list-item>
-                            <v-list-item-content class="text-left">
-                                <v-list-item-title>{{$t('dark.mode')}}</v-list-item-title>
-                            </v-list-item-content>
-                            <v-list-item-action class="mr-2">
-                                <v-switch v-model="themeModel"></v-switch>
-                            </v-list-item-action>
-                        </v-list-item>
-                        <v-list-item link @click="onSignoutClick">
-                            <v-list-item-content class="text-left">
-                                <v-list-item-title>{{$t('signout')}}</v-list-item-title>
-                            </v-list-item-content>
-                            <v-list-item-avatar>
-                                <v-avatar small size="36">
-                                    <v-icon>mdi-logout-variant</v-icon>
-                                </v-avatar>
-                            </v-list-item-avatar>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
+                <container-menu></container-menu>
             </template>
         </bar-top>
         <container-app>
@@ -97,6 +56,7 @@ const firebase = new FirebaseWeb();
 import BarTop from "@/components/BarTop.vue";
 import TaskCardList from "@/components/TaskCardList.vue";
 import ContainerApp from "@/components/ContainerApp.vue";
+import ContainerMenu from "@/components/ContainerMenu.vue";
 // @ts-ignore
 import {
     navigateToPath,
@@ -112,6 +72,7 @@ export default Vue.extend({
     components: {
         BarTop,
         ContainerApp,
+        ContainerMenu,
         TaskCardList
     },
     data() {
@@ -121,21 +82,12 @@ export default Vue.extend({
             tasksByStatus: {
                 todo: [],
                 done: []
-            },
-            langs: ["en", "hi"]
+            }
         };
     },
     computed: {
         currentUser() {
             return this.$store.getters.user;
-        },
-        themeModel: {
-            get() {
-                return this.$vuetify.theme.dark;
-            },
-            set(val: boolean) {
-                this.$vuetify.theme.dark = val;
-            }
         }
     },
     methods: {
@@ -222,23 +174,6 @@ export default Vue.extend({
                 .finally(() => {
                     this.tasksUpdating = false;
                     this.$store.dispatch("LOADING", false);
-                });
-        },
-        onSignoutClick() {
-            this.logout();
-        },
-        logout() {
-            firebase
-                .signOut()
-                .then(() => {
-                    this.$store.dispatch("RESET_STORE");
-                    this.$store.dispatch("SHOW_SNACK", "Signout Succes!");
-                })
-                .catch(() => {
-                    this.$store.dispatch(
-                        "SHOW_SNACK",
-                        "Error Signing out. Please try later!"
-                    );
                 });
         },
         loadPage() {

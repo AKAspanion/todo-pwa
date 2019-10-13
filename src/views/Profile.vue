@@ -6,18 +6,13 @@
                     <v-icon>mdi-arrow-left</v-icon>
                 </v-btn>
             </template>
-
             <template #center>
                 <v-chip small outlined>Profile</v-chip>
             </template>
-
             <template #right>
-                <v-btn icon @click="navigateToHome">
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
+                <container-menu></container-menu>
             </template>
         </bar-top>
-
         <container-app coloured elevated-bg>
             <div class="pt-3 pb-6">
                 <v-avatar size="100" color="white">
@@ -47,13 +42,15 @@ const firebase = new FirebaseWeb();
 
 import BarTop from "@/components/BarTop.vue";
 import ContainerApp from "@/components/ContainerApp.vue";
+import ContainerMenu from "@/components/ContainerMenu.vue";
 // @ts-ignore
 import { navigateToPath, getInitials } from "@/util";
 export default Vue.extend({
     name: "Profile",
     components: {
         BarTop,
-        ContainerApp
+        ContainerApp,
+        ContainerMenu
     },
     data() {
         return {};
