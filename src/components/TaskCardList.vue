@@ -1,5 +1,5 @@
 <template>
-    <v-container fill-height grid-list-lg fluid pa-0>
+    <v-container fill-height grid-list-xl fluid pa-0>
         <v-layout row wrap fill-height>
             <template v-if="taskList.length">
                 <template v-for="(task, index) in taskList">
@@ -27,7 +27,7 @@
                     </template>
                 </template>
                 <template v-else>
-                    <v-card outlined class="mx-2 text-left pa-4" width="100%">
+                    <v-card outlined class="mx-3 text-left pa-4" width="100%">
                         <div class="subtitle-2">{{noDataObject.title}}</div>
                         <div class="caption">{{noDataObject.caption}}</div>
                         <slot name="no-data"></slot>

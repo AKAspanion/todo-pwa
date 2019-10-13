@@ -19,7 +19,7 @@ export const getTextColorByBg = (color) => {
     } : null;
     if (rgb) {
         let ratio = Math.round(((parseInt(rgb.r) * 299) + (parseInt(rgb.g) * 587) + (parseInt(rgb.b) * 114)) / 1000)
-        if (ratio > 125) {
+        if (ratio > 128) {
             return '#333333'
         } else {
             return '#ffffff'

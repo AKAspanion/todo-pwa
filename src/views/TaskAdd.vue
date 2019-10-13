@@ -31,9 +31,8 @@
                                     v-bind="textFieldAttributes"
                                     prepend-inner-icon="mdi-format-title"
                                     v-model="task.title"
-                                    hint="Name your task"
                                     placeholder="Name your task"
-                                    :rules="[rules.empty.title]"
+                                    :rules="[rules.empty.title, rules.nospace.field]"
                                 ></v-text-field>
                             </v-flex>
                             <v-flex xs12 sm6 md4 class="py-0">
@@ -43,7 +42,6 @@
                                             v-on="on"
                                             readonly
                                             v-bind="textFieldAttributes"
-                                            hint="Choose time"
                                             placeholder="Select time"
                                             prepend-inner-icon="mdi-clock-outline"
                                             :value="readableTime()"
@@ -70,7 +68,6 @@
                                         <v-text-field
                                             v-on="on"
                                             readonly
-                                            hint="Choose date"
                                             placeholder="Select date"
                                             v-bind="textFieldAttributes"
                                             prepend-inner-icon="mdi-calendar-outline"
@@ -92,86 +89,44 @@
                                 </v-menu>
                             </v-flex>
                             <v-flex xs12 class="py-0">
-                                <v-autocomplete
-                                    v-model="task.type"
-                                    :items="types"
-                                    item-text="label"
-                                    return-object
-                                    small-chips
-                                    multiple
-                                    :rules="[rules.empty.type]"
-                                    v-bind="textFieldAttributes"
-                                    :loading="taskTypesLoading"
-                                    :search-input.sync="typeSearch"
-                                    prepend-inner-icon="mdi-label-outline"
-                                    placeholder="Task type"
-                                    hint="Choose a task type"
+                                <div
+                                    class="px-3"
+                                    :class="!$vuetify.theme.dark ? 'light-type-card':'dark-type-card'"
                                 >
-                                    <template #selection="data">
-                                        <v-chip
-                                            v-bind="data.attrs"
-                                            :input-value="data.selected"
-                                            label
-                                            :small="$vuetify.breakpoint.xsOnly"
-                                            :text-color="getTextColor(data.item.color)"
-                                            :color="data.item.color"
-                                            @click="data.select"
-                                        >{{ data.item.label }}</v-chip>
-                                    </template>
-                                    <template #item="data">
-                                        <template v-if="typeof data.item !== 'object'">
-                                            <v-list-item-content v-text="data.item"></v-list-item-content>
-                                        </template>
-                                        <template v-else>
-                                            <v-list-item-avatar
-                                                size="24"
-                                                :color="data.item.color"
-                                                @click="typeSearch = ''"
-                                            ></v-list-item-avatar>
-                                            <v-list-item-content
-                                                class="text-left"
-                                                @click="typeSearch = ''"
+                                    <v-layout
+                                        justify-start
+                                        align-center
+                                        row
+                                        class="ma-0 type-layout"
+                                    >
+                                        <v-icon
+                                            class="pr-3"
+                                            style="margin-left: -2px;"
+                                        >mdi-label-outline</v-icon>
+                                        <div style="width: calc(100% - 36px)">
+                                            <v-chip-group
+                                                v-model="taskTypes"
+                                                multiple
+                                                dark
+                                                return-object
                                             >
-                                                <v-list-item-title v-html="data.item.label"></v-list-item-title>
-                                            </v-list-item-content>
-                                        </template>
-                                    </template>
-                                    <template #no-data>
-                                        <v-card flat tile class="py-2">
-                                            <div style="margin: 0 auto; width: 300px;">
-                                                <div class="pt-1 pb-3 subtitle-1">No task found</div>
-                                                <v-divider></v-divider>
-                                                <v-card-text>
-                                                    <div
-                                                        class="pb-3"
-                                                    >Give a name in the field and choose a color to create a new one</div>
-                                                    <v-chip
-                                                        label
-                                                        :small="$vuetify.breakpoint.xsOnly"
-                                                        class="mb-3"
-                                                        :color="newTypeColor"
-                                                        :text-color="getTextColor(newTypeColor)"
-                                                    >{{typeSearch}}</v-chip>
-                                                    <v-color-picker
-                                                        v-model="newTypeColor"
-                                                        hide-canvas
-                                                        hide-inputs
-                                                        hide-swatches
-                                                    ></v-color-picker>
-                                                </v-card-text>
-                                                <v-card-actions>
-                                                    <v-spacer></v-spacer>
-                                                    <v-btn
-                                                        color="primary"
-                                                        :disabled="!(typeSearch && typeSearch.trim() !== '')"
-                                                        @click="onAddTaskTypeSubmit"
-                                                    >Create</v-btn>
-                                                    <v-spacer></v-spacer>
-                                                </v-card-actions>
-                                            </div>
-                                        </v-card>
-                                    </template>
-                                </v-autocomplete>
+                                                <v-chip
+                                                    filter
+                                                    label
+                                                    dark
+                                                    :color="tag.color"
+                                                    v-for="(tag, index) in types"
+                                                    :key="tag.id"
+                                                    @focus="onChipFocus(true)"
+                                                    @blur="onChipFocus(false)"
+                                                    @keyup.enter="updateTaskModel(index)"
+                                                    :text-color="getTextColor(tag.color)"
+                                                    :small="$vuetify.breakpoint.xsOnly"
+                                                >{{ tag.label }}</v-chip>
+                                            </v-chip-group>
+                                        </div>
+                                    </v-layout>
+                                </div>
                             </v-flex>
 
                             <v-flex xs12 class="py-0 text-area">
@@ -179,10 +134,8 @@
                                     v-model="task.description"
                                     auto-grow
                                     v-bind="textFieldAttributes"
-                                    :rules="[rules.empty.desc]"
                                     prepend-inner-icon="mdi-card-text-outline"
                                     placeholder="A detailed description of the task"
-                                    hint="Enter a description"
                                 ></v-textarea>
                             </v-flex>
 
@@ -262,6 +215,7 @@ export default Vue.extend({
                 type: []
             },
             types: [],
+            taskTypeIndexHolder: [],
             textFieldAttributes: {
                 dense: !this.$vuetify.breakpoint.mdAndUp,
                 outlined: true
@@ -301,6 +255,20 @@ export default Vue.extend({
             }
         };
     },
+    computed: {
+        taskTypes: {
+            get() {
+                // @ts-ignore
+                return this.taskTypeIndexHolder;
+            },
+            set(val) {
+                // @ts-ignore
+                this.taskTypeIndexHolder = val;
+                // @ts-ignore
+                this.updateType(val);
+            }
+        }
+    },
     methods: {
         navigateTo(path: any) {
             navigateToPath(path);
@@ -311,6 +279,40 @@ export default Vue.extend({
         },
         readableTime() {
             return get12FormatTime(this.task.time);
+        },
+        onChipFocus(e: any) {
+            this.$nextTick(() => {
+                let lightCard = document.getElementsByClassName(
+                    "light-type-card"
+                );
+                let darkCard = document.getElementsByClassName(
+                    "dark-type-card"
+                );
+                let taskLayout = document.getElementsByClassName("type-layout");
+                if (lightCard.length) {
+                    if (e) {
+                        lightCard[0].classList.add("light-focused");
+                    } else {
+                        lightCard[0].classList.remove("light-focused");
+                    }
+                } else {
+                    if (e) {
+                        darkCard[0].classList.add("dark-focused");
+                    } else {
+                        darkCard[0].classList.remove("dark-focused");
+                    }
+                }
+                if (e) {
+                    taskLayout[0].classList.add("layout-focused");
+                } else {
+                    taskLayout[0].classList.remove("layout-focused");
+                }
+            });
+        },
+        updateType(val: any) {
+            this.task.type = val.map((index: any) => {
+                return this.types[index];
+            });
         },
         onAddTaskSubmit() {
             let addTaskValidator: any = this.$refs.formAddTask;
@@ -375,6 +377,18 @@ export default Vue.extend({
                 .then(err => {
                     this.addTaskLoading = false;
                 });
+        },
+
+        updateTaskModel(index: any) {
+            //@ts-ignore
+            let indexVal = this.taskTypeIndexHolder.indexOf(index);
+            if (indexVal !== -1) {
+                this.taskTypeIndexHolder.splice(indexVal, 1);
+            } else {
+                //@ts-ignore
+                this.taskTypeIndexHolder.push(index);
+            }
+            this.updateType(this.taskTypeIndexHolder);
         },
         loadPage() {
             return Promise.all([
@@ -457,5 +471,55 @@ export default Vue.extend({
 }
 .pt-2px {
     padding-top: 3px;
+}
+.light-type-card,
+.dark-type-card {
+    min-height: 36px;
+    max-height: 50px;
+    margin-bottom: 28px;
+    border-radius: 4px;
+}
+
+.light-type-card {
+    border: 1px solid rgba(0, 0, 0, 0.24) !important;
+}
+.dark-type-card {
+    border: 1px solid rgb(192, 192, 192) !important;
+}
+.light-focused {
+    border: 2px solid #1976d2 !important;
+}
+.dark-focused {
+    border: 2px solid #2196f3 !important;
+}
+.light-focused .v-icon {
+    color: #1976d2;
+}
+.dark-focused .v-icon {
+    color: #2196f3;
+}
+.layout-focused {
+    margin-left: -1px !important;
+    margin-top: -1px !important;
+}
+@media only screen and (max-width: 600px) {
+    .task-add-container >>> .v-text-field__slot {
+        font-size: 13px !important;
+    }
+    .task-add-container >>> .v-input__slot {
+        min-height: 36px !important;
+    }
+    .task-add-container >>> .v-input__prepend-inner {
+        margin-top: 6px !important;
+    }
+    .text-area >>> .v-input__prepend-inner {
+        margin-top: 8px !important;
+    }
+    .type-card >>> .v-chip-group .v-slide-group__content {
+        padding: 2px 0 !important;
+    }
+    .type-card {
+        height: 36px;
+    }
 }
 </style>
