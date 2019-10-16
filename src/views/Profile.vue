@@ -13,22 +13,70 @@
                 <container-menu></container-menu>
             </template>
         </bar-top>
-        <container-app coloured elevated-bg>
-            <div class="pt-3 pb-6">
-                <v-avatar size="100" :color="!$vuetify.theme.dark ? 'white':'#404040'">
+        <container-app coloured elevated-bg bg-height="224px">
+            <div class="pt-2 pb-4">
+                <v-avatar size="110" :color="!$vuetify.theme.dark ? 'white':'#404040'">
                     <template v-if="currentUser.photoURL">
                         <v-img :src="currentUser.photoURL"></v-img>
                     </template>
                     <template v-else>
                         <div
+                            v-if="currentUser.displayName"
                             class="display-1 font-weight-medium"
                         >{{getInitials(currentUser.displayName)}}</div>
+                        <v-icon v-else color="primary">mdi-face</v-icon>
                     </template>
                 </v-avatar>
             </div>
-            <div class="subtitle-2 white--text">{{currentUser.displayName}}</div>
-            <!-- <v-chip dark small label outlined>{{currentUser.email}}</v-chip> -->
-            <div class="caption font-weight-light white--text">{{currentUser.email}}</div>
+            <v-layout
+                row
+                wrap
+                align-center
+                justify-center
+                class="ma-0 mr-n8 editable-item mb-n2"
+                style="min-height: 40px;"
+            >
+                <v-text-field
+                    light
+                    ref="nameEdit"
+                    v-if="editName"
+                    solo
+                    dense
+                    v-model="user.displayName"
+                    class="mb-n6"
+                    style="max-width: 300px"
+                ></v-text-field>
+                <div v-else class="title white--text text-item">{{currentUser.displayName || 'NA'}}</div>
+                <v-icon dark class="mx-2" v-if="editName" @click="resetEditFlags()">mdi-check</v-icon>
+                <div v-else class="px-2 edit-button">
+                    <v-icon dark small class="edit-icon" @click="onNameEdit()">mdi-pencil</v-icon>
+                </div>
+            </v-layout>
+            <v-layout
+                row
+                wrap
+                align-center
+                justify-center
+                class="ma-0 mr-n8 editable-item"
+                style="min-height: 40px;"
+            >
+                <v-text-field
+                    light
+                    solo
+                    dense
+                    class="mb-n6"
+                    ref="emailEdit"
+                    v-if="editEmail"
+                    v-model="user.email"
+                    style="max-width: 300px"
+                ></v-text-field>
+                <div v-else class="subtitle-2 white--text text-item">{{currentUser.email || 'NA'}}</div>
+                <v-icon dark class="mx-2" v-if="editEmail" @click="resetEditFlags()">mdi-check</v-icon>
+
+                <div v-else class="px-2 edit-button">
+                    <v-icon dark small class="edit-icon" @click="onEmailEdit()">mdi-pencil</v-icon>
+                </div>
+            </v-layout>
             <v-card-text class="mt-8">
                 <v-card outlined class="py-4 mx-3">
                     <div style="margin: 0 auto; width: 300px;">
@@ -101,7 +149,13 @@ export default Vue.extend({
             taskTypeLabel: "",
             types: [],
             pageLoading: false,
-            taskTypesLoading: false
+            taskTypesLoading: false,
+            editName: false,
+            editEmail: false,
+            user: {
+                displayName: "",
+                email: ""
+            }
         };
     },
     computed: {
@@ -110,6 +164,20 @@ export default Vue.extend({
         }
     },
     methods: {
+        onNameEdit() {
+            this.resetEditFlags();
+            this.editName = true;
+            focusByRef("nameEdit");
+        },
+        onEmailEdit() {
+            this.resetEditFlags();
+            this.editEmail = true;
+            focusByRef("nameEdit");
+        },
+        resetEditFlags() {
+            this.editName = false;
+            this.editEmail = false;
+        },
         navigateToHome() {
             navigateToPath("/home");
         },
@@ -162,37 +230,55 @@ export default Vue.extend({
                     this.taskTypesLoading = false;
                 });
         },
-        mounted() {
-            if (!this.$store.getters.landingVisited) {
-                this.pageLoading = true;
-                this.taskTypesLoading = true;
-                this.loadPage()
-                    .then(response => {
-                        this.$store.dispatch("SET_TASKS", response[0]);
-                        this.$store.dispatch("SET_TYPES", response[1]);
-                        this.$store.dispatch("LANDING_VISITED", true);
-                        this.types = response[1];
-                        return parseTasksByStatus(response[0]);
-                    })
-                    .then((tasksByStatus: any) => {
-                        this.$store.dispatch(
-                            "SET_TASKS_BY_STATUS",
-                            tasksByStatus
-                        );
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-                    .finally(() => {
-                        this.pageLoading = false;
-                        this.taskTypesLoading = false;
-                    });
-            } else {
-                this.types = this.$store.getters.types;
-            }
+        focusByRef(name) {
+            this.$nextTick(() => {
+                this.$refs[name].focus();
+            });
         }
+    },
+    mounted() {
+        if (!this.$store.getters.landingVisited) {
+            this.pageLoading = true;
+            this.taskTypesLoading = true;
+            this.loadPage()
+                .then(response => {
+                    this.$store.dispatch("SET_TASKS", response[0]);
+                    this.$store.dispatch("SET_TYPES", response[1]);
+                    this.$store.dispatch("LANDING_VISITED", true);
+                    this.types = response[1];
+                    return parseTasksByStatus(response[0]);
+                })
+                .then((tasksByStatus: any) => {
+                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    this.pageLoading = false;
+                    this.taskTypesLoading = false;
+                });
+        } else {
+            this.types = this.$store.getters.types;
+        }
+        this.user = this.$store.getters.user;
     }
 });
 </script>
-<style>
+<style scoped>
+.text-item {
+    z-index: 10;
+}
+.edit-icon {
+    display: none;
+}
+.edit-button {
+    z-index: 10;
+    min-width: 32px;
+    min-height: 24px;
+}
+.editable-item:hover .edit-icon {
+    display: contents;
+    cursor: pointer;
+}
 </style>

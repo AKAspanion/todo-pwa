@@ -177,12 +177,15 @@ export default Vue.extend({
                         this.navigateToHome();
                     })
                     .catch((err: any) => {
+                        this.$store.dispatch("SHOW_SNACK", err.message);
+                    })
+                    .catch(() => {
                         this.$store.dispatch(
                             "SHOW_SNACK",
                             this.$t("toast.error.sign-in")
                         );
                     })
-                    .then(() => {
+                    .finally(() => {
                         this.signingIn = false;
                     });
             }
