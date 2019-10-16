@@ -1,12 +1,16 @@
 {
     "task-manager": "Task Manager",
-    "todo": "TO DO",
+    "todo": "TODO",
     "done": "Done",
     "label": {
         "label": "Label",
+        "edit": "Edit labels",
         "create": "Create a new label type",
         "no-label": "No label available, create one in profile page"
     },
+    "ok": "OK",
+    "save": "Save",
+    "close": "Close",
     "create": "Create",
     "options": "Options",
     "profile": "Profile",
@@ -56,6 +60,7 @@
     },
     "task": {
         "add": "Add Task",
+        "delete": "Delete this task?",
         "title-placeholder": "Name your task",
         "desc-placeholder": "A detailed description of the task"
     },

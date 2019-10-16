@@ -14,9 +14,21 @@
             </template>
         </bar-top>
         <container-app>
-            <v-card flat tile width="100%" class="px-7">
-                <div class="overline text-left pb-3">{{$t('todo')}}</div>
+            <v-card flat tile width="100%" :class="$vuetify.breakpoint.xsOnly ? 'px-4':'px-7'">
+                <v-layout row align-center justify-space-between class="ma-0 pb-1">
+                    <div class="overline text-left">{{$t('todo')}}</div>
+                    <v-btn
+                        icon
+                        class="mr-n2"
+                        @click="compact = !compact"
+                        v-if="$vuetify.breakpoint.xsOnly"
+                    >
+                        <v-icon v-if="compact">mdi-view-agenda</v-icon>
+                        <v-icon v-else>mdi-view-grid</v-icon>
+                    </v-btn>
+                </v-layout>
                 <task-card-list
+                    :compact="compact"
                     :task-list="tasksByStatus['todo']"
                     :loading="pageLoading"
                     @edit="onTaskEdit"
@@ -40,6 +52,7 @@
                 </task-card-list>
                 <div class="overline text-left pb-3">{{$t('done')}}</div>
                 <task-card-list
+                    :compact="compact"
                     :task-list="tasksByStatus['done']"
                     class="pb-4"
                     :loading="pageLoading"
@@ -90,7 +103,8 @@ export default Vue.extend({
             tasksByStatus: {
                 todo: [],
                 done: []
-            }
+            },
+            compact: true
         };
     },
     computed: {

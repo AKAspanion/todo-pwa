@@ -7,24 +7,15 @@
         </template>
         <v-list>
             <slot name="top-list-item"></slot>
-            <v-subheader class="overline">{{$t('settings')}}</v-subheader>
-            <!-- <v-list-item>
+            <!-- TODO implement -->
+            <v-subheader class="overline">{{$t('label.label')}}</v-subheader>
+            <v-list-item link>
                 <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('label')}}</v-list-item-title>
+                    <v-list-item-title>{{$t('label.edit')}}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-avatar>
                     <v-avatar small size="36">
                         <v-icon>mdi-pencil</v-icon>
-                    </v-avatar>
-                </v-list-item-avatar>
-            </v-list-item>-->
-            <v-list-item link @click="onSignoutClick">
-                <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('sign-out')}}</v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-avatar>
-                    <v-avatar small size="36">
-                        <v-icon>mdi-logout-variant</v-icon>
                     </v-avatar>
                 </v-list-item-avatar>
             </v-list-item>
@@ -51,6 +42,17 @@
                         >{{ lang }}</v-btn>
                     </v-btn-toggle>
                 </v-list-item-action>
+            </v-list-item>
+            <v-subheader class="overline">{{$t('settings')}}</v-subheader>
+            <v-list-item link @click="onSignoutClick">
+                <v-list-item-content class="text-left">
+                    <v-list-item-title>{{$t('sign-out')}}</v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-avatar>
+                    <v-avatar small size="36">
+                        <v-icon>mdi-logout-variant</v-icon>
+                    </v-avatar>
+                </v-list-item-avatar>
             </v-list-item>
             <slot name="bottom-list-item"></slot>
             <v-divider class="mt-1"></v-divider>

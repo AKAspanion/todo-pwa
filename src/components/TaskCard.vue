@@ -59,7 +59,7 @@
             </template>
             <template v-else>
                 <v-layout column fill-height justify-space-between class="ma-0">
-                    <v-card-text class="pb-3">
+                    <v-card-text :class="$vuetify.breakpoint.xsOnly ? 'pa-3':'pb-3'">
                         <v-layout
                             row
                             wrap
@@ -82,51 +82,12 @@
                                         dense
                                     ></v-textarea>
                                 </div>
-                                <!-- <div v-if="isEdit" class="mt-n3 mb-n5">
-                                    <v-select
-                                        :items="$store.getters.types"
-                                        item-text="label"
-                                        solo
-                                        return-object
-                                        small-chips
-                                        multiple
-                                        mandatory
-                                        :dense="$vuetify.breakpoint.xsOnly"
-                                        v-model="localTask.type"
-                                    >
-                                        <template #selection="data">
-                                            <v-chip
-                                                label
-                                                v-bind="data.attrs"
-                                                @click="data.select"
-                                                :color="data.item.color"
-                                                :input-value="data.selected"
-                                                :small="$vuetify.breakpoint.xsOnly"
-                                                :text-color="getTextColorForBg(data.item.color)"
-                                            >{{ data.item.label }}</v-chip>
-                                        </template>
-                                        <template #item="data">
-                                            <template v-if="typeof data.item !== 'object'">
-                                                <v-list-item-content v-text="data.item"></v-list-item-content>
-                                            </template>
-                                            <template v-else>
-                                                <v-list-item-avatar
-                                                    size="24"
-                                                    :color="data.item.color"
-                                                ></v-list-item-avatar>
-                                                <v-list-item-content class="text-left">
-                                                    <v-list-item-title v-html="data.item.label"></v-list-item-title>
-                                                </v-list-item-content>
-                                            </template>
-                                        </template>
-                                    </v-select>
-                                </div>-->
                                 <!-- delete part -->
                                 <div
                                     v-if="isDelete"
                                     class="body-2 font-weight-bold pb-1 px-1"
                                     :class="getTextColor() !== '#ffffff' ? 'black--text':'white--text'"
-                                >Delete this task?</div>
+                                >{{$t('task.delete')}}</div>
                                 <!-- Non edit/delete part -->
                                 <div
                                     v-if="!isEdit && !isDelete"
@@ -147,15 +108,6 @@
                                         <span>{{task.title}}</span>
                                     </v-tooltip>
                                 </div>
-                                <div
-                                    v-if="!isEdit && !isDelete"
-                                    class="task-desc"
-                                    :class="[
-                                        $vuetify.breakpoint.xsOnly ? 'caption':'body-2',
-                                        task.status == 'done' ? 'line-through-text':'', 
-                                        getTextColor() !== '#ffffff' ? 'black--text':'white--text'
-                                    ]"
-                                >{{task.description}}</div>
                             </div>
                             <div
                                 v-if="!isEdit && !isDelete"
@@ -175,9 +127,21 @@
                                 </v-btn>
                             </div>
                         </v-layout>
+                        <div
+                            v-if="!isEdit && !isDelete"
+                            class="task-desc pt-1"
+                            :class="[
+                                $vuetify.breakpoint.xsOnly ? 'caption':'body-2',
+                                task.status == 'done' ? 'line-through-text':'', 
+                                getTextColor() !== '#ffffff' ? 'black--text':'white--text'
+                            ]"
+                        >{{task.description}}</div>
                     </v-card-text>
                     <div>
-                        <v-card-text v-if="!isEdit && !isDelete" class="pb-3">
+                        <v-card-text
+                            v-if="!isEdit && !isDelete"
+                            :class="$vuetify.breakpoint.xsOnly ? 'pa-3':'py-3'"
+                        >
                             <div>
                                 <v-chip
                                     label
@@ -195,7 +159,9 @@
                             </div>
                         </v-card-text>
                         <v-divider light></v-divider>
-                        <v-card-actions class="pl-4 pr-3">
+                        <v-card-actions
+                            :class="$vuetify.breakpoint.xsOnly ? 'pl-3 pr-2':'pl-4 pr-3'"
+                        >
                             <div v-if="!isEdit && !isDelete">
                                 <v-icon
                                     :small="$vuetify.breakpoint.xsOnly"

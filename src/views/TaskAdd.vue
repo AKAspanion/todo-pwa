@@ -14,7 +14,12 @@
             </template>
         </bar-top>
         <container-app>
-            <v-card flat tile class="mx-3 pt-3 pb-3 task-add-container">
+            <v-card
+                flat
+                tile
+                class="pt-3 pb-3 task-add-container"
+                :class="$vuetify.breakpoint.smAndUp ? 'mx-3':''"
+            >
                 <v-form
                     v-model="addTaskForm"
                     ref="formAddTask"

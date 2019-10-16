@@ -101,7 +101,6 @@ export default Vue.extend({
             taskTypeLabel: "",
             types: [],
             pageLoading: false,
-            taskTypesLoading: false,
             taskTypesLoading: false
         };
     },

@@ -1,9 +1,15 @@
 <template>
-    <v-container fill-height grid-list-xl fluid pa-0>
+    <v-container fill-height :grid-list-xl="$vuetify.breakpoint.smAndUp" fluid pa-0>
         <v-layout row wrap fill-height>
             <template v-if="taskList.length">
                 <template v-for="(task, index) in taskList">
-                    <v-flex xs6 lg4 :key="index">
+                    <v-flex
+                        lg4
+                        sm6
+                        :key="index"
+                        :xs6="compact && $vuetify.breakpoint.xsOnly"
+                        :xs12="!compact && $vuetify.breakpoint.xsOnly"
+                    >
                         <task-card
                             :task="task"
                             :loading="loading"
@@ -21,13 +27,24 @@
             <template v-else>
                 <template v-if="loading">
                     <template v-for="i in 2">
-                        <v-flex xs6 :key="i">
+                        <v-flex
+                            lg4
+                            sm6
+                            :key="i"
+                            :xs6="compact && $vuetify.breakpoint.xsOnly"
+                            :xs12="!compact && $vuetify.breakpoint.xsOnly"
+                        >
                             <task-card :task="{}" :loading="true"></task-card>
                         </v-flex>
                     </template>
                 </template>
                 <template v-else>
-                    <v-card outlined class="mx-3 text-left pa-4" width="100%">
+                    <v-card
+                        outlined
+                        width="100%"
+                        class="text-left pa-4"
+                        :class="$vuetify.breakpoint.xsOnly ? 'mx-1':'mx-3'"
+                    >
                         <div class="subtitle-2">{{noDataObject.title}}</div>
                         <div class="caption">{{noDataObject.caption}}</div>
                         <slot name="no-data"></slot>
@@ -56,6 +73,10 @@ export default Vue.extend({
         disabled: {
             type: Boolean,
             default: false
+        },
+        compact: {
+            type: Boolean,
+            default: true
         },
         noDataObject: {
             type: Object,

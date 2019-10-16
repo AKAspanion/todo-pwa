@@ -3,7 +3,7 @@
         <v-progress-linear v-if="loading" indeterminate class="fixed-progress" height="3"></v-progress-linear>
         <v-snackbar v-model="snackbar.model" bottom :timeout="5000">
             {{ snackbar.text }}
-            <v-btn dark text @click="snackbar.model = false">Close</v-btn>
+            <v-btn dark text @click="snackbar.model = false">{{$t('close')}}</v-btn>
         </v-snackbar>
         <v-container fluid grid-list-md class="pa-0">
             <transition :name="transitionName" mode="out-in">

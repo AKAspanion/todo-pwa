@@ -135,6 +135,7 @@ export default Vue.extend({
             set(val: string) {
                 this.$i18n.locale = val;
                 if (this.$refs.formSignIn)
+                    //@ts-ignore
                     this.$refs.formSignIn.resetValidation();
                 localStorage.setItem("lang", this.$i18n.locale);
             }
@@ -147,6 +148,7 @@ export default Vue.extend({
             } else {
                 this.isEmailSignin = true;
                 this.$nextTick(() => {
+                    //@ts-ignore
                     if (this.$refs.userEmail) this.$refs.userEmail.focus();
                 });
             }
@@ -160,6 +162,7 @@ export default Vue.extend({
         onSignIn() {
             if (
                 this.$refs.formSignIn &&
+                //@ts-ignore
                 this.$refs.formSignIn.validate() &&
                 this.signInForm
             ) {

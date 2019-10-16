@@ -160,6 +160,7 @@ export default Vue.extend({
             set(val: string) {
                 this.$i18n.locale = val;
                 if (this.$refs.formSignUp)
+                    //@ts-ignore
                     this.$refs.formSignUp.resetValidation();
                 localStorage.setItem("lang", this.$i18n.locale);
             }

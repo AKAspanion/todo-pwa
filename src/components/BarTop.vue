@@ -1,5 +1,11 @@
 <template>
-    <v-toolbar :dark="dark" :color="primary? 'primary':''" flat class="px-3" height="80">
+    <v-toolbar
+        flat
+        height="80"
+        :dark="dark"
+        :color="primary? 'primary':''"
+        :class="$vuetify.breakpoint.smAndUp ? 'px-3':''"
+    >
         <div class="fallback-content fallback-left">
             <slot name="left"></slot>
         </div>
