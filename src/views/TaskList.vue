@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <bar-top>
+        <bar-top dark primary>
             <template #left>
                 <v-avatar>
                     <v-icon>mdi-check-all</v-icon>
@@ -13,8 +13,24 @@
                 <container-menu></container-menu>
             </template>
         </bar-top>
-        <container-app>
-            <v-card flat tile width="100%" :class="$vuetify.breakpoint.xsOnly ? 'px-4':'px-7'">
+        <container-app
+            coloured
+            elevated-bg
+            :bg-height="$vuetify.breakpoint.xsOnly ?'140px':'152px'"
+        >
+            <div :class="$vuetify.breakpoint.xsOnly ? '':'mx-3 mb-2'">
+                <v-card-text class="text-left py-0 white--text">Hello Ankit.</v-card-text>
+                <v-card-title class="py-0 white--text">
+                    {{tasksByStatus['todo'] ? tasksByStatus['todo'].length : 0}}
+                    tasks
+                    {{calendarDate}}.
+                </v-card-title>
+            </div>
+            <bar-date
+                v-model="selectedDate"
+                :class="$vuetify.breakpoint.xsOnly ? 'mx-1 mb-6':'mx-4 mb-8'"
+            ></bar-date>
+            <div style="width: 100%" :class="$vuetify.breakpoint.xsOnly ? 'px-4':'px-7'">
                 <v-layout row align-center justify-space-between class="ma-0 pb-1">
                     <div class="overline text-left">{{$t('todo')}}</div>
                     <v-btn
@@ -27,7 +43,7 @@
                         <v-icon v-else>mdi-view-grid</v-icon>
                     </v-btn>
                 </v-layout>
-                <task-card-list
+                <task-card-grid
                     :compact="compact"
                     :task-list="tasksByStatus['todo']"
                     :loading="pageLoading"
@@ -49,9 +65,9 @@
                             @click="navigateTo('/add')"
                         >{{$t('create')}}</v-btn>
                     </template>
-                </task-card-list>
+                </task-card-grid>
                 <div class="overline text-left pb-3">{{$t('done')}}</div>
-                <task-card-list
+                <task-card-grid
                     :compact="compact"
                     :task-list="tasksByStatus['done']"
                     class="pb-4"
@@ -63,8 +79,8 @@
                         title: $t('no-task.done.title'), 
                         caption: $t('no-task.done.caption')
                     }"
-                ></task-card-list>
-            </v-card>
+                ></task-card-grid>
+            </div>
         </container-app>
     </div>
 </template>
@@ -75,7 +91,8 @@ import FirebaseWeb from "../firebase";
 const firebase = new FirebaseWeb();
 
 import BarTop from "@/components/BarTop.vue";
-import TaskCardList from "@/components/TaskCardList.vue";
+import BarDate from "@/components/BarDate.vue";
+import TaskCardGrid from "@/components/TaskCardGrid.vue";
 import ContainerApp from "@/components/ContainerApp.vue";
 import ContainerMenu from "@/components/ContainerMenu.vue";
 // @ts-ignore
@@ -85,6 +102,7 @@ import {
     getAllTaskTypesForUser,
     updateTasks,
     deleteTasks,
+    getCalendarDate,
     parseTasksByStatus
     // @ts-ignore
 } from "@/util";
@@ -92,12 +110,14 @@ import {
 export default Vue.extend({
     components: {
         BarTop,
+        BarDate,
         ContainerApp,
         ContainerMenu,
-        TaskCardList
+        TaskCardGrid
     },
     data() {
         return {
+            selectedDate: new Date().toISOString().substr(0, 10),
             pageLoading: false,
             tasksUpdating: false,
             tasksByStatus: {
@@ -110,6 +130,28 @@ export default Vue.extend({
     computed: {
         currentUser() {
             return this.$store.getters.user;
+        },
+        calendarDate() {
+            let date = getCalendarDate(this.selectedDate).toLowerCase();
+            if (date.includes("invalid date")) {
+                return "todo";
+            } else {
+                if (
+                    !(
+                        date.includes("tomorrow") ||
+                        date.includes("yesterday") ||
+                        date.includes("today") ||
+                        date.includes("last")
+                    )
+                ) {
+                    date = " on " + date;
+                }
+                if (date.includes(":")) {
+                    return date.substr(0, date.length - 11);
+                } else {
+                    return date;
+                }
+            }
         }
     },
     methods: {

@@ -167,12 +167,12 @@ export default Vue.extend({
         onNameEdit() {
             this.resetEditFlags();
             this.editName = true;
-            focusByRef("nameEdit");
+            this.focusByRef("nameEdit");
         },
         onEmailEdit() {
             this.resetEditFlags();
             this.editEmail = true;
-            focusByRef("nameEdit");
+            this.focusByRef("emailEdit");
         },
         resetEditFlags() {
             this.editName = false;
@@ -230,8 +230,9 @@ export default Vue.extend({
                     this.taskTypesLoading = false;
                 });
         },
-        focusByRef(name) {
+        focusByRef(name: any) {
             this.$nextTick(() => {
+                //@ts-ignore
                 this.$refs[name].focus();
             });
         }

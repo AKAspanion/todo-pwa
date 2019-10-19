@@ -209,6 +209,7 @@
                                 <v-btn
                                     icon
                                     :disabled="disabled"
+                                    :small="$vuetify.breakpoint.xsOnly"
                                     @click.stop="onModalCancel();isEdit = false; isDelete = false;"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 >
@@ -220,6 +221,7 @@
                                 <v-btn
                                     icon
                                     :disabled="disabled"
+                                    :small="$vuetify.breakpoint.xsOnly"
                                     @click.stop="onModalCheck(); isEdit = false; isDelete = false;"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 >
