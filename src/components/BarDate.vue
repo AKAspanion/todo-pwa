@@ -7,6 +7,7 @@
             v-slot:default="{ active, toggle }"
         >
             <v-card
+                light
                 width="48"
                 height="48"
                 class="ma-3"
@@ -68,7 +69,7 @@
 import { getMomentDate, getShortMonth, getNumberDay, getWeekDay } from "@/util";
 import Vue from "vue";
 export default Vue.extend({
-    props: ["value"],
+    props: ["value", "refresh"],
     data() {
         return {
             dates: [],
@@ -81,6 +82,16 @@ export default Vue.extend({
                 if (newValue != oldValue) {
                     // @ts-ignore
                     this.$emit("input", newValue);
+                }
+            },
+            deep: true,
+            immediate: true
+        },
+        refresh: {
+            handler(newValue) {
+                if (newValue) {
+                    // @ts-ignore
+                    this.populateDates();
                 }
             },
             deep: true,
@@ -101,6 +112,7 @@ export default Vue.extend({
     },
     methods: {
         populateDates() {
+            let newDates = [];
             let today: any = new Date();
             for (let i = 0; i <= 15; i++) {
                 let next: any = new Date();
@@ -112,8 +124,11 @@ export default Vue.extend({
                     model: getMomentDate(next).substr(0, 10)
                 };
                 //@ts-ignore
-                this.dates.push(date);
+                newDates.push(date);
             }
+            //@ts-ignore
+            this.dates = [...newDates];
+            this.$emit("after-refresh");
         }
     },
     created() {

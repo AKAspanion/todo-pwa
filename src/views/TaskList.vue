@@ -19,15 +19,19 @@
             :bg-height="$vuetify.breakpoint.xsOnly ?'140px':'152px'"
         >
             <div :class="$vuetify.breakpoint.xsOnly ? '':'mx-3 mb-2'">
-                <v-card-text class="text-left py-0 white--text">Hello Ankit.</v-card-text>
+                <v-card-text
+                    class="text-left py-0 white--text"
+                >{{$t('hello')}} {{currentUser.displayName}}.</v-card-text>
                 <v-card-title class="py-0 white--text">
-                    {{tasksByStatus['todo'] ? tasksByStatus['todo'].length : 0}}
-                    tasks
+                    {{todoListLength}}
+                    {{todoListLength != 1 ? $t("task.plural"):$t("task.singular")}}
                     {{calendarDate}}.
                 </v-card-title>
             </div>
             <bar-date
+                :refresh="refreshDates"
                 v-model="selectedDate"
+                @after-refresh="refreshDates = false"
                 :class="$vuetify.breakpoint.xsOnly ? 'mx-1 mb-6':'mx-4 mb-8'"
             ></bar-date>
             <div style="width: 100%" :class="$vuetify.breakpoint.xsOnly ? 'px-4':'px-7'">
@@ -45,7 +49,7 @@
                 </v-layout>
                 <task-card-grid
                     :compact="compact"
-                    :task-list="tasksByStatus['todo']"
+                    :task-list="todoList"
                     :loading="pageLoading"
                     @edit="onTaskEdit"
                     @check="onTaskCheck"
@@ -69,7 +73,7 @@
                 <div class="overline text-left pb-3">{{$t('done')}}</div>
                 <task-card-grid
                     :compact="compact"
-                    :task-list="tasksByStatus['done']"
+                    :task-list="doneList"
                     class="pb-4"
                     :loading="pageLoading"
                     :disabled="tasksUpdating"
@@ -117,8 +121,9 @@ export default Vue.extend({
     },
     data() {
         return {
-            selectedDate: new Date().toISOString().substr(0, 10),
+            selectedDate: "",
             pageLoading: false,
+            refreshDates: false,
             tasksUpdating: false,
             tasksByStatus: {
                 todo: [],
@@ -127,29 +132,71 @@ export default Vue.extend({
             compact: true
         };
     },
+    watch: {
+        "$i18n.locale": {
+            handler(newValue) {
+                this.refreshDates = true;
+            }
+        },
+        deep: true
+    },
     computed: {
         currentUser() {
             return this.$store.getters.user;
         },
+        isSelectedDateValid() {
+            return !this.selectedDate || this.selectedDate == "";
+        },
+        todoList() {
+            if (this.isSelectedDateValid) {
+                return this.tasksByStatus["todo"];
+            } else {
+                return this.tasksByStatus["todo"].filter(
+                    task => task.date == this.selectedDate
+                );
+            }
+        },
+        doneList() {
+            if (this.isSelectedDateValid) {
+                return this.tasksByStatus["done"];
+            } else {
+                return this.tasksByStatus["done"].filter(
+                    task => task.date == this.selectedDate
+                );
+            }
+        },
+        todoListLength() {
+            return this.todoList ? this.todoList.length : 0;
+        },
         calendarDate() {
             let date = getCalendarDate(this.selectedDate).toLowerCase();
-            if (date.includes("invalid date")) {
-                return "todo";
+            if (date.includes("invalid")) {
+                return this.$t("todo");
             } else {
-                if (
-                    !(
-                        date.includes("tomorrow") ||
-                        date.includes("yesterday") ||
-                        date.includes("today") ||
-                        date.includes("last")
-                    )
-                ) {
-                    date = " on " + date;
-                }
-                if (date.includes(":")) {
-                    return date.substr(0, date.length - 11);
+                if (this.$i18n.locale != "en") {
+                    if (date.includes("कल") || date.includes("आज")) {
+                        return date.substr(0, date.length - 14);
+                    }
+                    if (date.includes(":")) {
+                        date = date.substr(0, date.length - 15);
+                    }
+                    return date + " को";
                 } else {
-                    return date;
+                    if (
+                        !(
+                            date.includes("tomorrow") ||
+                            date.includes("yesterday") ||
+                            date.includes("today") ||
+                            date.includes("last")
+                        )
+                    ) {
+                        date = " on " + date;
+                    }
+                    if (date.includes(":")) {
+                        return date.substr(0, date.length - 11);
+                    } else {
+                        return date;
+                    }
                 }
             }
         }

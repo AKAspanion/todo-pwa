@@ -11,6 +11,7 @@
     "ok": "OK",
     "save": "Save",
     "close": "Close",
+    "hello": "Hello",
     "create": "Create",
     "options": "Options",
     "profile": "Profile",
@@ -59,6 +60,8 @@
         "label": "Home"
     },
     "task": {
+        "singular": "task",
+        "plural": "tasks",
         "add": "Add Task",
         "delete": "Delete this task?",
         "title-placeholder": "Name your task",
