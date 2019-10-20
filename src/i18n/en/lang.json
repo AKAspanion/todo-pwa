@@ -63,6 +63,7 @@
         "singular": "task",
         "plural": "tasks",
         "add": "Add Task",
+        "indefinite": "Indefinite task?",
         "delete": "Delete this task?",
         "title-placeholder": "Name your task",
         "desc-placeholder": "A detailed description of the task"

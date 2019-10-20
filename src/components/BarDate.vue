@@ -43,7 +43,7 @@
                 >
                     <v-menu :close-on-content-click="false">
                         <template #activator="{ on }">
-                            <v-btn icon v-on="on">
+                            <v-btn dark icon v-on="on">
                                 <v-icon>mdi-calendar</v-icon>
                             </v-btn>
                         </template>

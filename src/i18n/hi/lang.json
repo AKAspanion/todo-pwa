@@ -63,6 +63,7 @@
         "singular": "कार्य",
         "plural": "कार्य",
         "add": "कार्य बनाएँ",
+        "indefinite": "अनिश्चितकालीन कार्य?",
         "delete": "इस कार्य को हटाएं?",
         "title-placeholder": "अपने कार्य को नाम दें",
         "desc-placeholder": "कार्य का विस्तृत विवरण"

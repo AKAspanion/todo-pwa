@@ -25,7 +25,7 @@
                     <v-list-item-title>{{$t('dark.mode')}}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action class="mr-2">
-                    <v-switch v-model="themeModel"></v-switch>
+                    <v-switch color="primary" v-model="themeModel"></v-switch>
                 </v-list-item-action>
             </v-list-item>
             <v-list-item>

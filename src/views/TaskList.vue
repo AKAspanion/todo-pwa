@@ -21,11 +21,11 @@
             <div :class="$vuetify.breakpoint.xsOnly ? '':'mx-3 mb-2'">
                 <v-card-text
                     class="text-left py-0 white--text"
-                >{{$t('hello')}} {{currentUser.displayName}}.</v-card-text>
+                >{{$t('hello')}} {{currentUser.displayName}}</v-card-text>
                 <v-card-title class="py-0 white--text">
                     {{todoListLength}}
                     {{todoListLength != 1 ? $t("task.plural"):$t("task.singular")}}
-                    {{calendarDate}}.
+                    {{calendarDate}}
                 </v-card-title>
             </div>
             <bar-date
@@ -106,11 +106,13 @@ import {
     getAllTaskTypesForUser,
     updateTasks,
     deleteTasks,
+    getMomentDate,
     getCalendarDate,
     parseTasksByStatus
     // @ts-ignore
 } from "@/util";
 
+// @ts-ignores
 export default Vue.extend({
     components: {
         BarTop,
@@ -121,7 +123,7 @@ export default Vue.extend({
     },
     data() {
         return {
-            selectedDate: "",
+            selectedDate: getMomentDate(new Date()).substr(0, 10),
             pageLoading: false,
             refreshDates: false,
             tasksUpdating: false,
@@ -135,6 +137,7 @@ export default Vue.extend({
     watch: {
         "$i18n.locale": {
             handler(newValue) {
+                // @ts-ignore
                 this.refreshDates = true;
             }
         },
@@ -142,37 +145,49 @@ export default Vue.extend({
     },
     computed: {
         currentUser() {
+            // @ts-ignore
             return this.$store.getters.user;
         },
         isSelectedDateValid() {
+            // @ts-ignore
             return !this.selectedDate || this.selectedDate == "";
         },
         todoList() {
             if (this.isSelectedDateValid) {
+                // @ts-ignore
                 return this.tasksByStatus["todo"];
             } else {
+                // @ts-ignore
                 return this.tasksByStatus["todo"].filter(
-                    task => task.date == this.selectedDate
+                    // @ts-ignore
+                    task => task.date == this.selectedDate || task.indefinite
                 );
             }
         },
         doneList() {
+            // @ts-ignore
             if (this.isSelectedDateValid) {
+                // @ts-ignore
                 return this.tasksByStatus["done"];
             } else {
+                // @ts-ignore
                 return this.tasksByStatus["done"].filter(
-                    task => task.date == this.selectedDate
+                    // @ts-ignore
+                    task => task.date == this.selectedDate || task.indefinite
                 );
             }
         },
         todoListLength() {
+            // @ts-ignore
             return this.todoList ? this.todoList.length : 0;
         },
         calendarDate() {
             let date = getCalendarDate(this.selectedDate).toLowerCase();
             if (date.includes("invalid")) {
-                return this.$t("todo");
+                // @ts-ignore
+                return this.$t("todo").toLowerCase();
             } else {
+                // @ts-ignore
                 if (this.$i18n.locale != "en") {
                     if (date.includes("कल") || date.includes("आज")) {
                         return date.substr(0, date.length - 14);
@@ -203,8 +218,10 @@ export default Vue.extend({
     },
     methods: {
         onTaskEdit(task: any) {
+            // @ts-ignore
             if (this.isTaskValid(task)) {
                 let { title, date, time, status, description, type } = task;
+                // @ts-ignore
                 this.updateTasks(task.id, {
                     title,
                     date,
@@ -221,19 +238,23 @@ export default Vue.extend({
             }
         },
         onTaskDelete(task: any) {
+            // @ts-ignore
             this.deleteTask(task);
         },
         onTaskUncheck(task: any) {
+            // @ts-ignore
             this.updateTasks(task.id, {
                 status: "todo"
             });
         },
         onTaskCheck(task: any) {
+            // @ts-ignore
             this.updateTasks(task.id, {
                 status: "done"
             });
         },
         deleteTask(task: any) {
+            // @ts-ignore
             this.tasksUpdating = true;
             this.$store.dispatch("LOADING", true);
             firebase
@@ -241,30 +262,33 @@ export default Vue.extend({
                 .then(() => {
                     return deleteTasks(task.id, this.$store.getters.tasks);
                 })
-                .then(tasks => {
+                .then((tasks: any) => {
                     this.$store.dispatch("SET_TASKS", tasks);
                     return parseTasksByStatus(tasks);
                 })
                 .then((tasksByStatus: any) => {
                     this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    // @ts-ignore
                     this.tasksByStatus = tasksByStatus;
                     this.$store.dispatch(
                         "SHOW_SNACK",
                         this.$t("toast.success.task.delete")
                     );
                 })
-                .catch(err => {
+                .catch((err: any) => {
                     this.$store.dispatch(
                         "SHOW_SNACK",
                         this.$t("toast.error.task.delete")
                     );
                 })
                 .finally(() => {
+                    // @ts-ignore
                     this.tasksUpdating = false;
                     this.$store.dispatch("LOADING", false);
                 });
         },
         updateTasks(taskId: any, updatedTask: any) {
+            // @ts-ignore
             this.tasksUpdating = true;
             this.$store.dispatch("LOADING", true);
             firebase
@@ -282,6 +306,7 @@ export default Vue.extend({
                 })
                 .then((tasksByStatus: any) => {
                     this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    // @ts-ignore
                     this.tasksByStatus = tasksByStatus;
                     this.$store.dispatch(
                         "SHOW_SNACK",
@@ -295,13 +320,16 @@ export default Vue.extend({
                     );
                 })
                 .finally(() => {
+                    // @ts-ignore
                     this.tasksUpdating = false;
                     this.$store.dispatch("LOADING", false);
                 });
         },
         loadPage() {
             return Promise.all([
+                // @ts-ignore
                 getAllTasksForUser(this.currentUser),
+                // @ts-ignore
                 getAllTaskTypesForUser(this.currentUser)
             ]);
         },
@@ -309,28 +337,29 @@ export default Vue.extend({
             navigateToPath(path);
         },
         isTaskValid(task: any) {
-            return (
-                task.title.trim() !== "" &&
-                task.description.trim() !== "" &&
-                task.type.length
-            );
+            return task.title.trim() !== "";
         }
     },
     mounted() {
         if (!this.$store.getters.landingVisited) {
             this.pageLoading = true;
             this.loadPage()
-                .then(response => {
+                .then((response: any) => {
+                    // @ts-ignore
                     this.$store.dispatch("SET_TASKS", response[0]);
+                    // @ts-ignore
                     this.$store.dispatch("SET_TYPES", response[1]);
+                    // @ts-ignore
                     this.$store.dispatch("LANDING_VISITED", true);
                     return parseTasksByStatus(response[0]);
                 })
                 .then((tasksByStatus: any) => {
+                    // @ts-ignore
                     this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
                     this.tasksByStatus = tasksByStatus;
                 })
-                .catch(err => {
+                .catch((err: any) => {
+                    // @ts-ignore
                     this.$store.dispatch("SHOW_SNACK", err);
                 })
                 .then(() => {

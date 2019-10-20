@@ -283,7 +283,8 @@ export default Vue.extend({
             return getTextColorByBg(color);
         },
         getCalendarDate() {
-            return getCalendarDate(this.task.date + "T" + this.task.time);
+            if (this.task.indefinite) return "No time restriction";
+            else return getCalendarDate(this.task.date + "T" + this.task.time);
         },
         onModalCheck() {
             if (this.isDelete && !this.isEdit) {

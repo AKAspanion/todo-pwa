@@ -44,6 +44,7 @@
                                         <v-text-field
                                             v-on="on"
                                             readonly
+                                            :disabled="task.indefinite"
                                             v-bind="textFieldAttributes"
                                             placeholder="Select time"
                                             prepend-inner-icon="mdi-clock-outline"
@@ -70,6 +71,7 @@
                                         <v-text-field
                                             v-on="on"
                                             readonly
+                                            :disabled="task.indefinite"
                                             placeholder="Select date"
                                             v-bind="textFieldAttributes"
                                             prepend-inner-icon="mdi-calendar-outline"
@@ -112,20 +114,18 @@
                                                 <v-chip-group
                                                     v-model="taskTypes"
                                                     multiple
-                                                    dark
                                                     return-object
                                                 >
                                                     <v-chip
                                                         filter
                                                         label
-                                                        dark
+                                                        outlined
+                                                        :key="tag.id"
                                                         :color="tag.color"
                                                         v-for="(tag, index) in types"
-                                                        :key="tag.id"
                                                         @focus="onChipFocus(true)"
                                                         @blur="onChipFocus(false)"
                                                         @keyup.enter="updateTaskModel(index)"
-                                                        :text-color="getTextColor(tag.color)"
                                                         :small="$vuetify.breakpoint.xsOnly"
                                                     >{{ tag.label }}</v-chip>
                                                 </v-chip-group>
@@ -148,9 +148,8 @@
                                     :placeholder="$t('task.desc-placeholder')"
                                 ></v-textarea>
                             </v-flex>
-
-                            <v-flex xs12 class="py-0">
-                                <v-layout row align-center justify-start class="ma-0 pb-5">
+                            <v-flex xs12 class="py-0 mt-n5 pb-3">
+                                <v-layout row align-center justify-start class="ma-0">
                                     <v-btn-toggle dense block v-model="task.status">
                                         <v-btn left value="todo">
                                             <span
@@ -164,7 +163,19 @@
                                         </v-btn>
                                     </v-btn-toggle>
                                     <v-spacer></v-spacer>
+                                    <div class="mx-2 subtitle-2">{{$t('task.indefinite')}}</div>
+                                    <v-switch
+                                        color="primary"
+                                        v-model="task.indefinite"
+                                        class="mb-n1 mr-n1"
+                                    ></v-switch>
+                                </v-layout>
+                            </v-flex>
+                            <v-flex xs12 class="py-0">
+                                <v-layout row align-center justify-start class="ma-0 pb-5">
+                                    <v-spacer></v-spacer>
                                     <v-btn
+                                        large
                                         type="submit"
                                         color="primary"
                                         :disabled="!addTaskForm"
@@ -190,6 +201,7 @@ import ContainerApp from "@/components/ContainerApp.vue";
 import ContainerMenu from "@/components/ContainerMenu.vue";
 // @ts-ignore
 import {
+    getMomentDate,
     navigateToPath,
     getReadableDate,
     get12FormatTime,
@@ -218,10 +230,11 @@ export default Vue.extend({
             taskTypesLoading: false,
             task: {
                 title: "",
-                date: new Date().toISOString().substr(0, 10),
-                time: new Date().toISOString().substr(11, 5),
+                date: getMomentDate(new Date()).substr(0, 10),
+                time: getMomentDate(new Date()).substr(11, 5),
                 status: "todo",
                 description: "",
+                indefinite: false,
                 type: []
             },
             types: [],

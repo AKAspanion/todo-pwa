@@ -38,6 +38,8 @@ class FirebaseWeb {
         return tasksRef.add({
             uid: user.uid,
             ...task,
+            time: task.indefinite ? 'NA' : task.time,
+            date: task.indefinite ? 'NA' : task.date,
             type: task.type.map((e: any) => firebase.firestore().doc(`types/${e.id}`)),
         });
     }
