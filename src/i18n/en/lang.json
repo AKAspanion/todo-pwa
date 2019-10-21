@@ -64,6 +64,7 @@
         "plural": "tasks",
         "add": "Add Task",
         "indefinite": "Indefinite task?",
+        "no-due": "No due date",
         "delete": "Delete this task?",
         "title-placeholder": "Name your task",
         "desc-placeholder": "A detailed description of the task"

@@ -47,7 +47,7 @@
                                             :disabled="task.indefinite"
                                             v-bind="textFieldAttributes"
                                             placeholder="Select time"
-                                            prepend-inner-icon="mdi-clock-outline"
+                                            prepend-inner-icon="mdi-clock"
                                             :value="readableTime()"
                                         ></v-text-field>
                                     </template>
@@ -74,7 +74,7 @@
                                             :disabled="task.indefinite"
                                             placeholder="Select date"
                                             v-bind="textFieldAttributes"
-                                            prepend-inner-icon="mdi-calendar-outline"
+                                            prepend-inner-icon="mdi-calendar"
                                             :value="readableDate()"
                                         ></v-text-field>
                                     </template>
@@ -102,10 +102,7 @@
                                         row
                                         class="ma-0 type-layout label-container"
                                     >
-                                        <v-icon
-                                            class="pr-3"
-                                            style="margin-left: -2px;"
-                                        >mdi-label-outline</v-icon>
+                                        <v-icon class="pr-3" style="margin-left: -2px;">mdi-label</v-icon>
                                         <template v-if="taskTypesLoading">
                                             <div class="animate label-shimmer"></div>
                                         </template>
@@ -144,7 +141,7 @@
                                     v-model="task.description"
                                     auto-grow
                                     v-bind="textFieldAttributes"
-                                    prepend-inner-icon="mdi-card-text-outline"
+                                    prepend-inner-icon="mdi-card-text"
                                     :placeholder="$t('task.desc-placeholder')"
                                 ></v-textarea>
                             </v-flex>

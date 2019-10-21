@@ -6,6 +6,11 @@ export const getReadableDate = (date) => {
     return moment(dateTime).locale(i18n.locale).format("dddd[,] MMMM Do[,] YYYY");
 }
 
+export const getShortReadableDate = (date) => {
+    let dateTime = new Date(date);
+    return moment(dateTime).locale(i18n.locale).format("MMM[,] Do[,] YY");
+}
+
 export const getCalendarDate = (date) => {
     let dateTime = new Date(date);
     return moment(dateTime).locale(i18n.locale).calendar()

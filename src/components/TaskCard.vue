@@ -59,7 +59,7 @@
             </template>
             <template v-else>
                 <v-layout column fill-height justify-space-between class="ma-0">
-                    <v-card-text :class="$vuetify.breakpoint.xsOnly ? 'pa-3':'pb-3'">
+                    <v-card-text :class="$vuetify.breakpoint.xsOnly ? 'pa-3':''">
                         <v-layout
                             row
                             wrap
@@ -72,15 +72,98 @@
                             >
                                 <!-- Editing part -->
                                 <div v-if="isEdit">
-                                    <v-text-field v-model="localTask.title" solo dense></v-text-field>
+                                    <v-text-field v-model="localTask.title" solo flat dense></v-text-field>
                                 </div>
-                                <div v-if="isEdit" class="mt-n3">
+                                <div v-if="isEdit" :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'">
                                     <v-textarea
                                         v-model="localTask.description"
                                         auto-grow
                                         solo
+                                        flat
                                         dense
                                     ></v-textarea>
+                                </div>
+                                <div v-if="isEdit" :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'">
+                                    <v-card flat class="px-3">
+                                        <v-chip-group v-model="localType" multiple return-object>
+                                            <v-chip
+                                                filter
+                                                small
+                                                label
+                                                outlined
+                                                :value="tag.id"
+                                                :key="tag.id"
+                                                :color="tag.color"
+                                                v-for="(tag) in $store.getters.types"
+                                                @keyup.enter="updateTaskModel(tag.id)"
+                                            >{{ tag.label }}</v-chip>
+                                        </v-chip-group>
+                                    </v-card>
+                                </div>
+                                <div v-if="isEdit" :class="$vuetify.breakpoint.xsOnly? 'mt-3':'mt-4 mb-n6'">
+                                    <v-layout row wrap align-center class="ma-0">
+                                        <v-flex
+                                            xs12
+                                            md6
+                                            py-0
+                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'pl-0 pr-2'"
+                                        >
+                                            <v-menu :close-on-content-click="false">
+                                                <template #activator="{ on }">
+                                                    <v-text-field
+                                                        v-on="on"
+                                                        solo
+                                                        flat
+                                                        dense
+                                                        readonly
+                                                        :value="readableTime"
+                                                        prepend-inner-icon="mdi-clock"
+                                                        :class="$vuetify.breakpoint.xsOnly? 'mb-n4 ':''"
+                                                    ></v-text-field>
+                                                </template>
+                                                <v-card>
+                                                    <v-time-picker
+                                                        color="primary"
+                                                        ref="timePicker"
+                                                        class="pickerTime"
+                                                        v-model="localTask.time"
+                                                        :locale="$i18n.locale"
+                                                        :ampm-in-title="$vuetify.breakpoint.mdAndUp"
+                                                    ></v-time-picker>
+                                                </v-card>
+                                            </v-menu>
+                                        </v-flex>
+                                        <v-flex
+                                            xs12
+                                            md6
+                                            py-0
+                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'pl-2 pr-0'"
+                                        >
+                                            <v-menu :close-on-content-click="false">
+                                                <template #activator="{ on }">
+                                                    <v-text-field
+                                                        solo
+                                                        flat
+                                                        dense
+                                                        v-on="on"
+                                                        readonly
+                                                        :value="readableDate"
+                                                        prepend-inner-icon="mdi-calendar"
+                                                        :class="$vuetify.breakpoint.xsOnly? 'mb-n6':''"
+                                                    ></v-text-field>
+                                                </template>
+                                                <v-card>
+                                                    <v-date-picker
+                                                        reactive
+                                                        color="primary"
+                                                        ref="datePicker"
+                                                        v-model="localTask.date"
+                                                        :locale="$i18n.locale"
+                                                    ></v-date-picker>
+                                                </v-card>
+                                            </v-menu>
+                                        </v-flex>
+                                    </v-layout>
                                 </div>
                                 <!-- delete part -->
                                 <div
@@ -112,10 +195,11 @@
                             <div
                                 v-if="!isEdit && !isDelete"
                                 class="mr-n1"
-                                style="margin-top: -2px !important"
+                                style="margin-top: -2px !important; height: 36px;"
                             >
                                 <v-btn
                                     icon
+                                    v-show="hover || $vuetify.breakpoint.xsOnly"
                                     :disabled="disabled"
                                     :small="$vuetify.breakpoint.xsOnly"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
@@ -161,6 +245,7 @@
                         <v-divider light></v-divider>
                         <v-card-actions
                             :class="$vuetify.breakpoint.xsOnly ? 'pl-3 pr-2':'pl-4 pr-3'"
+                            style="min-height: 52px;"
                         >
                             <div v-if="!isEdit && !isDelete">
                                 <v-icon
@@ -185,6 +270,7 @@
                             <div v-if="!isEdit && !isDelete">
                                 <v-btn
                                     icon
+                                    v-show="hover || $vuetify.breakpoint.xsOnly"
                                     v-if="task.status == 'todo'"
                                     :disabled="disabled"
                                     :small="$vuetify.breakpoint.xsOnly"
@@ -197,6 +283,7 @@
                             <div v-if="!isEdit && !isDelete">
                                 <v-btn
                                     icon
+                                    v-show="hover || $vuetify.breakpoint.xsOnly"
                                     :disabled="disabled"
                                     :small="$vuetify.breakpoint.xsOnly"
                                     @click.stop="isDelete = true"
@@ -238,7 +325,13 @@
 <script lang="ts">
 import Vue from "vue";
 // @ts-ignore
-import { getCalendarDate, getTextColorByBg } from "@/util";
+import {
+    getCalendarDate,
+    getTextColorByBg,
+    get12FormatTime,
+    getShortReadableDate
+    // @ts-ignore
+} from "@/util";
 export default Vue.extend({
     props: {
         task: {
@@ -258,8 +351,33 @@ export default Vue.extend({
         return {
             isDelete: false,
             isEdit: false,
-            localTask: {}
+            localTask: {
+                date: "",
+                description: "",
+                indefinite: true,
+                status: "",
+                title: "",
+                time: "",
+                type: [],
+                uid: ""
+            }
         };
+    },
+    computed: {
+        localType: {
+            get() {
+                return this.localTask.type.map(type => type.id);
+            },
+            set(val) {
+                this.updateTypes(val);
+            }
+        },
+        readableTime() {
+            return get12FormatTime(this.localTask.time);
+        },
+        readableDate() {
+            return getShortReadableDate(this.localTask.date);
+        }
     },
     methods: {
         getTextColor() {
@@ -283,7 +401,7 @@ export default Vue.extend({
             return getTextColorByBg(color);
         },
         getCalendarDate() {
-            if (this.task.indefinite) return "No time restriction";
+            if (this.task.indefinite) return this.$t("task.no-due");
             else return getCalendarDate(this.task.date + "T" + this.task.time);
         },
         onModalCheck() {
@@ -296,8 +414,30 @@ export default Vue.extend({
         },
         onModalCancel() {
             this.localTask = {
-                ...this.task
+                ...this.task,
+                time: this.task.indefinite ? null: this.task.time,
+                date: this.task.indefinite ? null: this.task.date
             };
+        },
+        updateTypes(val) {
+            let types = [];
+            val.forEach(element => {
+                let type = this.$store.getters.types.find(e => e.id == element);
+                if (type) types.push(type);
+            });
+            this.localTask.type = [...types];
+        },
+        updateTaskModel(id) {
+            //@ts-ignore
+            let localT = this.localType;
+            let indexVal = localT.indexOf(id);
+            if (indexVal !== -1) {
+                localT.splice(indexVal, 1);
+            } else {
+                //@ts-ignore
+                localT.push(id);
+            }
+            this.updateTypes(localT);
         }
     }
 });
