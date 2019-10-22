@@ -74,7 +74,10 @@
                                 <div v-if="isEdit">
                                     <v-text-field v-model="localTask.title" solo flat dense></v-text-field>
                                 </div>
-                                <div v-if="isEdit" :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'">
+                                <div
+                                    v-if="isEdit"
+                                    :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'"
+                                >
                                     <v-textarea
                                         v-model="localTask.description"
                                         auto-grow
@@ -83,7 +86,10 @@
                                         dense
                                     ></v-textarea>
                                 </div>
-                                <div v-if="isEdit" :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'">
+                                <div
+                                    v-if="isEdit"
+                                    :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'"
+                                >
                                     <v-card flat class="px-3">
                                         <v-chip-group v-model="localType" multiple return-object>
                                             <v-chip
@@ -100,7 +106,10 @@
                                         </v-chip-group>
                                     </v-card>
                                 </div>
-                                <div v-if="isEdit" :class="$vuetify.breakpoint.xsOnly? 'mt-3':'mt-4 mb-n6'">
+                                <div
+                                    v-if="isEdit"
+                                    :class="$vuetify.breakpoint.xsOnly? 'mt-3':'mt-4 mb-n6'"
+                                >
                                     <v-layout row wrap align-center class="ma-0">
                                         <v-flex
                                             xs12
@@ -366,26 +375,35 @@ export default Vue.extend({
     computed: {
         localType: {
             get() {
+                // @ts-ignore
                 return this.localTask.type.map(type => type.id);
             },
             set(val) {
+                // @ts-ignore
                 this.updateTypes(val);
             }
         },
         readableTime() {
+            // @ts-ignore
             return get12FormatTime(this.localTask.time);
         },
         readableDate() {
+            // @ts-ignore
             return getShortReadableDate(this.localTask.date);
         }
     },
     methods: {
+        // @ts-ignore
         getTextColor() {
             return this.getTextColorForBg(this.getBgColor());
         },
+        // @ts-ignore
         getBgColor() {
+            // @ts-ignore
             if (this.task.status === "todo") {
+                // @ts-ignore
                 if (this.task.type.length) {
+                    // @ts-ignore
                     return this.task.type[0].color;
                 } else {
                     if (this.$vuetify.theme.dark) {
@@ -400,34 +418,48 @@ export default Vue.extend({
         getTextColorForBg(color: any) {
             return getTextColorByBg(color);
         },
+        // @ts-ignore
         getCalendarDate() {
+            // @ts-ignore
             if (this.task.indefinite) return this.$t("task.no-due");
+            // @ts-ignore
             else return getCalendarDate(this.task.date + "T" + this.task.time);
         },
         onModalCheck() {
+            // @ts-ignore
             if (this.isDelete && !this.isEdit) {
+                // @ts-ignore
                 this.$emit("delete", this.task);
             }
+            // @ts-ignore
             if (!this.isDelete && this.isEdit) {
+                // @ts-ignore
                 this.$emit("edit", this.localTask);
             }
         },
         onModalCancel() {
+            // @ts-ignore
             this.localTask = {
+                // @ts-ignore
                 ...this.task,
-                time: this.task.indefinite ? null: this.task.time,
-                date: this.task.indefinite ? null: this.task.date
+                // @ts-ignore
+                time: this.task.indefinite ? null : this.task.time,
+                // @ts-ignore
+                date: this.task.indefinite ? null : this.task.date
             };
         },
-        updateTypes(val) {
-            let types = [];
-            val.forEach(element => {
-                let type = this.$store.getters.types.find(e => e.id == element);
+        updateTypes(val: any) {
+            let types: any = [];
+            val.forEach((element: any) => {
+                let type = this.$store.getters.types.find(
+                    (e: any) => e.id == element
+                );
                 if (type) types.push(type);
             });
+            // @ts-ignore
             this.localTask.type = [...types];
         },
-        updateTaskModel(id) {
+        updateTaskModel(id: any) {
             //@ts-ignore
             let localT = this.localType;
             let indexVal = localT.indexOf(id);
@@ -437,6 +469,7 @@ export default Vue.extend({
                 //@ts-ignore
                 localT.push(id);
             }
+            // @ts-ignore
             this.updateTypes(localT);
         }
     }

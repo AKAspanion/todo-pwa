@@ -1,4 +1,5 @@
 import * as firebase from 'firebase';
+import store from '../store/store';
 
 class FirebaseWeb {
     private firebaseConfig: any = {
@@ -71,19 +72,19 @@ class FirebaseWeb {
         firebase.initializeApp(this.firebaseConfig);
         Notification.requestPermission().then((permission) => {
             if (permission === 'granted') {
-                console.log('Notification permission granted.', permission);
+                store.dispatch('setNotificationPermission', true);
                 // TODO(developer): Retrieve an Instance ID token for use with FCM.
                 // ...
             } else {
-                console.log('Unable to get permission to notify.');
+                store.dispatch('setNotificationPermission', false);
             }
         });
         this.getMessagingToken();
     }
 
-    public tokenRefreshListner(callback: any) {
+    public tokenRefreshListener(callback: any) {
         const messaging = firebase.messaging();
-        messaging.usePublicVapidKey("BEbQX5KIcHqh5tYXtx8uJ4rUuB0Yi-5ZyaBruT1poU0DGYzIuvAirV-dHDvgPjl09eCt45JwJPTKVlWonrxDRlc");
+        messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
         messaging.onTokenRefresh(callback);
         // messaging.getToken().then((refreshedToken) => {
         //     console.log('Token refreshed.');
@@ -101,7 +102,7 @@ class FirebaseWeb {
 
     public getMessagingToken = () => {
         const messaging = firebase.messaging();
-        messaging.usePublicVapidKey("BEbQX5KIcHqh5tYXtx8uJ4rUuB0Yi-5ZyaBruT1poU0DGYzIuvAirV-dHDvgPjl09eCt45JwJPTKVlWonrxDRlc");
+        messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
         messaging.getToken().then((currentToken) => {
             if (currentToken) {
                 console.log(currentToken);
@@ -119,6 +120,14 @@ class FirebaseWeb {
             // showToken('Error retrieving Instance ID token. ', err);
             // setTokenSentToServer(false);
         });
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            // ...
+        });
+    }
+
+    public sendTokenToServer = () => {
+
     }
 
     public updateUserProfile = (updatedUser: any) => {
