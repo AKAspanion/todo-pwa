@@ -1,7 +1,7 @@
 <template>
     <v-hover #default="{ hover }">
         <v-card
-            :elevation="hover && $vuetify.breakpoint.smAndUp? 8 : 2"
+            :elevation="hover && $vuetify.breakpoint.smAndUp? 5 : 2"
             :light="getTextColor() !== '#ffffff' ? true : false"
             :dark="getTextColor() === '#ffffff' ? true : false"
             height="100%"
@@ -183,10 +183,10 @@
                                 <!-- Non edit/delete part -->
                                 <div
                                     v-if="!isEdit && !isDelete"
-                                    class="font-weight-bold pb-1 overflow-text"
+                                    class="font-weight-bold overflow-text"
                                     :style="$vuetify.breakpoint.xsOnly ? 'min-height: 24px;':'min-height: 28px;'"
                                     :class="[
-                                    $vuetify.breakpoint.xsOnly ? 'body-2':'body-1',
+                                    $vuetify.breakpoint.xsOnly ? 'body-2':'body-1 pb-1',
                                     getTextColor() !== '#ffffff' ? 'black--text':'white--text'
                                 ]"
                                 >
@@ -204,7 +204,8 @@
                             <div
                                 v-if="!isEdit && !isDelete"
                                 class="mr-n1"
-                                style="margin-top: -2px !important; height: 36px;"
+                                style="margin-top: -2px !important;"
+                                :style="$vuetify.breakpoint.xsOnly ? 'min-height: 24px;':'min-height: 36px;'"
                             >
                                 <v-btn
                                     icon
@@ -222,9 +223,9 @@
                         </v-layout>
                         <div
                             v-if="!isEdit && !isDelete"
-                            class="task-desc pt-1"
+                            class="task-desc"
                             :class="[
-                                $vuetify.breakpoint.xsOnly ? 'caption':'body-2',
+                                $vuetify.breakpoint.xsOnly ? 'caption':'body-2 pt-1',
                                 task.status == 'done' ? 'line-through-text':'', 
                                 getTextColor() !== '#ffffff' ? 'black--text':'white--text'
                             ]"
@@ -232,7 +233,7 @@
                     </v-card-text>
                     <div>
                         <v-card-text
-                            v-if="!isEdit && !isDelete"
+                            v-if="!isEdit && !isDelete && task.type.length"
                             :class="$vuetify.breakpoint.xsOnly ? 'pa-3':'py-3'"
                         >
                             <div>

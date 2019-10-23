@@ -34,8 +34,14 @@
                 @after-refresh="refreshDates = false"
                 :class="$vuetify.breakpoint.xsOnly ? 'mx-1 mb-6':'mx-4 mb-8'"
             ></bar-date>
-            <div style="width: 100%" :class="$vuetify.breakpoint.xsOnly ? 'px-4':'px-7'">
-                <v-layout row align-center justify-space-between class="ma-0 pb-1">
+            <div style="width: 100%" :class="$vuetify.breakpoint.xsOnly ? 'px-3':'px-4'">
+                <v-layout
+                    row
+                    align-center
+                    justify-space-between
+                    class="ma-0 pb-1"
+                    :class="$vuetify.breakpoint.xsOnly ? 'px-1':'px-3'"
+                >
                     <div class="overline text-left">{{$t('todo')}}</div>
                     <v-btn
                         icon
@@ -70,7 +76,10 @@
                         >{{$t('create')}}</v-btn>
                     </template>
                 </task-card-grid>
-                <div class="overline text-left pb-3">{{$t('done')}}</div>
+                <div
+                    class="overline text-left pb-3"
+                    :class="$vuetify.breakpoint.xsOnly ? 'px-1':'px-3'"
+                >{{$t('done')}}</div>
                 <task-card-grid
                     :compact="compact"
                     :task-list="doneList"

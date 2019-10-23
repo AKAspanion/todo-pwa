@@ -1,15 +1,9 @@
 <template>
-    <v-container fill-height :grid-list-xl="$vuetify.breakpoint.smAndUp" fluid pa-0>
-        <v-layout row wrap fill-height>
-            <template v-if="taskList.length">
-                <template v-for="(task, index) in taskList">
-                    <v-flex
-                        lg4
-                        sm6
-                        :key="index"
-                        :xs6="compact && $vuetify.breakpoint.xsOnly"
-                        :xs12="!compact && $vuetify.breakpoint.xsOnly"
-                    >
+    <div>
+        <template v-if="taskList.length">
+            <waterfall :percent="percent">
+                <waterfall-item v-for="(task, index) in taskList" :key="index">
+                    <v-card flat :class="gridClasses">
                         <task-card
                             :task="task"
                             :loading="loading"
@@ -21,45 +15,45 @@
                             @check="(v) => $emit('check', v)"
                             @edit="(v) => $emit('edit', v)"
                         ></task-card>
-                    </v-flex>
-                </template>
+                    </v-card>
+                </waterfall-item>
+            </waterfall>
+        </template>
+        <template v-else>
+            <template v-if="loading">
+                <waterfall :percent="percent">
+                    <waterfall-item v-for="index in 4" :key="index">
+                        <v-card flat :class="gridClasses">
+                            <task-card :task="{}" :loading="true"></task-card>
+                        </v-card>
+                    </waterfall-item>
+                </waterfall>
             </template>
             <template v-else>
-                <template v-if="loading">
-                    <template v-for="i in 2">
-                        <v-flex
-                            lg4
-                            sm6
-                            :key="i"
-                            :xs6="compact && $vuetify.breakpoint.xsOnly"
-                            :xs12="!compact && $vuetify.breakpoint.xsOnly"
-                        >
-                            <task-card :task="{}" :loading="true"></task-card>
-                        </v-flex>
-                    </template>
-                </template>
-                <template v-else>
-                    <v-card
-                        outlined
-                        width="100%"
-                        class="text-left pa-4"
-                        :class="$vuetify.breakpoint.xsOnly ? 'mx-1':'mx-3'"
-                    >
-                        <div class="subtitle-2">{{noDataObject.title}}</div>
-                        <div class="caption">{{noDataObject.caption}}</div>
-                        <slot name="no-data"></slot>
-                    </v-card>
-                </template>
+                <v-card
+                    outlined
+                    width="100%"
+                    class="text-left pa-4"
+                    :class="$vuetify.breakpoint.xsOnly ? 'mx-1':'mx-3'"
+                >
+                    <div class="subtitle-2">{{noDataObject.title}}</div>
+                    <div class="caption">{{noDataObject.caption}}</div>
+                    <slot name="no-data"></slot>
+                </v-card>
             </template>
-        </v-layout>
-    </v-container>
+        </template>
+    </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
+//@ts-ignore
+import { Waterfall, WaterfallItem } from "vue2-waterfall";
 import TaskCard from "@/components/TaskCard.vue";
 export default Vue.extend({
     components: {
-        TaskCard
+        TaskCard,
+        Waterfall,
+        WaterfallItem
     },
     props: {
         taskList: {
@@ -85,6 +79,54 @@ export default Vue.extend({
                     title: "No data found",
                     caption: "Perform some action to populate data"
                 };
+            }
+        }
+    },
+    computed: {
+        width() {
+            switch (this.$vuetify.breakpoint.name) {
+                case "xs":
+                    return window.screen.width;
+                case "sm":
+                    return "400px";
+                case "md":
+                    return "500px";
+                case "lg":
+                    return "600px";
+                case "xl":
+                    return "800px";
+            }
+        },
+        percent() {
+            switch (this.$vuetify.breakpoint.name) {
+                case "xs":
+                    if (!this.compact) {
+                        return [1];
+                    } else {
+                        return [1, 1];
+                    }
+                case "sm":
+                    return [1, 1];
+                case "md":
+                    return [1, 1, 1];
+                case "lg":
+                    return [1, 1, 1];
+                case "xl":
+                    return [1, 1, 1, 1];
+            }
+        },
+        gridClasses() {
+            switch (this.$vuetify.breakpoint.name) {
+                case "xs":
+                    return "pa-1";
+                case "sm":
+                    return "pa-2";
+                case "md":
+                    return "pa-2";
+                case "lg":
+                    return "pa-3";
+                case "xl":
+                    return "pa-3";
             }
         }
     }
