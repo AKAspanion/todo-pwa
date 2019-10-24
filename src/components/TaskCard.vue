@@ -254,7 +254,7 @@
                         </v-card-text>
                         <v-divider light></v-divider>
                         <v-card-actions
-                            :class="$vuetify.breakpoint.xsOnly ? 'pl-3 pr-2':'pl-4 pr-3'"
+                            :class="$vuetify.breakpoint.xsOnly ? 'px-2':'px-3'"
                             style="min-height: 52px;"
                         >
                             <div v-if="!isEdit && !isDelete">
@@ -302,7 +302,7 @@
                                     <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-delete</v-icon>
                                 </v-btn>
                             </div>
-                            <div v-if="isEdit || isDelete" class="ml-n1">
+                            <div v-if="isEdit || isDelete">
                                 <v-btn
                                     icon
                                     :disabled="disabled"
@@ -314,7 +314,7 @@
                                 </v-btn>
                             </div>
                             <v-spacer v-if="isEdit || isDelete"></v-spacer>
-                            <div v-if="isEdit || isDelete" class="mr-n1">
+                            <div v-if="isEdit || isDelete">
                                 <v-btn
                                     icon
                                     :disabled="disabled"
@@ -495,7 +495,12 @@ export default Vue.extend({
 .task-container >>> input {
     font-size: 14px !important;
 }
-
+.pickerTime >>> .v-time-picker-title {
+    justify-content: center !important;
+}
+.pickerTime {
+    width: 100%;
+}
 @media only screen and (max-width: 600px) {
     .task-container >>> textarea {
         font-size: 12px !important;

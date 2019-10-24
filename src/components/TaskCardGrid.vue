@@ -83,20 +83,6 @@ export default Vue.extend({
         }
     },
     computed: {
-        width() {
-            switch (this.$vuetify.breakpoint.name) {
-                case "xs":
-                    return window.screen.width;
-                case "sm":
-                    return "400px";
-                case "md":
-                    return "500px";
-                case "lg":
-                    return "600px";
-                case "xl":
-                    return "800px";
-            }
-        },
         percent() {
             switch (this.$vuetify.breakpoint.name) {
                 case "xs":
