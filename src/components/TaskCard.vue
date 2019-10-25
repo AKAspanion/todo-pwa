@@ -277,31 +277,66 @@
                                 <span>{{getCalendarDate()}}</span>
                             </v-tooltip>
                             <v-spacer v-if="!isEdit && !isDelete"></v-spacer>
-                            <div v-if="!isEdit && !isDelete">
+                            <template v-if="!isEdit && !isDelete">
+                                <v-menu>
+                                    <template #activator="{ on }">
+                                        <v-btn
+                                            icon
+                                            small
+                                            v-on="on"
+                                            v-show="$vuetify.breakpoint.xsOnly"
+                                            v-if="task.status == 'todo'"
+                                            :disabled="disabled"
+                                            :color="getTextColor() === '#ffffff' ? 'white':'black'"
+                                        >
+                                            <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-dots-vertical</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <v-card width="72">
+                                        <v-layout row class="mx-0">
+                                            <v-btn 
+                                                icon
+                                                small
+                                                class="ma-1"
+                                                @click.stop="onModalCancel(); isEdit = true">
+                                                <v-icon small>
+                                                    mdi-pencil
+                                                </v-icon>
+                                            </v-btn>
+                                            <v-btn 
+                                                icon
+                                                small
+                                                class="ma-1" 
+                                                @click.stop="isDelete = true">
+                                                <v-icon small>
+                                                    mdi-delete
+                                                </v-icon>
+                                            </v-btn>
+                                        </v-layout>
+                                    </v-card>
+                                </v-menu>
                                 <v-btn
                                     icon
-                                    v-show="hover || $vuetify.breakpoint.xsOnly"
-                                    v-if="task.status == 'todo'"
                                     :disabled="disabled"
+                                    v-if="task.status == 'todo'"
                                     :small="$vuetify.breakpoint.xsOnly"
+                                    v-show="hover && !$vuetify.breakpoint.xsOnly"
                                     @click.stop="onModalCancel(); isEdit = true"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 >
                                     <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-pencil</v-icon>
                                 </v-btn>
-                            </div>
-                            <div v-if="!isEdit && !isDelete">
                                 <v-btn
                                     icon
-                                    v-show="hover || $vuetify.breakpoint.xsOnly"
                                     :disabled="disabled"
-                                    :small="$vuetify.breakpoint.xsOnly"
                                     @click.stop="isDelete = true"
+                                    :small="$vuetify.breakpoint.xsOnly"
+                                    v-show="hover && !$vuetify.breakpoint.xsOnly"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 >
                                     <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-delete</v-icon>
                                 </v-btn>
-                            </div>
+                            </template>
                             <div v-if="isEdit || isDelete">
                                 <v-btn
                                     icon

@@ -72,14 +72,14 @@ class FirebaseWeb {
         firebase.initializeApp(this.firebaseConfig);
         Notification.requestPermission().then((permission) => {
             if (permission === 'granted') {
-                store.dispatch('setNotificationPermission', true);
-                // TODO(developer): Retrieve an Instance ID token for use with FCM.
+                // store.dispatch('setNotificationPermission', true);
+                // TODO Retrieve an Instance ID token for use with FCM.
+                // this.getMessagingToken();
                 // ...
             } else {
-                store.dispatch('setNotificationPermission', false);
+                // store.dispatch('setNotificationPermission', false);
             }
         });
-        this.getMessagingToken();
     }
 
     public tokenRefreshListener(callback: any) {
@@ -105,28 +105,42 @@ class FirebaseWeb {
         messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
         messaging.getToken().then((currentToken) => {
             if (currentToken) {
-                console.log(currentToken);
-                // sendTokenToServer(currentToken);
+                return this.sendFCMTokenToServer(currentToken);
                 // updateUIForPushEnabled(currentToken);
             } else {
                 // Show permission request.
-                console.log('No Instance ID token available. Request permission to generate one.');
+                throw new Error('No Instance ID token available. Request permission to generate one.');
                 // Show permission UI.
                 // updateUIForPushPermissionRequired();
                 // setTokenSentToServer(false);
             }
-        }).catch((err) => {
+        })
+        .then((msg) => {
+            console.log(msg);
+        })
+        .catch((err) => {
             console.log('An error occurred while retrieving token. ', err);
             // showToken('Error retrieving Instance ID token. ', err);
             // setTokenSentToServer(false);
-        });
+        })
         messaging.onMessage((payload) => {
             console.log('Message received. ', payload);
             // ...
         });
     }
 
-    public sendTokenToServer = () => {
+    public sendFCMTokenToServer = (token: any) => {       
+        const fcmsRef = firebase.firestore().collection('fcms');
+        const user: any = firebase.auth().currentUser;
+        console.log(token, user);
+        if (user && user.uid) {
+            return fcmsRef.doc(user.uid).set({
+                token
+            })
+        }
+    }
+
+    public getFCMTokenForUser = () => {
 
     }
 
