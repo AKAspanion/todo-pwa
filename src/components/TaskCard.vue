@@ -254,8 +254,8 @@
                         </v-card-text>
                         <v-divider light></v-divider>
                         <v-card-actions
-                            :class="$vuetify.breakpoint.xsOnly ? 'px-2':'px-3'"
-                            style="min-height: 52px;"
+                            :class="$vuetify.breakpoint.xsOnly ? 'px-2 py-0':'px-3'"
+                            :style="`min-height: ${$vuetify.breakpoint.xsOnly ? '36px':'52px'}`"
                         >
                             <div v-if="!isEdit && !isDelete">
                                 <v-icon
@@ -289,28 +289,28 @@
                                             :disabled="disabled"
                                             :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                         >
-                                            <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-dots-vertical</v-icon>
+                                            <v-icon
+                                                :small="$vuetify.breakpoint.xsOnly"
+                                            >mdi-dots-vertical</v-icon>
                                         </v-btn>
                                     </template>
                                     <v-card width="72">
                                         <v-layout row class="mx-0">
-                                            <v-btn 
+                                            <v-btn
                                                 icon
                                                 small
                                                 class="ma-1"
-                                                @click.stop="onModalCancel(); isEdit = true">
-                                                <v-icon small>
-                                                    mdi-pencil
-                                                </v-icon>
+                                                @click.stop="onModalCancel(); isEdit = true"
+                                            >
+                                                <v-icon small>mdi-pencil</v-icon>
                                             </v-btn>
-                                            <v-btn 
+                                            <v-btn
                                                 icon
                                                 small
-                                                class="ma-1" 
-                                                @click.stop="isDelete = true">
-                                                <v-icon small>
-                                                    mdi-delete
-                                                </v-icon>
+                                                class="ma-1"
+                                                @click.stop="isDelete = true"
+                                            >
+                                                <v-icon small>mdi-delete</v-icon>
                                             </v-btn>
                                         </v-layout>
                                     </v-card>

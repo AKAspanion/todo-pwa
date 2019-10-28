@@ -70,78 +70,74 @@ class FirebaseWeb {
 
     public initializeFirebase = () => {
         firebase.initializeApp(this.firebaseConfig);
+    }
+
+    public askNotificationPermission = () => {
         Notification.requestPermission().then((permission) => {
             if (permission === 'granted') {
-                // store.dispatch('setNotificationPermission', true);
-                // TODO Retrieve an Instance ID token for use with FCM.
-                // this.getMessagingToken();
-                // ...
+                this.getMessagingToken();
             } else {
-                // store.dispatch('setNotificationPermission', false);
+                store.dispatch('SET_NOTIFICATION_GRANT', false);
+                this.sendFCMTokenToServer(false);
             }
         });
     }
 
-    public tokenRefreshListener(callback: any) {
-        const messaging = firebase.messaging();
-        messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
-        messaging.onTokenRefresh(callback);
-        // messaging.getToken().then((refreshedToken) => {
-        //     console.log('Token refreshed.');
-        //     // Indicate that the new Instance ID token has not yet been sent to the
-        //     // app server.
-        //     setTokenSentToServer(false);
-        //     // Send Instance ID token to app server.
-        //     sendTokenToServer(refreshedToken);
-        //     // ...
-        // }).catch((err) => {
-        //     console.log('Unable to retrieve refreshed token ', err);
-        //     showToken('Unable to retrieve refreshed token ', err);
-        // });
-    }
 
     public getMessagingToken = () => {
         const messaging = firebase.messaging();
         messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
-        messaging.getToken().then((currentToken) => {
-            if (currentToken) {
-                return this.sendFCMTokenToServer(currentToken);
-                // updateUIForPushEnabled(currentToken);
-            } else {
-                // Show permission request.
-                throw new Error('No Instance ID token available. Request permission to generate one.');
-                // Show permission UI.
-                // updateUIForPushPermissionRequired();
-                // setTokenSentToServer(false);
-            }
-        })
-        .then((msg) => {
-            console.log(msg);
-        })
-        .catch((err) => {
-            console.log('An error occurred while retrieving token. ', err);
-            // showToken('Error retrieving Instance ID token. ', err);
-            // setTokenSentToServer(false);
-        })
-        messaging.onMessage((payload) => {
-            console.log('Message received. ', payload);
-            // ...
+        messaging
+            .getToken()
+            .then((currentToken) => {
+                if (currentToken) {
+                    store.dispatch('SET_NOTIFICATION_GRANT', true);
+                    return this.sendFCMTokenToServer(currentToken);
+                } else {
+                    store.dispatch('SET_NOTIFICATION_GRANT', false);
+                    return this.sendFCMTokenToServer(false);
+                }
+            })
+            .then(() => {
+                messaging.onMessage((payload) => {
+                    store.dispatch('SHOW_SNACK', payload.notification.body);
+                });
+            })
+            .catch(() => {
+                store.dispatch('SET_NOTIFICATION_GRANT', false);
+            });
+    }
+
+    public tokenRefreshListener() {
+        const messaging = firebase.messaging();
+        messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
+        messaging.getToken().then((refreshedToken) => {
+            this.sendFCMTokenToServer(refreshedToken);
+        }).catch(() => {
+            // ERROR
         });
     }
 
-    public sendFCMTokenToServer = (token: any) => {       
-        const fcmsRef = firebase.firestore().collection('fcms');
+    public sendFCMTokenToServer = (token: any) => {
+        const fcmRef = firebase.firestore().collection('fcm');
         const user: any = firebase.auth().currentUser;
-        console.log(token, user);
-        if (user && user.uid) {
-            return fcmsRef.doc(user.uid).set({
-                token
-            })
+        if (user && user) {
+            if (token) {
+                return fcmRef.doc(user.uid).set({
+                    token,
+                });
+            } else {
+                return fcmRef.doc(user.uid).set({
+                    token: null,
+                });
+            }
+        } else {
+            throw new Error('User not defined');
         }
     }
 
     public getFCMTokenForUser = () => {
-
+        // TODO
     }
 
     public updateUserProfile = (updatedUser: any) => {

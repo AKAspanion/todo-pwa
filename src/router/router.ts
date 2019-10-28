@@ -83,14 +83,14 @@ router.beforeEach((to, from, next) => {
     if (!firebase.isAppInitialized()) {
         firebase.initializeFirebase();
     }
-    store.dispatch("LOADING", true);
-    if (to.name == 'signin' || to.name == 'signup') {
-        store.dispatch("SHOW_NAVBAR", false);
+    store.dispatch('LOADING', true);
+    if (to.name === 'signin' || to.name === 'signup') {
+        store.dispatch('SHOW_NAVBAR', false);
     }
     firebase.authChangeListener((user: any) => {
-        store.dispatch("LOADING", false);
+        store.dispatch('LOADING', false);
         if (to.matched.some((record: any) => record.meta.requireAuth)) {
-            store.dispatch("SHOW_NAVBAR", true);
+            store.dispatch('SHOW_NAVBAR', true);
             if (!user) {
                 store.dispatch('UNSET_USER');
                 store.dispatch('LOGOUT');

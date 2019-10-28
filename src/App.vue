@@ -7,7 +7,7 @@
     </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import BarNav from "@/components/BarNav.vue";
 import ContainerMain from "@/components/ContainerMain.vue";
 import FirebaseWeb from "./firebase";
@@ -21,10 +21,20 @@ const firebase = new FirebaseWeb();
 })
 export default class App extends Vue {
     mounted() {
-        // this.$store.dispatch("LOADING", false);
         if (!firebase.isAppInitialized) {
             firebase.initializeFirebase();
         }
+    }
+
+    @Watch("isBarNav", { immediate: true, deep: true })
+    onBarNavChange(val: any, oldVal: any) {
+        if (val) {
+            firebase.askNotificationPermission();
+        }
+    }
+
+    get isBarNav() {
+        return this.$store.getters.barnav;
     }
 }
 </script>

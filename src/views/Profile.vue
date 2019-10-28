@@ -78,6 +78,14 @@
                 </div>
             </v-layout>
             <v-card-text class="mt-8">
+                <v-card outlined class="mb-4 mx-3 px-3">
+                    <v-checkbox
+                        readonly
+                        :ripple="false"
+                        v-model="$store.getters.notificationGrant"
+                        label="Notification permission granted"
+                    ></v-checkbox>
+                </v-card>
                 <v-card outlined class="py-4 mx-3">
                     <div style="margin: 0 auto; width: 300px;">
                         <v-card-text>

@@ -1,5 +1,5 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import Vue from 'vue';
+import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
@@ -7,7 +7,7 @@ const store = new Vuex.Store({
     state: {
         snackBar: {
             model: false,
-            text: "",
+            text: '',
         },
         user: {
             uid: '',
@@ -22,6 +22,7 @@ const store = new Vuex.Store({
         tasks: [],
         types: [],
         landingVisited: false,
+        notificationGrant: false,
     },
     mutations: {
         setSnackBar(state, payload) {
@@ -51,57 +52,51 @@ const store = new Vuex.Store({
         landingVisited(state, payload) {
             state.landingVisited = payload;
         },
+        setNotificationGrant(state, payload) {
+            state.notificationGrant = payload;
+        },
     },
     actions: {
         RESET_STORE({ commit }) {
             commit('setTasksByStatus', {});
             commit('setTasks', []);
             commit('landingVisited', false);
-            commit("setUser", {
+            commit('setUser', {
                 uid: '',
                 displayName: '',
                 photoURL: '',
                 email: '',
             });
-            commit("setLogin", false);
+            commit('setLogin', false);
             localStorage.setItem('isLoggedIn', JSON.stringify(false));
         },
-        SET_TASKS_BY_STATUS({
-            commit
-        }, payload) {
+        SET_TASKS_BY_STATUS({ commit }, payload) {
             commit('setTasksByStatus', payload);
         },
-        SET_TASKS({
-            commit
-        }, payload) {
+        SET_TASKS({ commit }, payload) {
             commit('setTasks', payload);
         },
-        SET_TYPES({
-            commit
-        }, payload) {
+        SET_TYPES({ commit }, payload) {
             commit('setTypes', payload);
         },
-
-        LANDING_VISITED({
-            commit
-        }, payload) {
+        LANDING_VISITED({ commit }, payload) {
             commit('landingVisited', payload);
         },
         SHOW_SNACK({ commit }, payload) {
-            commit("setSnackBar", {
+            commit('setSnackBar', {
                 model: true,
                 text: payload,
             });
         },
         LOADING({ commit }, payload) {
-            commit("setLoading", payload);
+            commit('setLoading', payload);
         },
         SHOW_NAVBAR({ commit }, payload) {
-            commit("setBarNav", payload);
+            commit('setBarNav', payload);
         },
         SET_USER({ commit }, payload) {
             const { uid, displayName, photoURL, email } = payload;
-            commit("setUser", {
+            commit('setUser', {
                 uid,
                 email,
                 displayName,
@@ -109,7 +104,7 @@ const store = new Vuex.Store({
             });
         },
         UNSET_USER({ commit }) {
-            commit("setUser", {
+            commit('setUser', {
                 uid: '',
                 displayName: '',
                 photoURL: '',
@@ -117,12 +112,15 @@ const store = new Vuex.Store({
             });
         },
         LOGIN({ commit }) {
-            commit("setLogin", true);
+            commit('setLogin', true);
             localStorage.setItem('isLoggedIn', JSON.stringify(true));
         },
         LOGOUT({ commit }) {
-            commit("setLogin", false);
+            commit('setLogin', false);
             localStorage.setItem('isLoggedIn', JSON.stringify(false));
+        },
+        SET_NOTIFICATION_GRANT({ commit }, payload) {
+            commit('setNotificationGrant', payload);
         },
     },
     getters: {
@@ -152,6 +150,9 @@ const store = new Vuex.Store({
         },
         landingVisited(state) {
             return state.landingVisited;
+        },
+        notificationGrant(state) {
+            return state.notificationGrant;
         },
     },
 });
