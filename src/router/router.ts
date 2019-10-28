@@ -49,12 +49,21 @@ const router = new Router({
             },
         },
         {
+            path: '/notification',
+            name: 'notification',
+            component: () => import('@/views/Notification.vue'),
+            meta: {
+                requireAuth: true,
+                index: 4,
+            },
+        },
+        {
             path: '/profile',
             name: 'profile',
             component: () => import('@/views/Profile.vue'),
             meta: {
                 requireAuth: true,
-                index: 3,
+                index: 5,
             },
         },
         {
@@ -64,7 +73,7 @@ const router = new Router({
             component: () => import('@/views/NotFound.vue'),
             meta: {
                 requireAuth: true,
-                index: 4,
+                index: 6,
             },
         },
         {

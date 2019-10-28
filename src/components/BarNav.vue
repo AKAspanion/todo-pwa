@@ -6,6 +6,10 @@
         <v-btn value="add" @click="navigateTo('/add')">
             <v-icon>mdi-plus</v-icon>
         </v-btn>
+
+        <v-btn value="notification" @click="navigateTo('/notification')">
+            <v-icon>mdi-bell</v-icon>
+        </v-btn>
         <v-btn value="profile" @click="navigateTo('/profile')">
             <v-avatar v-if="currentUser.photoURL" size="24">
                 <v-img :src="currentUser.photoURL"></v-img>

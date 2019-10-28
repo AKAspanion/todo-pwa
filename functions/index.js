@@ -49,6 +49,7 @@ exports.testFunction = functions.https.onRequest(async (req, res) => {
             // eslint-disable-next-line no-await-in-loop
             const response = await admin.messaging().sendToDevice(messages[i].token, messages[i].payload);
             console.log(messages[i], response.results);
+            // TODO create notifications for that specific user in firestore
         }
     })();
 
