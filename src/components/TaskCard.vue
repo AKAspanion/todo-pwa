@@ -1,63 +1,64 @@
 <template>
-    <v-hover #default="{ hover }">
-        <v-card
-            :elevation="hover && $vuetify.breakpoint.smAndUp? 5 : 2"
-            :light="getTextColor() !== '#ffffff' ? true : false"
-            :dark="getTextColor() === '#ffffff' ? true : false"
-            height="100%"
-            class="text-left"
-            :color="getBgColor()"
-        >
-            <template v-if="loading">
-                <v-layout column fill-height justify-space-between class="ma-0">
-                    <div>
-                        <v-card-text class="pb-3">
-                            <v-layout row wrap align-start justify-space-between class="ma-0">
-                                <div style="width: calc(100% - 36px)">
-                                    <div
-                                        class="shimmer title-shimmer"
-                                        :class="getTextColor() === '#ffffff' ? 'light--animate':'dark--animate'"
-                                    ></div>
-                                    <div
-                                        class="shimmer subtitle-shimmer"
-                                        :class="getTextColor() === '#ffffff' ? 'light--animate':'dark--animate'"
-                                    ></div>
-                                </div>
+    <div>
+        <v-card v-if="loading">
+            <v-layout column fill-height justify-space-between class="ma-0">
+                <div>
+                    <v-card-text class="pb-3">
+                        <v-layout row wrap align-start justify-space-between class="ma-0">
+                            <div style="width: calc(100% - 36px)">
                                 <div
-                                    class="shimmer icon-shimmer"
-                                    :class="getTextColor() === '#ffffff' ? 'light--animate':'dark--animate'"
+                                    class="shimmer title-shimmer"
+                                    :class="getTextColor() === '#ffffff' ? 'dark--animate':'light--animate'"
                                 ></div>
-                            </v-layout>
-                        </v-card-text>
-                    </div>
-                    <div>
-                        <v-card-text class="pb-2 pt-1">
-                            <div
-                                class="shimmer chip-shimmer"
-                                :class="getTextColor() === '#ffffff' ? 'light--animate':'dark--animate'"
-                            ></div>
-                        </v-card-text>
-                        <v-divider light></v-divider>
-                        <v-card-actions class="px-3 mx-1">
-                            <div
-                                class="shimmer title-shimmer"
-                                :class="getTextColor() === '#ffffff' ? 'light--animate':'dark--animate'"
-                                style="width: 50%"
-                            ></div>
-                            <v-spacer></v-spacer>
+                                <div
+                                    class="shimmer subtitle-shimmer"
+                                    :class="getTextColor() === '#ffffff' ? 'dark--animate':'light--animate'"
+                                ></div>
+                            </div>
                             <div
                                 class="shimmer icon-shimmer"
-                                :class="getTextColor() === '#ffffff' ? 'light--animate':'dark--animate'"
+                                :class="getTextColor() === '#ffffff' ? 'dark--animate':'light--animate'"
                             ></div>
-                            <div
-                                class="shimmer icon-shimmer ml-1"
-                                :class="getTextColor() === '#ffffff' ? 'light--animate':'dark--animate'"
-                            ></div>
-                        </v-card-actions>
-                    </div>
-                </v-layout>
-            </template>
-            <template v-else>
+                        </v-layout>
+                    </v-card-text>
+                </div>
+                <div>
+                    <v-card-text class="pb-2 pt-1">
+                        <div
+                            class="shimmer chip-shimmer"
+                            :class="getTextColor() === '#ffffff' ? 'dark--animate':'light--animate'"
+                        ></div>
+                    </v-card-text>
+                    <v-divider light></v-divider>
+                    <v-card-actions class="px-3 mx-1" :class="$vuetify.breakpoint.xsOnly?'py-0':''">
+                        <div
+                            class="shimmer title-shimmer"
+                            :class="getTextColor() === '#ffffff' ? 'dark--animate':'light--animate'"
+                            style="width: 50%"
+                        ></div>
+                        <v-spacer></v-spacer>
+                        <div
+                            class="shimmer icon-shimmer"
+                            :class="getTextColor() === '#ffffff' ? 'dark--animate':'light--animate'"
+                        ></div>
+                        <div
+                            v-if="!$vuetify.breakpoint.xsOnly"
+                            class="shimmer icon-shimmer ml-1"
+                            :class="getTextColor() === '#ffffff' ? 'dark--animate':'light--animate'"
+                        ></div>
+                    </v-card-actions>
+                </div>
+            </v-layout>
+        </v-card>
+        <v-hover v-else #default="{ hover }">
+            <v-card
+                :elevation="hover && $vuetify.breakpoint.smAndUp? 5 : 2"
+                :light="getTextColor() !== '#ffffff' ? true : false"
+                :dark="getTextColor() === '#ffffff' ? true : false"
+                height="100%"
+                class="text-left"
+                :color="bg"
+            >
                 <v-layout column fill-height justify-space-between class="ma-0">
                     <v-card-text :class="$vuetify.breakpoint.xsOnly ? 'pa-3':''">
                         <v-layout
@@ -363,9 +364,9 @@
                         </v-card-actions>
                     </div>
                 </v-layout>
-            </template>
-        </v-card>
-    </v-hover>
+            </v-card>
+        </v-hover>
+    </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
@@ -409,6 +410,12 @@ export default Vue.extend({
         };
     },
     computed: {
+        bg: {
+            get() {
+                // @ts-ignore
+                return this.getBgColor();
+            }
+        },
         localType: {
             get() {
                 // @ts-ignore
@@ -431,7 +438,8 @@ export default Vue.extend({
     methods: {
         // @ts-ignore
         getTextColor() {
-            return this.getTextColorForBg(this.getBgColor());
+            // @ts-ignore
+            return this.getTextColorForBg(this.bg);
         },
         // @ts-ignore
         getBgColor() {
@@ -449,7 +457,13 @@ export default Vue.extend({
                     }
                 }
             }
-            return "#808080";
+            // @ts-ignore
+            if (this.loading) {
+                // @ts-ignore
+                return this.$vuetify.theme.dark ? "#303030" : "#ffffff";
+            } else {
+                return "#808080";
+            }
         },
         getTextColorForBg(color: any) {
             return getTextColorByBg(color);

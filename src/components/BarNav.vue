@@ -1,5 +1,5 @@
 <template>
-    <v-bottom-navigation v-if="showBarNav" fixed grow v-model="navBar">
+    <v-bottom-navigation v-if="showBarNav" fixed grow v-model="navBar" color="primary">
         <v-btn value="home" @click="navigateTo('/home')">
             <v-icon>mdi-view-grid</v-icon>
         </v-btn>

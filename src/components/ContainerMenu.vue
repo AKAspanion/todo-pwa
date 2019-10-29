@@ -7,27 +7,7 @@
         </template>
         <v-list>
             <slot name="top-list-item"></slot>
-            <!-- TODO implement -->
-            <v-subheader class="overline">{{$t('label.label')}}</v-subheader>
-            <v-list-item link>
-                <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('label.edit')}}</v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-avatar>
-                    <v-avatar small size="36">
-                        <v-icon>mdi-pencil</v-icon>
-                    </v-avatar>
-                </v-list-item-avatar>
-            </v-list-item>
             <v-subheader class="overline">{{$t('options')}}</v-subheader>
-            <v-list-item>
-                <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('dark.mode')}}</v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-action class="mr-2">
-                    <v-switch color="primary" v-model="themeModel"></v-switch>
-                </v-list-item-action>
-            </v-list-item>
             <v-list-item>
                 <v-list-item-content class="text-left">
                     <v-list-item-title>{{$t('language.label')}}</v-list-item-title>
@@ -42,6 +22,26 @@
                         >{{ lang }}</v-btn>
                     </v-btn-toggle>
                 </v-list-item-action>
+            </v-list-item>
+            <v-list-item>
+                <v-list-item-content class="text-left">
+                    <v-list-item-title>{{$t('dark.mode')}}</v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-action class="mr-2">
+                    <v-switch color="primary" v-model="themeModel"></v-switch>
+                </v-list-item-action>
+            </v-list-item>
+            <!-- TODO implement -->
+            <v-subheader class="overline">{{$t('label.label')}}</v-subheader>
+            <v-list-item link>
+                <v-list-item-content class="text-left">
+                    <v-list-item-title>{{$t('label.edit')}}</v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-avatar>
+                    <v-avatar small size="36">
+                        <v-icon>mdi-pencil</v-icon>
+                    </v-avatar>
+                </v-list-item-avatar>
             </v-list-item>
             <v-subheader class="overline">{{$t('settings')}}</v-subheader>
             <v-list-item link @click="onSignoutClick">

@@ -16,19 +16,22 @@
         <container-app
             coloured
             elevated-bg
-            :bg-height="$vuetify.breakpoint.xsOnly ?'140px':'152px'"
+            :bg-height="$vuetify.breakpoint.xsOnly ?'124px':'132px'"
         >
             <div :class="$vuetify.breakpoint.xsOnly ? '':'mx-3 mb-2'">
-                <v-card-text
-                    class="text-left py-0 white--text"
-                >{{$t('hello')}} {{currentUser.displayName}}</v-card-text>
-                <v-card-title class="py-0 white--text">
-                    {{todoListLength}}
+                <v-card-title class="py-1 white--text">
+                    <div
+                        v-if="pageLoading"
+                        class="shimmer animate mr-1"
+                        style="width: 13px;height: 20px;"
+                    ></div>
+                    <span v-else class="mr-1">{{todoListLength}}</span>
                     {{todoListLength != 1 ? $t("task.plural"):$t("task.singular")}}
                     {{calendarDate}}
                 </v-card-title>
             </div>
             <bar-date
+                :loading="pageLoading"
                 :refresh="refreshDates"
                 v-model="selectedDate"
                 @after-refresh="refreshDates = false"

@@ -17,6 +17,7 @@
     "profile": "Profile",
     "settings": "Settings",
     "sign-out": "Sign out",
+    "notification": "Notification",
     "sign-in": {
         "label": "Sign in",
         "desc": "Sign in to application",
