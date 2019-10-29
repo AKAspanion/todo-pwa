@@ -23,6 +23,7 @@ const store = new Vuex.Store({
         types: [],
         landingVisited: false,
         notificationGrant: false,
+        notifications: [],
     },
     mutations: {
         setSnackBar(state, payload) {
@@ -51,6 +52,9 @@ const store = new Vuex.Store({
         },
         landingVisited(state, payload) {
             state.landingVisited = payload;
+        },
+        setNotifications(state, payload) {
+            state.notifications = payload;
         },
         setNotificationGrant(state, payload) {
             state.notificationGrant = payload;
@@ -119,6 +123,20 @@ const store = new Vuex.Store({
             commit('setLogin', false);
             localStorage.setItem('isLoggedIn', JSON.stringify(false));
         },
+        SET_NOTIFICATIONS({ commit }, payload) {
+            const sortedNotifications = payload.sort((notification1: any, notification2: any) => {
+                const a = new Date(notification1.timestamp);
+                const b = new Date(notification2.timestamp);
+                if (a < b) {
+                    return 1;
+                }
+                if (a > b) {
+                    return -1;
+                }
+                return 0;
+            });
+            commit('setNotifications', sortedNotifications);
+        },
         SET_NOTIFICATION_GRANT({ commit }, payload) {
             commit('setNotificationGrant', payload);
         },
@@ -150,6 +168,9 @@ const store = new Vuex.Store({
         },
         landingVisited(state) {
             return state.landingVisited;
+        },
+        notifications(state) {
+            return state.notifications;
         },
         notificationGrant(state) {
             return state.notificationGrant;

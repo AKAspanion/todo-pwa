@@ -22,7 +22,7 @@
                 <v-card-title class="py-1 white--text">
                     <div
                         v-if="pageLoading"
-                        class="shimmer animate mr-1"
+                        class="shimmer light--animate mr-1"
                         style="width: 13px;height: 20px;"
                     ></div>
                     <span v-else class="mr-1">{{todoListLength}}</span>
@@ -116,6 +116,7 @@ import {
     navigateToPath,
     getAllTasksForUser,
     getAllTaskTypesForUser,
+    getAllNotificationsForUser,
     updateTasks,
     deleteTasks,
     getMomentDate,
@@ -342,7 +343,9 @@ export default Vue.extend({
                 // @ts-ignore
                 getAllTasksForUser(this.currentUser),
                 // @ts-ignore
-                getAllTaskTypesForUser(this.currentUser)
+                getAllTaskTypesForUser(this.currentUser),
+                // @ts-ignore
+                getAllNotificationsForUser(this.currentUser)
             ]);
         },
         navigateTo(path: any) {
@@ -361,6 +364,8 @@ export default Vue.extend({
                     this.$store.dispatch("SET_TASKS", response[0]);
                     // @ts-ignore
                     this.$store.dispatch("SET_TYPES", response[1]);
+                    // @ts-ignore
+                    this.$store.dispatch("SET_NOTIFICATIONS", response[2]);
                     // @ts-ignore
                     this.$store.dispatch("LANDING_VISITED", true);
                     return parseTasksByStatus(response[0]);

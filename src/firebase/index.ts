@@ -1,6 +1,8 @@
 import * as firebase from 'firebase';
 import store from '../store/store';
 
+import { getAllNotificationsForUser } from '../util/commonHelper';
+
 class FirebaseWeb {
     private firebaseConfig: any = {
         apiKey: process.env.VUE_APP_API_KEY,
@@ -14,6 +16,10 @@ class FirebaseWeb {
 
     public isAppInitialized() {
         return firebase.apps.length;
+    }
+    public fetchAllNotificationByUID = (user: any) => {
+        const notificationRef = firebase.firestore().collection('notifications');
+        return notificationRef.where('uid', '==', user.uid).get();
     }
 
     public fetchAllTaskTypeByUID = (user: any) => {
@@ -101,6 +107,13 @@ class FirebaseWeb {
             .then(() => {
                 messaging.onMessage((payload) => {
                     store.dispatch('SHOW_SNACK', payload.notification.body);
+                    getAllNotificationsForUser(store.state.user)
+                        .then((response: any) => {
+                            store.dispatch('SET_NOTIFICATIONS', response);
+                        })
+                        .catch(() => {
+                            // err
+                        });
                 });
             })
             .catch(() => {

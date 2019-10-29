@@ -34,6 +34,23 @@ export const getInitials = (name) => {
     return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
 }
 
+export const getAllNotificationsForUser = (user) => {
+    return new Promise((resolve, reject) => {
+        firebase
+            .fetchAllNotificationByUID(user)
+            .then(snapshot => {
+                return parseAllNotification(snapshot);
+            })
+            .then(notification => {
+                resolve(notification);
+            })
+            .catch((err) => {
+                console.log(err);
+                reject("Error getting tasks. Please try later!")
+            })
+    })
+}
+
 export const getAllTasksForUser = (user) => {
     return new Promise((resolve, reject) => {
         firebase
@@ -119,6 +136,19 @@ export const deleteTasks = (taskId, tasks) => {
     });
 }
 
+const parseAllNotification = (snapshot) => {
+    return new Promise((resolve) => {
+        let notification = [];
+        snapshot.forEach(doc => {
+            notification.push({
+                id: doc.id,
+                ...doc.data(),
+            });
+        });
+        resolve(notification);
+    });
+}
+
 const parseAllTypes = (snapshot) => {
     return new Promise((resolve) => {
         let types = [];
@@ -131,6 +161,7 @@ const parseAllTypes = (snapshot) => {
         resolve(types);
     });
 }
+
 
 const parseAllTasks = (snapshot) => {
     return new Promise((resolve) => {

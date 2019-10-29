@@ -48,13 +48,27 @@
                     <v-flex xs12 class="pa-0">
                         <div class="overline text-left">{{$t('notification')}}</div>
                     </v-flex>
-
-                    <v-flex xs12 class="pa-0">
-                        <v-card outlined width="100%" class="text-left pa-4 my-3">
-                            <div class="subtitle-2">No notifications</div>
-                            <div class="caption">Task reminder notifications will populate here</div>
-                        </v-card>
-                    </v-flex>
+                    <template v-if="!notifications.length">
+                        <v-flex xs12 class="pa-0">
+                            <v-card outlined width="100%" class="text-left pa-4 my-3">
+                                <div class="subtitle-2">No notifications</div>
+                                <div class="caption">Task reminder notifications will populate here</div>
+                            </v-card>
+                        </v-flex>
+                    </template>
+                    <template v-else>
+                        <v-flex
+                            xs12
+                            class="pa-0"
+                            v-for="(notification, index) in notifications"
+                            :key="index"
+                        >
+                            <v-card dark width="100%" class="text-left pa-4 mt-3" color="primary">
+                                <div class="subtitle-2">{{notification.title}}</div>
+                                <div class="caption">{{notification.body}}</div>
+                            </v-card>
+                        </v-flex>
+                    </template>
                 </v-layout>
             </div>
         </container-app>
@@ -75,6 +89,11 @@ export default Vue.extend({
         BarTop,
         ContainerApp,
         ContainerMenu
+    },
+    computed: {
+        notifications() {
+            return this.$store.getters.notifications;
+        }
     },
     methods: {
         navigateToHome() {
