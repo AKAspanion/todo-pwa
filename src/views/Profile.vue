@@ -132,6 +132,7 @@ import {
     getInitials,
     getAllTasksForUser,
     getAllTaskTypesForUser,
+    getAllNotificationsForUser,
     parseTasksByStatus,
     getTextColorByBg
     // @ts-ignore
@@ -193,7 +194,8 @@ export default Vue.extend({
         loadPage() {
             return Promise.all([
                 getAllTasksForUser(this.$store.getters.user),
-                getAllTaskTypesForUser(this.$store.getters.user)
+                getAllTaskTypesForUser(this.$store.getters.user),
+                getAllNotificationsForUser(this.$store.getters.user)
             ]);
         },
         addTaskType() {
@@ -245,6 +247,7 @@ export default Vue.extend({
                 .then(response => {
                     this.$store.dispatch("SET_TASKS", response[0]);
                     this.$store.dispatch("SET_TYPES", response[1]);
+                    this.$store.dispatch("SET_NOTIFICATIONS", response[2]);
                     this.$store.dispatch("LANDING_VISITED", true);
                     this.types = response[1];
                     return parseTasksByStatus(response[0]);

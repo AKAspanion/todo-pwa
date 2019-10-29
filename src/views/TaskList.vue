@@ -152,9 +152,14 @@ export default Vue.extend({
             handler(newValue) {
                 // @ts-ignore
                 this.refreshDates = true;
-            }
+            },
+            deep: true
         },
-        deep: true
+        compact: {
+            handler(newValue) {
+                localStorage.setItem("compact", newValue);
+            }
+        }
     },
     computed: {
         currentUser() {
@@ -233,16 +238,13 @@ export default Vue.extend({
         onTaskEdit(task: any) {
             // @ts-ignore
             if (this.isTaskValid(task)) {
-                let { title, date, time, status, description, type } = task;
+                let newTask = {
+                    ...task,
+                    time: task.indefinite ? "NA" : task.time,
+                    date: task.indefinite ? "NA" : task.date
+                };
                 // @ts-ignore
-                this.updateTasks(task.id, {
-                    title,
-                    date,
-                    time,
-                    status,
-                    description,
-                    type
-                });
+                this.updateTasks(task.id, newTask);
             } else {
                 this.$store.dispatch(
                     "SHOW_SNACK",
@@ -385,6 +387,7 @@ export default Vue.extend({
         } else {
             this.tasksByStatus = this.$store.getters.tasksByStatus;
         }
+        this.compact = localStorage.getItem("compact") == "true";
     }
 });
 </script>

@@ -92,7 +92,12 @@
                                     :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'"
                                 >
                                     <v-card flat class="px-3">
-                                        <v-chip-group v-model="localType" multiple return-object>
+                                        <v-chip-group
+                                            multiple
+                                            return-object
+                                            v-model="localType"
+                                            v-if=" $store.getters.types.length"
+                                        >
                                             <v-chip
                                                 filter
                                                 small
@@ -105,6 +110,10 @@
                                                 @keyup.enter="updateTaskModel(tag.id)"
                                             >{{ tag.label }}</v-chip>
                                         </v-chip-group>
+                                        <div
+                                            v-else
+                                            class="caption py-2 warning--text"
+                                        >No label found</div>
                                     </v-card>
                                 </div>
                                 <div
@@ -127,6 +136,7 @@
                                                         dense
                                                         readonly
                                                         :value="readableTime"
+                                                        :disabled="localTask.indefinite"
                                                         prepend-inner-icon="mdi-clock"
                                                         :class="$vuetify.breakpoint.xsOnly? 'mb-n4 ':''"
                                                     ></v-text-field>
@@ -158,6 +168,7 @@
                                                         v-on="on"
                                                         readonly
                                                         :value="readableDate"
+                                                        :disabled="localTask.indefinite"
                                                         prepend-inner-icon="mdi-calendar"
                                                         :class="$vuetify.breakpoint.xsOnly? 'mb-n6':''"
                                                     ></v-text-field>
@@ -173,6 +184,20 @@
                                                 </v-card>
                                             </v-menu>
                                         </v-flex>
+                                    </v-layout>
+                                </div>
+                                <div
+                                    v-if="isEdit"
+                                    :class="$vuetify.breakpoint.xsOnly? 'mt-n2 mb-n6 ml-1':'mt-0 mb-n5'"
+                                >
+                                    <v-layout class="ma-0" align-center>
+                                        <div>Indefinte task?</div>
+                                        <v-spacer></v-spacer>
+                                        <v-switch
+                                            class="mr-n1"
+                                            color="primary"
+                                            v-model="localTask.indefinite"
+                                        ></v-switch>
                                     </v-layout>
                                 </div>
                                 <!-- delete part -->
@@ -374,6 +399,7 @@ import Vue from "vue";
 import {
     getCalendarDate,
     getTextColorByBg,
+    getMomentDate,
     get12FormatTime,
     getShortReadableDate
     // @ts-ignore
@@ -398,12 +424,12 @@ export default Vue.extend({
             isDelete: false,
             isEdit: false,
             localTask: {
-                date: "",
+                date: getMomentDate(new Date()).substr(0, 10),
+                time: getMomentDate(new Date()).substr(11, 5),
                 description: "",
                 indefinite: true,
                 status: "",
                 title: "",
-                time: "",
                 type: [],
                 uid: ""
             }
@@ -489,13 +515,15 @@ export default Vue.extend({
         },
         onModalCancel() {
             // @ts-ignore
+            let { indefinite, date, time } = this.task;
+            // @ts-ignore
             this.localTask = {
                 // @ts-ignore
                 ...this.task,
                 // @ts-ignore
-                time: this.task.indefinite ? null : this.task.time,
+                time: indefinite ? this.localTask.time : time,
                 // @ts-ignore
-                date: this.task.indefinite ? null : this.task.date
+                date: indefinite ? this.localTask.date : date
             };
         },
         updateTypes(val: any) {
