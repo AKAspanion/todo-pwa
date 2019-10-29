@@ -73,7 +73,7 @@
                             >
                                 <!-- Editing part -->
                                 <div v-if="isEdit">
-                                    <v-text-field v-model="localTask.title" solo flat dense></v-text-field>
+                                    <v-text-field filled v-model="localTask.title" solo flat dense></v-text-field>
                                 </div>
                                 <div
                                     v-if="isEdit"
@@ -82,6 +82,7 @@
                                     <v-textarea
                                         v-model="localTask.description"
                                         auto-grow
+                                        filled
                                         solo
                                         flat
                                         dense
@@ -91,7 +92,7 @@
                                     v-if="isEdit"
                                     :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'"
                                 >
-                                    <v-card flat class="px-3">
+                                    <v-card flat color="rgba(0,0,0,.06)" class="px-3">
                                         <v-chip-group
                                             multiple
                                             return-object
@@ -102,12 +103,12 @@
                                                 filter
                                                 small
                                                 label
-                                                outlined
                                                 :value="tag.id"
                                                 :key="tag.id"
                                                 :color="tag.color"
                                                 v-for="(tag) in $store.getters.types"
                                                 @keyup.enter="updateTaskModel(tag.id)"
+                                                :style="`color: ${getTextColorForBg(tag.color)} !important`"
                                             >{{ tag.label }}</v-chip>
                                         </v-chip-group>
                                         <div
@@ -134,6 +135,7 @@
                                                         solo
                                                         flat
                                                         dense
+                                                        filled
                                                         readonly
                                                         :value="readableTime"
                                                         :disabled="localTask.indefinite"
@@ -166,6 +168,7 @@
                                                         flat
                                                         dense
                                                         v-on="on"
+                                                        filled
                                                         readonly
                                                         :value="readableDate"
                                                         :disabled="localTask.indefinite"

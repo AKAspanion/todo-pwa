@@ -96,7 +96,15 @@ import ContainerApp from "@/components/ContainerApp.vue";
 import ContainerMenu from "@/components/ContainerMenu.vue";
 
 // @ts-ignore
-import { navigateToPath, getMomentDate } from "@/util";
+import {
+    navigateToPath,
+    getMomentDate,
+    getAllTasksForUser,
+    getAllTaskTypesForUser,
+    getAllNotificationsForUser,
+    parseTasksByStatus
+    // @ts-ignore
+} from "@/util";
 
 import Vue from "vue";
 export default Vue.extend({
@@ -117,6 +125,7 @@ export default Vue.extend({
         },
         start: null,
         end: null,
+        pageLoading: true,
         selectedEvent: {},
         selectedElement: null,
         selectedOpen: false
@@ -180,8 +189,44 @@ export default Vue.extend({
     mounted() {
         //@ts-ignore
         this.$refs.calendar.checkChange();
+        if (!this.$store.getters.landingVisited) {
+            this.pageLoading = true;
+            this.loadPage()
+                .then((response: any) => {
+                    // @ts-ignore
+                    this.$store.dispatch("SET_TASKS", response[0]);
+                    // @ts-ignore
+                    this.$store.dispatch("SET_TYPES", response[1]);
+                    // @ts-ignore
+                    this.$store.dispatch("SET_NOTIFICATIONS", response[2]);
+                    // @ts-ignore
+                    this.$store.dispatch("LANDING_VISITED", true);
+                    return parseTasksByStatus(response[0]);
+                })
+                .then((tasksByStatus: any) => {
+                    // @ts-ignore
+                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                })
+                .catch((err: any) => {
+                    // @ts-ignore
+                    this.$store.dispatch("SHOW_SNACK", err);
+                })
+                .then(() => {
+                    this.pageLoading = false;
+                });
+        }
     },
     methods: {
+        loadPage() {
+            return Promise.all([
+                // @ts-ignore
+                getAllTasksForUser(this.$store.getters.user),
+                // @ts-ignore
+                getAllTaskTypesForUser(this.$store.getters.user),
+                // @ts-ignore
+                getAllNotificationsForUser(this.$store.getters.user)
+            ]);
+        },
         navigateToHome() {
             navigateToPath("/home");
         },

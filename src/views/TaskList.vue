@@ -200,6 +200,7 @@ export default Vue.extend({
             return this.todoList ? this.todoList.length : 0;
         },
         calendarDate() {
+            // @ts-ignore
             let date = getCalendarDate(this.selectedDate).toLowerCase();
             if (date.includes("invalid")) {
                 // @ts-ignore
@@ -387,7 +388,9 @@ export default Vue.extend({
         } else {
             this.tasksByStatus = this.$store.getters.tasksByStatus;
         }
-        this.compact = localStorage.getItem("compact") == "true";
+        let ct = localStorage.getItem("compact");
+        console.log(ct);
+        this.compact = ct ? ct == "true" : true;
     }
 });
 </script>

@@ -116,7 +116,7 @@
                                                     <v-chip
                                                         filter
                                                         label
-                                                        outlined
+                                                        light
                                                         :key="tag.id"
                                                         :color="tag.color"
                                                         v-for="(tag, index) in types"
@@ -124,6 +124,7 @@
                                                         @blur="onChipFocus(false)"
                                                         @keyup.enter="updateTaskModel(index)"
                                                         :small="$vuetify.breakpoint.xsOnly"
+                                                        :style="`color: ${getTextColor(tag.color)} !important`"
                                                     >{{ tag.label }}</v-chip>
                                                 </v-chip-group>
                                                 <div
@@ -389,12 +390,6 @@ export default Vue.extend({
         } else {
             this.types = this.$store.getters.types;
         }
-        this.$nextTick(() => {
-            setTimeout(() => {
-                let title: any = this.$refs.titleField;
-                title.focus();
-            }, 300);
-        });
     }
 });
 </script>
