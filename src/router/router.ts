@@ -40,12 +40,21 @@ const router = new Router({
             },
         },
         {
+            path: '/calendar',
+            name: 'calendar',
+            component: () => import('@/views/Calendar.vue'),
+            meta: {
+                requireAuth: true,
+                index: 3,
+            },
+        },
+        {
             path: '/add',
             name: 'add',
             component: () => import('@/views/TaskAdd.vue'),
             meta: {
                 requireAuth: true,
-                index: 3,
+                index: 4,
             },
         },
         {
@@ -54,7 +63,7 @@ const router = new Router({
             component: () => import('@/views/Notification.vue'),
             meta: {
                 requireAuth: true,
-                index: 4,
+                index: 5,
             },
         },
         {
@@ -63,7 +72,7 @@ const router = new Router({
             component: () => import('@/views/Profile.vue'),
             meta: {
                 requireAuth: true,
-                index: 5,
+                index: 6,
             },
         },
         {
@@ -73,7 +82,7 @@ const router = new Router({
             component: () => import('@/views/NotFound.vue'),
             meta: {
                 requireAuth: true,
-                index: 6,
+                index: 7,
             },
         },
         {

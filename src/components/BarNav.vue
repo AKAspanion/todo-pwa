@@ -3,10 +3,12 @@
         <v-btn value="home" @click="navigateTo('/home')">
             <v-icon>mdi-view-grid</v-icon>
         </v-btn>
+        <v-btn value="calendar" @click="navigateTo('/calendar')">
+            <v-icon>mdi-calendar</v-icon>
+        </v-btn>
         <v-btn value="add" @click="navigateTo('/add')">
             <v-icon>mdi-plus</v-icon>
         </v-btn>
-
         <v-btn value="notification" @click="navigateTo('/notification')">
             <v-icon>mdi-bell</v-icon>
         </v-btn>
