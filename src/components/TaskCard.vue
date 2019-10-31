@@ -60,13 +60,14 @@
                 :color="bg"
             >
                 <v-layout column fill-height justify-space-between class="ma-0">
-                    <v-card-text :class="$vuetify.breakpoint.xsOnly ? 'pa-3':''">
+                    <v-card-text :class="$vuetify.breakpoint.xsOnly ? 'pa-3 pb-0':'pb-0'">
                         <v-layout
                             row
                             wrap
                             align-start
                             justify-space-between
                             class="ma-0 task-container"
+                            :class="$vuetify.breakpoint.xsOnly ? 'mt-n1 mb-1':''"
                         >
                             <div
                                 :style="!isEdit && !isDelete?'width: calc(100% - 36px)':'width: 100%'"
@@ -92,7 +93,7 @@
                                     v-if="isEdit"
                                     :class="$vuetify.breakpoint.xsOnly? 'mt-n4':'mt-n3'"
                                 >
-                                    <v-card flat color="rgba(0,0,0,.06)" class="px-3">
+                                    <v-card flat class="px-3 type-card">
                                         <v-chip-group
                                             multiple
                                             return-object
@@ -126,7 +127,7 @@
                                             xs12
                                             md6
                                             py-0
-                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'pl-0 pr-2'"
+                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'px-0'"
                                         >
                                             <v-menu :close-on-content-click="false">
                                                 <template #activator="{ on }">
@@ -159,7 +160,7 @@
                                             xs12
                                             md6
                                             py-0
-                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'pl-2 pr-0'"
+                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'px-0'"
                                         >
                                             <v-menu :close-on-content-click="false">
                                                 <template #activator="{ on }">
@@ -191,7 +192,7 @@
                                 </div>
                                 <div
                                     v-if="isEdit"
-                                    :class="$vuetify.breakpoint.xsOnly? 'mt-n2 mb-n6 ml-1':'mt-0 mb-n5'"
+                                    :class="$vuetify.breakpoint.xsOnly? 'mt-n2 ml-1':'mt-0'"
                                 >
                                     <v-layout class="ma-0" align-center>
                                         <div>Indefinte task?</div>
@@ -258,7 +259,9 @@
                                 task.status == 'done' ? 'line-through-text':'', 
                                 getTextColor() !== '#ffffff' ? 'black--text':'white--text'
                             ]"
-                        >{{task.description}}</div>
+                        >
+                            <vue-markdown :source="task.description"></vue-markdown>
+                        </div>
                     </v-card-text>
                     <div>
                         <v-card-text
@@ -307,14 +310,13 @@
                             </v-tooltip>
                             <v-spacer v-if="!isEdit && !isDelete"></v-spacer>
                             <template v-if="!isEdit && !isDelete">
-                                <v-menu>
+                                <v-menu v-if="task.status == 'todo'">
                                     <template #activator="{ on }">
                                         <v-btn
                                             icon
                                             small
                                             v-on="on"
                                             v-show="$vuetify.breakpoint.xsOnly"
-                                            v-if="task.status == 'todo'"
                                             :disabled="disabled"
                                             :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                         >
@@ -360,7 +362,7 @@
                                     :disabled="disabled"
                                     @click.stop="isDelete = true"
                                     :small="$vuetify.breakpoint.xsOnly"
-                                    v-show="hover && !$vuetify.breakpoint.xsOnly"
+                                    v-show="(hover && !$vuetify.breakpoint.xsOnly) || task.status == 'done'"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 >
                                     <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-delete</v-icon>
@@ -399,6 +401,8 @@
 <script lang="ts">
 import Vue from "vue";
 // @ts-ignore
+import VueMarkdown from 'vue-markdown';
+// @ts-ignore
 import {
     getCalendarDate,
     getTextColorByBg,
@@ -408,6 +412,9 @@ import {
     // @ts-ignore
 } from "@/util";
 export default Vue.extend({
+    components: {
+        VueMarkdown
+    },
     props: {
         task: {
             type: Object,
@@ -562,8 +569,12 @@ export default Vue.extend({
     background: red;
 }
 .task-desc {
+    overflow: hidden;
     white-space: pre-wrap;
     line-height: 1.2em !important;
+}
+.task-desc >>> p {
+    margin: 0 !important;
 }
 .task-time {
     padding-top: 3px;
@@ -573,13 +584,22 @@ export default Vue.extend({
     margin-top: 4px !important;
 }
 .task-container >>> input {
-    font-size: 14px !important;
+    font-size: 16px !important;
 }
 .pickerTime >>> .v-time-picker-title {
     justify-content: center !important;
 }
 .pickerTime {
     width: 100%;
+}
+.type-card{
+    background-color: rgba(0,0,0,.06) !important;
+    border-color: rgba(0,0,0,.06) !important;
+    transition: all 0.3s ease;
+}
+.type-card:hover {
+    background-color: rgba(0,0,0,.1) !important;
+    border-color: rgba(0,0,0,.1) !important;
 }
 @media only screen and (max-width: 600px) {
     .task-container >>> textarea {

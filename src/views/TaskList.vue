@@ -184,16 +184,7 @@ export default Vue.extend({
         },
         doneList() {
             // @ts-ignore
-            if (this.isSelectedDateValid) {
-                // @ts-ignore
-                return this.tasksByStatus["done"];
-            } else {
-                // @ts-ignore
-                return this.tasksByStatus["done"].filter(
-                    // @ts-ignore
-                    task => task.date == this.selectedDate || task.indefinite
-                );
-            }
+            return this.tasksByStatus["done"];
         },
         todoListLength() {
             // @ts-ignore
@@ -389,7 +380,6 @@ export default Vue.extend({
             this.tasksByStatus = this.$store.getters.tasksByStatus;
         }
         let ct = localStorage.getItem("compact");
-        console.log(ct);
         this.compact = ct ? ct == "true" : true;
     }
 });
