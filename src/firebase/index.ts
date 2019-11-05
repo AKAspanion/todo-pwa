@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 import store from '../store/store';
 
+// @ts-ignore
 import { getAllNotificationsForUser } from '../util/commonHelper';
 
 class FirebaseWeb {
