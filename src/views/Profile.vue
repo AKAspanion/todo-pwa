@@ -7,7 +7,7 @@
                 </v-btn>
             </template>
             <template #center>
-                <v-chip small outlined>{{$t('profile')}}</v-chip>
+                <v-chip small outlined>{{ $t('profile') }}</v-chip>
             </template>
             <template #right>
                 <container-menu></container-menu>
@@ -15,7 +15,10 @@
         </bar-top>
         <container-app coloured elevated-bg bg-height="224px">
             <div class="pt-2 pb-4">
-                <v-avatar size="110" :color="!$vuetify.theme.dark ? 'white':'#404040'">
+                <v-avatar
+                    size="110"
+                    :color="!$vuetify.theme.dark ? 'white' : '#404040'"
+                >
                     <template v-if="currentUser.photoURL">
                         <v-img :src="currentUser.photoURL"></v-img>
                     </template>
@@ -23,7 +26,9 @@
                         <div
                             v-if="currentUser.displayName"
                             class="display-1 font-weight-medium"
-                        >{{getInitials(currentUser.displayName)}}</div>
+                        >
+                            {{ getInitials(currentUser.displayName) }}
+                        </div>
                         <v-icon v-else color="primary">mdi-face</v-icon>
                     </template>
                 </v-avatar>
@@ -46,37 +51,25 @@
                     class="mb-n6"
                     style="max-width: 300px"
                 ></v-text-field>
-                <div v-else class="title white--text text-item">{{currentUser.displayName || 'NA'}}</div>
-                <v-icon dark class="mx-2" v-if="editName" @click="resetEditFlags()">mdi-check</v-icon>
+                <div v-else class="title white--text text-item">
+                    {{ currentUser.displayName || 'NA' }}
+                </div>
+                <v-icon
+                    dark
+                    class="mx-2"
+                    v-if="editName"
+                    @click="resetEditFlags()"
+                    >mdi-check</v-icon
+                >
                 <div v-else class="px-2 edit-button">
-                    <v-icon dark small class="edit-icon" @click="onNameEdit()">mdi-pencil</v-icon>
+                    <v-icon dark small class="edit-icon" @click="onNameEdit()"
+                        >mdi-pencil</v-icon
+                    >
                 </div>
             </v-layout>
-            <v-layout
-                row
-                wrap
-                align-center
-                justify-center
-                class="ma-0 mr-n8 editable-item"
-                style="min-height: 40px;"
-            >
-                <v-text-field
-                    light
-                    solo
-                    dense
-                    class="mb-n6"
-                    ref="emailEdit"
-                    v-if="editEmail"
-                    v-model="user.email"
-                    style="max-width: 300px"
-                ></v-text-field>
-                <div v-else class="subtitle-2 white--text text-item">{{currentUser.email || 'NA'}}</div>
-                <v-icon dark class="mx-2" v-if="editEmail" @click="resetEditFlags()">mdi-check</v-icon>
-
-                <div v-else class="px-2 edit-button">
-                    <v-icon dark small class="edit-icon" @click="onEmailEdit()">mdi-pencil</v-icon>
-                </div>
-            </v-layout>
+            <div class="subtitle-2 mt-3 white--text text-item">
+                {{ currentUser.email || 'NA' }}
+            </div>
             <v-card-text class="mt-8">
                 <v-card outlined class="py-4 mx-3">
                     <div style="margin: 0 auto; width: 300px;">
@@ -94,7 +87,8 @@
                                     class="ml-2"
                                     :color="newTypeColor"
                                     :text-color="getTextColor(newTypeColor)"
-                                >{{taskTypeLabel}}</v-chip>
+                                    >{{ taskTypeLabel }}</v-chip
+                                >
                             </div>
                             <v-color-picker
                                 v-model="newTypeColor"
@@ -110,7 +104,8 @@
                                 :loading="taskTypesLoading"
                                 :disabled="taskTypeLabel.trim() == ''"
                                 @click="onAddTaskTypeSubmit"
-                            >{{$t('create')}}</v-btn>
+                                >{{ $t('create') }}</v-btn
+                            >
                             <v-spacer></v-spacer>
                         </v-card-actions>
                     </div>
@@ -120,13 +115,13 @@
     </div>
 </template>
 <script lang="ts">
-import Vue from "vue";
-import FirebaseWeb from "../firebase";
+import Vue from 'vue';
+import FirebaseWeb from '../firebase';
 const firebase = new FirebaseWeb();
 
-import BarTop from "@/components/BarTop.vue";
-import ContainerApp from "@/components/ContainerApp.vue";
-import ContainerMenu from "@/components/ContainerMenu.vue";
+import BarTop from '@/components/BarTop.vue';
+import ContainerApp from '@/components/ContainerApp.vue';
+import ContainerMenu from '@/components/ContainerMenu.vue';
 import {
     navigateToPath,
     getInitials,
@@ -134,53 +129,53 @@ import {
     getAllTaskTypesForUser,
     getAllNotificationsForUser,
     parseTasksByStatus,
-    getTextColorByBg
+    getTextColorByBg,
     // @ts-ignore
-} from "@/util";
+} from '@/util';
 export default Vue.extend({
-    name: "Profile",
+    name: 'Profile',
     components: {
         BarTop,
         ContainerApp,
-        ContainerMenu
+        ContainerMenu,
     },
     data() {
         return {
-            newTypeColor: "#8E00FF",
-            taskTypeLabel: "",
+            newTypeColor: '#8E00FF',
+            taskTypeLabel: '',
             types: [],
             pageLoading: false,
             taskTypesLoading: false,
             editName: false,
             editEmail: false,
             user: {
-                displayName: "",
-                email: ""
-            }
+                displayName: '',
+                email: '',
+            },
         };
     },
     computed: {
         currentUser() {
             return this.$store.getters.user;
-        }
+        },
     },
     methods: {
         onNameEdit() {
             this.resetEditFlags();
             this.editName = true;
-            this.focusByRef("nameEdit");
+            this.focusByRef('nameEdit');
         },
         onEmailEdit() {
             this.resetEditFlags();
             this.editEmail = true;
-            this.focusByRef("emailEdit");
+            this.focusByRef('emailEdit');
         },
         resetEditFlags() {
             this.editName = false;
             this.editEmail = false;
         },
         navigateToHome() {
-            navigateToPath("/home");
+            navigateToPath('/home');
         },
         getInitials(name: any) {
             return getInitials(name);
@@ -195,37 +190,37 @@ export default Vue.extend({
             return Promise.all([
                 getAllTasksForUser(this.$store.getters.user),
                 getAllTaskTypesForUser(this.$store.getters.user),
-                getAllNotificationsForUser(this.$store.getters.user)
+                getAllNotificationsForUser(this.$store.getters.user),
             ]);
         },
         addTaskType() {
             this.taskTypesLoading = true;
             let newTaskType = {
                 label: this.taskTypeLabel.trim(),
-                color: this.newTypeColor.trim()
+                color: this.newTypeColor.trim(),
             };
             firebase
                 .addTaskType(this.$store.getters.user, newTaskType)
-                .then(response => {
-                    this.$store.dispatch("LANDING_VISITED", false);
-                    this.$store.dispatch("SET_TYPES", [
+                .then((response) => {
+                    this.$store.dispatch('LANDING_VISITED', false);
+                    this.$store.dispatch('SET_TYPES', [
                         {
                             id: response.id,
-                            ...newTaskType
+                            ...newTaskType,
                         },
-                        ...this.types
+                        ...this.types,
                     ]);
                     this.types = this.$store.getters.types;
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.success.label")
+                        'SHOW_SNACK',
+                        this.$t('toast.success.label')
                     );
-                    this.taskTypeLabel = "";
+                    this.taskTypeLabel = '';
                 })
-                .catch(err => {
+                .catch((err) => {
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.error.label")
+                        'SHOW_SNACK',
+                        this.$t('toast.error.label')
                     );
                 })
                 .finally(() => {
@@ -237,25 +232,25 @@ export default Vue.extend({
                 //@ts-ignore
                 this.$refs[name].focus();
             });
-        }
+        },
     },
     mounted() {
         if (!this.$store.getters.landingVisited) {
             this.pageLoading = true;
             this.taskTypesLoading = true;
             this.loadPage()
-                .then(response => {
-                    this.$store.dispatch("SET_TASKS", response[0]);
-                    this.$store.dispatch("SET_TYPES", response[1]);
-                    this.$store.dispatch("SET_NOTIFICATIONS", response[2]);
-                    this.$store.dispatch("LANDING_VISITED", true);
+                .then((response) => {
+                    this.$store.dispatch('SET_TASKS', response[0]);
+                    this.$store.dispatch('SET_TYPES', response[1]);
+                    this.$store.dispatch('SET_NOTIFICATIONS', response[2]);
+                    this.$store.dispatch('LANDING_VISITED', true);
                     this.types = response[1];
                     return parseTasksByStatus(response[0]);
                 })
                 .then((tasksByStatus: any) => {
-                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.log(err);
                 })
                 .finally(() => {
@@ -266,7 +261,7 @@ export default Vue.extend({
             this.types = this.$store.getters.types;
         }
         this.user = this.$store.getters.user;
-    }
+    },
 });
 </script>
 <style scoped>

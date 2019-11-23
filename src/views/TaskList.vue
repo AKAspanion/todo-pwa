@@ -3,11 +3,13 @@
         <bar-top dark primary>
             <template #left>
                 <v-avatar>
-                    <v-icon>mdi-check-all</v-icon>
+                    <v-icon>
+                        mdi-check-all
+                    </v-icon>
                 </v-avatar>
             </template>
             <template #center>
-                <v-chip small outlined>{{$t('home.label')}}</v-chip>
+                <v-chip small outlined>{{ $t('home.label') }}</v-chip>
             </template>
             <template #right>
                 <container-menu></container-menu>
@@ -16,18 +18,22 @@
         <container-app
             coloured
             elevated-bg
-            :bg-height="$vuetify.breakpoint.xsOnly ?'124px':'132px'"
+            :bg-height="$vuetify.breakpoint.xsOnly ? '124px' : '132px'"
         >
-            <div :class="$vuetify.breakpoint.xsOnly ? '':'mx-3 mb-2'">
+            <div :class="$vuetify.breakpoint.xsOnly ? '' : 'mx-3 mb-2'">
                 <v-card-title class="py-1 white--text">
                     <div
                         v-if="pageLoading"
                         class="shimmer light--animate mr-1"
                         style="width: 13px;height: 20px;"
                     ></div>
-                    <span v-else class="mr-1">{{todoListLength}}</span>
-                    {{todoListLength != 1 ? $t("task.plural"):$t("task.singular")}}
-                    {{calendarDate}}
+                    <span v-else class="mr-1">{{ todoListLength }}</span>
+                    {{
+                        todoListLength != 1
+                            ? $t('task.plural')
+                            : $t('task.singular')
+                    }}
+                    {{ calendarDate }}
                 </v-card-title>
             </div>
             <bar-date
@@ -35,17 +41,20 @@
                 :refresh="refreshDates"
                 v-model="selectedDate"
                 @after-refresh="refreshDates = false"
-                :class="$vuetify.breakpoint.xsOnly ? 'mx-1 mb-6':'mx-4 mb-8'"
+                :class="$vuetify.breakpoint.xsOnly ? 'mx-1 mb-6' : 'mx-4 mb-8'"
             ></bar-date>
-            <div style="width: 100%" :class="$vuetify.breakpoint.xsOnly ? 'px-3':'px-4'">
+            <div
+                style="width: 100%"
+                :class="$vuetify.breakpoint.xsOnly ? 'px-3' : 'px-4'"
+            >
                 <v-layout
                     row
                     align-center
                     justify-space-between
                     class="ma-0 pb-1"
-                    :class="$vuetify.breakpoint.xsOnly ? 'px-1':'px-3'"
+                    :class="$vuetify.breakpoint.xsOnly ? 'px-1' : 'px-3'"
                 >
-                    <div class="overline text-left">{{$t('todo')}}</div>
+                    <div class="overline text-left">{{ $t('todo') }}</div>
                     <v-btn
                         icon
                         class="mr-n2"
@@ -65,8 +74,8 @@
                     @delete="onTaskDelete"
                     :disabled="tasksUpdating"
                     :no-data-object="{
-                        title: $t('no-task.todo.title'), 
-                        caption: $t('no-task.todo.caption')
+                        title: $t('no-task.todo.title'),
+                        caption: $t('no-task.todo.caption'),
                     }"
                     class="pb-4"
                 >
@@ -76,13 +85,16 @@
                             class="mt-2 font-weight-bold primary"
                             small
                             @click="navigateTo('/add')"
-                        >{{$t('create')}}</v-btn>
+                            >{{ $t('create') }}</v-btn
+                        >
                     </template>
                 </task-card-grid>
                 <div
                     class="overline text-left pb-3"
-                    :class="$vuetify.breakpoint.xsOnly ? 'px-1':'px-3'"
-                >{{$t('done')}}</div>
+                    :class="$vuetify.breakpoint.xsOnly ? 'px-1' : 'px-3'"
+                >
+                    {{ $t('done') }}
+                </div>
                 <task-card-grid
                     :compact="compact"
                     :task-list="doneList"
@@ -92,8 +104,8 @@
                     @delete="onTaskDelete"
                     @uncheck="onTaskUncheck"
                     :no-data-object="{
-                        title: $t('no-task.done.title'), 
-                        caption: $t('no-task.done.caption')
+                        title: $t('no-task.done.title'),
+                        caption: $t('no-task.done.caption'),
                     }"
                 ></task-card-grid>
             </div>
@@ -102,15 +114,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import FirebaseWeb from "../firebase";
+import Vue from 'vue';
+import FirebaseWeb from '../firebase';
 const firebase = new FirebaseWeb();
 
-import BarTop from "@/components/BarTop.vue";
-import BarDate from "@/components/BarDate.vue";
-import TaskCardGrid from "@/components/TaskCardGrid.vue";
-import ContainerApp from "@/components/ContainerApp.vue";
-import ContainerMenu from "@/components/ContainerMenu.vue";
+import BarTop from '@/components/BarTop.vue';
+import BarDate from '@/components/BarDate.vue';
+import TaskCardGrid from '@/components/TaskCardGrid.vue';
+import ContainerApp from '@/components/ContainerApp.vue';
+import ContainerMenu from '@/components/ContainerMenu.vue';
 // @ts-ignore
 import {
     navigateToPath,
@@ -121,9 +133,9 @@ import {
     deleteTasks,
     getMomentDate,
     getCalendarDate,
-    parseTasksByStatus
+    parseTasksByStatus,
     // @ts-ignore
-} from "@/util";
+} from '@/util';
 
 // @ts-ignores
 export default Vue.extend({
@@ -132,7 +144,7 @@ export default Vue.extend({
         BarDate,
         ContainerApp,
         ContainerMenu,
-        TaskCardGrid
+        TaskCardGrid,
     },
     data() {
         return {
@@ -142,24 +154,24 @@ export default Vue.extend({
             tasksUpdating: false,
             tasksByStatus: {
                 todo: [],
-                done: []
+                done: [],
             },
-            compact: true
+            compact: true,
         };
     },
     watch: {
-        "$i18n.locale": {
+        '$i18n.locale': {
             handler(newValue) {
                 // @ts-ignore
                 this.refreshDates = true;
             },
-            deep: true
+            deep: true,
         },
         compact: {
             handler(newValue) {
-                localStorage.setItem("compact", newValue);
-            }
-        }
+                localStorage.setItem('compact', newValue);
+            },
+        },
     },
     computed: {
         currentUser() {
@@ -168,23 +180,23 @@ export default Vue.extend({
         },
         isSelectedDateValid() {
             // @ts-ignore
-            return !this.selectedDate || this.selectedDate == "";
+            return !this.selectedDate || this.selectedDate == '';
         },
         todoList() {
             if (this.isSelectedDateValid) {
                 // @ts-ignore
-                return this.tasksByStatus["todo"];
+                return this.tasksByStatus['todo'];
             } else {
                 // @ts-ignore
-                return this.tasksByStatus["todo"].filter(
+                return this.tasksByStatus['todo'].filter(
                     // @ts-ignore
-                    task => task.date == this.selectedDate || task.indefinite
+                    (task) => task.date == this.selectedDate || task.indefinite
                 );
             }
         },
         doneList() {
             // @ts-ignore
-            return this.tasksByStatus["done"];
+            return this.tasksByStatus['done'];
         },
         todoListLength() {
             // @ts-ignore
@@ -193,38 +205,38 @@ export default Vue.extend({
         calendarDate() {
             // @ts-ignore
             let date = getCalendarDate(this.selectedDate).toLowerCase();
-            if (date.includes("invalid")) {
+            if (date.includes('invalid')) {
                 // @ts-ignore
-                return this.$t("todo").toLowerCase();
+                return this.$t('todo').toLowerCase();
             } else {
                 // @ts-ignore
-                if (this.$i18n.locale != "en") {
-                    if (date.includes("कल") || date.includes("आज")) {
+                if (this.$i18n.locale != 'en') {
+                    if (date.includes('कल') || date.includes('आज')) {
                         return date.substr(0, date.length - 14);
                     }
-                    if (date.includes(":")) {
+                    if (date.includes(':')) {
                         date = date.substr(0, date.length - 15);
                     }
-                    return date + " को";
+                    return date + ' को';
                 } else {
                     if (
                         !(
-                            date.includes("tomorrow") ||
-                            date.includes("yesterday") ||
-                            date.includes("today") ||
-                            date.includes("last")
+                            date.includes('tomorrow') ||
+                            date.includes('yesterday') ||
+                            date.includes('today') ||
+                            date.includes('last')
                         )
                     ) {
-                        date = " on " + date;
+                        date = ' on ' + date;
                     }
-                    if (date.includes(":")) {
+                    if (date.includes(':')) {
                         return date.substr(0, date.length - 11);
                     } else {
                         return date;
                     }
                 }
             }
-        }
+        },
     },
     methods: {
         onTaskEdit(task: any) {
@@ -232,15 +244,15 @@ export default Vue.extend({
             if (this.isTaskValid(task)) {
                 let newTask = {
                     ...task,
-                    time: task.indefinite ? "NA" : task.time,
-                    date: task.indefinite ? "NA" : task.date
+                    time: task.indefinite ? 'NA' : task.time,
+                    date: task.indefinite ? 'NA' : task.date,
                 };
                 // @ts-ignore
                 this.updateTasks(task.id, newTask);
             } else {
                 this.$store.dispatch(
-                    "SHOW_SNACK",
-                    this.$t("toast.error.task.invalid")
+                    'SHOW_SNACK',
+                    this.$t('toast.error.task.invalid')
                 );
             }
         },
@@ -251,53 +263,53 @@ export default Vue.extend({
         onTaskUncheck(task: any) {
             // @ts-ignore
             this.updateTasks(task.id, {
-                status: "todo"
+                status: 'todo',
             });
         },
         onTaskCheck(task: any) {
             // @ts-ignore
             this.updateTasks(task.id, {
-                status: "done"
+                status: 'done',
             });
         },
         deleteTask(task: any) {
             // @ts-ignore
             this.tasksUpdating = true;
-            this.$store.dispatch("LOADING", true);
+            this.$store.dispatch('LOADING', true);
             firebase
                 .deleteTask(task)
                 .then(() => {
                     return deleteTasks(task.id, this.$store.getters.tasks);
                 })
                 .then((tasks: any) => {
-                    this.$store.dispatch("SET_TASKS", tasks);
+                    this.$store.dispatch('SET_TASKS', tasks);
                     return parseTasksByStatus(tasks);
                 })
                 .then((tasksByStatus: any) => {
-                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
                     // @ts-ignore
                     this.tasksByStatus = tasksByStatus;
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.success.task.delete")
+                        'SHOW_SNACK',
+                        this.$t('toast.success.task.delete')
                     );
                 })
                 .catch((err: any) => {
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.error.task.delete")
+                        'SHOW_SNACK',
+                        this.$t('toast.error.task.delete')
                     );
                 })
                 .finally(() => {
                     // @ts-ignore
                     this.tasksUpdating = false;
-                    this.$store.dispatch("LOADING", false);
+                    this.$store.dispatch('LOADING', false);
                 });
         },
         updateTasks(taskId: any, updatedTask: any) {
             // @ts-ignore
             this.tasksUpdating = true;
-            this.$store.dispatch("LOADING", true);
+            this.$store.dispatch('LOADING', true);
             firebase
                 .updateTask(taskId, updatedTask)
                 .then(() => {
@@ -307,29 +319,29 @@ export default Vue.extend({
                         this.$store.getters.tasks
                     );
                 })
-                .then(tasks => {
-                    this.$store.dispatch("SET_TASKS", tasks);
+                .then((tasks) => {
+                    this.$store.dispatch('SET_TASKS', tasks);
                     return parseTasksByStatus(tasks);
                 })
                 .then((tasksByStatus: any) => {
-                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
                     // @ts-ignore
                     this.tasksByStatus = tasksByStatus;
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.success.task.edit")
+                        'SHOW_SNACK',
+                        this.$t('toast.success.task.edit')
                     );
                 })
-                .catch(err => {
+                .catch((err) => {
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.error.task.edit")
+                        'SHOW_SNACK',
+                        this.$t('toast.error.task.edit')
                     );
                 })
                 .finally(() => {
                     // @ts-ignore
                     this.tasksUpdating = false;
-                    this.$store.dispatch("LOADING", false);
+                    this.$store.dispatch('LOADING', false);
                 });
         },
         loadPage() {
@@ -339,15 +351,15 @@ export default Vue.extend({
                 // @ts-ignore
                 getAllTaskTypesForUser(this.currentUser),
                 // @ts-ignore
-                getAllNotificationsForUser(this.currentUser)
+                getAllNotificationsForUser(this.currentUser),
             ]);
         },
         navigateTo(path: any) {
             navigateToPath(path);
         },
         isTaskValid(task: any) {
-            return task.title.trim() !== "";
-        }
+            return task.title.trim() !== '';
+        },
     },
     mounted() {
         if (!this.$store.getters.landingVisited) {
@@ -355,23 +367,23 @@ export default Vue.extend({
             this.loadPage()
                 .then((response: any) => {
                     // @ts-ignore
-                    this.$store.dispatch("SET_TASKS", response[0]);
+                    this.$store.dispatch('SET_TASKS', response[0]);
                     // @ts-ignore
-                    this.$store.dispatch("SET_TYPES", response[1]);
+                    this.$store.dispatch('SET_TYPES', response[1]);
                     // @ts-ignore
-                    this.$store.dispatch("SET_NOTIFICATIONS", response[2]);
+                    this.$store.dispatch('SET_NOTIFICATIONS', response[2]);
                     // @ts-ignore
-                    this.$store.dispatch("LANDING_VISITED", true);
+                    this.$store.dispatch('LANDING_VISITED', true);
                     return parseTasksByStatus(response[0]);
                 })
                 .then((tasksByStatus: any) => {
                     // @ts-ignore
-                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
+                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
                     this.tasksByStatus = tasksByStatus;
                 })
                 .catch((err: any) => {
                     // @ts-ignore
-                    this.$store.dispatch("SHOW_SNACK", err);
+                    this.$store.dispatch('SHOW_SNACK', err);
                 })
                 .then(() => {
                     this.pageLoading = false;
@@ -379,9 +391,9 @@ export default Vue.extend({
         } else {
             this.tasksByStatus = this.$store.getters.tasksByStatus;
         }
-        let ct = localStorage.getItem("compact");
-        this.compact = ct ? ct == "true" : true;
-    }
+        let ct = localStorage.getItem('compact');
+        this.compact = ct ? ct == 'true' : true;
+    },
 });
 </script>
 <style scoped>

@@ -68,7 +68,7 @@ exports.testFunction = functions.https.onRequest(async (req, res) => {
 
 
 
-exports.testSchedule = functions.pubsub.schedule('every 45 minutes').onRun(async () => {
+exports.testSchedule = functions.pubsub.schedule('every 1 hour').onRun(async () => {
 
     /**
      * pseudo code: 

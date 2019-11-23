@@ -576,6 +576,9 @@ export default Vue.extend({
 .task-desc >>> p {
     margin: 0 !important;
 }
+.task-desc >>> br {
+    display: none;
+}
 .task-time {
     padding-top: 3px;
 }
