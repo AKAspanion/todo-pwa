@@ -18,7 +18,6 @@ const store = new Vuex.Store({
         loading: false,
         isLoggedIn: false,
         isBarNav: false,
-        tasksByStatus: {},
         tasks: [],
         types: [],
         landingVisited: false,
@@ -41,9 +40,6 @@ const store = new Vuex.Store({
         setBarNav(state, payload) {
             state.isBarNav = payload;
         },
-        setTasksByStatus(state, payload) {
-            state.tasksByStatus = payload;
-        },
         setTasks(state, payload) {
             state.tasks = payload;
         },
@@ -62,7 +58,6 @@ const store = new Vuex.Store({
     },
     actions: {
         RESET_STORE({ commit }) {
-            commit('setTasksByStatus', {});
             commit('setTasks', []);
             commit('landingVisited', false);
             commit('setUser', {
@@ -73,9 +68,6 @@ const store = new Vuex.Store({
             });
             commit('setLogin', false);
             localStorage.setItem('isLoggedIn', JSON.stringify(false));
-        },
-        SET_TASKS_BY_STATUS({ commit }, payload) {
-            commit('setTasksByStatus', payload);
         },
         SET_TASKS({ commit }, payload) {
             commit('setTasks', payload);
@@ -156,9 +148,6 @@ const store = new Vuex.Store({
         },
         loggedIn(state) {
             return state.isLoggedIn;
-        },
-        tasksByStatus(state) {
-            return state.tasksByStatus;
         },
         tasks(state) {
             return state.tasks;

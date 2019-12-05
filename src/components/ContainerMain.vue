@@ -1,9 +1,16 @@
 <template>
     <div class="main-container">
-        <v-progress-linear v-if="loading" indeterminate class="fixed-progress" height="3"></v-progress-linear>
+        <v-progress-linear
+            v-if="loading"
+            indeterminate
+            class="fixed-progress"
+            height="4"
+        ></v-progress-linear>
         <v-snackbar v-model="snackbar.model" bottom :timeout="5000">
             {{ snackbar.text }}
-            <v-btn dark text @click="snackbar.model = false">{{$t('close')}}</v-btn>
+            <v-btn dark text @click="snackbar.model = false">{{
+                $t('close')
+            }}</v-btn>
         </v-snackbar>
         <v-container fluid grid-list-md class="pa-0">
             <transition :name="transitionName" mode="out-in">
@@ -13,38 +20,38 @@
     </div>
 </template>
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 export default Vue.extend({
     data() {
         return {
-            transitionName: "slide-left"
+            transitionName: 'slide-left',
         };
     },
     computed: {
         snackbar: {
             get() {
                 return this.$store.getters.snackBar;
-            }
+            },
         },
         loading: {
             get() {
                 return this.$store.getters.loading;
-            }
-        }
+            },
+        },
     },
     created() {
         this.$router.beforeEach((to, from, next) => {
-            let toDepth = to.path.split("/").length;
-            let fromDepth = from.path.split("/").length;
+            let toDepth = to.path.split('/').length;
+            let fromDepth = from.path.split('/').length;
             if (toDepth === fromDepth) {
                 toDepth = to.meta.index;
                 fromDepth = from.meta.index;
             }
             this.transitionName =
-                toDepth < fromDepth ? "slide-right" : "slide-left";
+                toDepth < fromDepth ? 'slide-right' : 'slide-left';
             next();
         });
-    }
+    },
 });
 </script>
 <style>

@@ -47,67 +47,65 @@
                 style="width: 100%"
                 :class="$vuetify.breakpoint.xsOnly ? 'px-3' : 'px-4'"
             >
-                <v-layout
-                    row
-                    align-center
-                    justify-space-between
-                    class="ma-0 pb-1"
-                    :class="$vuetify.breakpoint.xsOnly ? 'px-1' : 'px-3'"
-                >
-                    <div class="overline text-left">{{ $t('todo') }}</div>
-                    <v-btn
-                        icon
-                        class="mr-n2"
-                        @click="compact = !compact"
-                        v-if="$vuetify.breakpoint.xsOnly"
-                    >
-                        <v-icon v-if="compact">mdi-view-agenda</v-icon>
-                        <v-icon v-else>mdi-view-grid</v-icon>
-                    </v-btn>
-                </v-layout>
-                <task-card-grid
-                    :compact="compact"
-                    :task-list="todoList"
-                    :loading="pageLoading"
-                    @edit="onTaskEdit"
-                    @check="onTaskCheck"
-                    @delete="onTaskDelete"
-                    :disabled="tasksUpdating"
-                    :no-data-object="{
-                        title: $t('no-task.todo.title'),
-                        caption: $t('no-task.todo.caption'),
-                    }"
-                    class="pb-4"
-                >
-                    <template #no-data>
-                        <v-btn
-                            text
-                            class="mt-2 font-weight-bold primary"
-                            small
-                            @click="navigateTo('/add')"
-                            >{{ $t('create') }}</v-btn
+                <v-row no-gutters class="ma-0">
+                    <v-col cols="12" md="6" class="pa-0">
+                        <div
+                            class="overline text-left"
+                            :class="
+                                $vuetify.breakpoint.xsOnly ? 'px-1' : 'px-3'
+                            "
                         >
-                    </template>
-                </task-card-grid>
-                <div
-                    class="overline text-left pb-3"
-                    :class="$vuetify.breakpoint.xsOnly ? 'px-1' : 'px-3'"
-                >
-                    {{ $t('done') }}
-                </div>
-                <task-card-grid
-                    :compact="compact"
-                    :task-list="doneList"
-                    class="pb-4"
-                    :loading="pageLoading"
-                    :disabled="tasksUpdating"
-                    @delete="onTaskDelete"
-                    @uncheck="onTaskUncheck"
-                    :no-data-object="{
-                        title: $t('no-task.done.title'),
-                        caption: $t('no-task.done.caption'),
-                    }"
-                ></task-card-grid>
+                            {{ $t('todo') }}
+                        </div>
+                        <task-card-grid
+                            class="pa-3 pb-6"
+                            :task-list="todoList"
+                            :loading="pageLoading"
+                            :disabled="tasksUpdating"
+                            @edit="onTaskEdit"
+                            @check="onTaskCheck"
+                            @delete="onTaskDelete"
+                            @change="onTaskGridChange"
+                            :no-data-object="{
+                                title: $t('no-task.todo.title'),
+                                caption: $t('no-task.todo.caption'),
+                            }"
+                        >
+                            <template #no-data>
+                                <v-btn
+                                    text
+                                    class="mt-2 font-weight-bold primary"
+                                    small
+                                    @click="navigateTo('/add')"
+                                    >{{ $t('create') }}</v-btn
+                                >
+                            </template>
+                        </task-card-grid>
+                    </v-col>
+                    <v-col cols="12" md="6" class="pa-0">
+                        <div
+                            class="overline text-left"
+                            :class="
+                                $vuetify.breakpoint.xsOnly ? 'px-1' : 'px-3'
+                            "
+                        >
+                            {{ $t('done') }}
+                        </div>
+                        <task-card-grid
+                            class="pa-3 pb-6"
+                            :task-list="doneList"
+                            :loading="pageLoading"
+                            :disabled="tasksUpdating"
+                            @delete="onTaskDelete"
+                            @uncheck="onTaskUncheck"
+                            @change="onTaskGridChange"
+                            :no-data-object="{
+                                title: $t('no-task.done.title'),
+                                caption: $t('no-task.done.caption'),
+                            }"
+                        ></task-card-grid>
+                    </v-col>
+                </v-row>
             </div>
         </container-app>
     </div>
@@ -133,7 +131,7 @@ import {
     deleteTasks,
     getMomentDate,
     getCalendarDate,
-    parseTasksByStatus,
+    getTasksByStatus,
     // @ts-ignore
 } from '@/util';
 
@@ -152,11 +150,6 @@ export default Vue.extend({
             pageLoading: false,
             refreshDates: false,
             tasksUpdating: false,
-            tasksByStatus: {
-                todo: [],
-                done: [],
-            },
-            compact: true,
         };
     },
     watch: {
@@ -167,11 +160,6 @@ export default Vue.extend({
             },
             deep: true,
         },
-        compact: {
-            handler(newValue) {
-                localStorage.setItem('compact', newValue);
-            },
-        },
     },
     computed: {
         currentUser() {
@@ -181,6 +169,9 @@ export default Vue.extend({
         isSelectedDateValid() {
             // @ts-ignore
             return !this.selectedDate || this.selectedDate == '';
+        },
+        tasksByStatus() {
+            return getTasksByStatus(this.$store.getters.tasks);
         },
         todoList() {
             if (this.isSelectedDateValid) {
@@ -256,26 +247,58 @@ export default Vue.extend({
                 );
             }
         },
+        onTaskGridChange(change: any) {
+            let event = Object.keys(change)[0];
+            switch (event) {
+                case 'added':
+                    switch (change[event].element.status) {
+                        case 'todo':
+                            this.onTaskCheck(
+                                change[event].element,
+                                change[event].newIndex
+                            );
+                            break;
+                        case 'done':
+                            this.onTaskUncheck(
+                                change[event].element,
+                                change[event].newIndex
+                            );
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        },
         onTaskDelete(task: any) {
             // @ts-ignore
             this.deleteTask(task);
         },
-        onTaskUncheck(task: any) {
+        onTaskUncheck(task: any, index: any) {
             // @ts-ignore
-            this.updateTasks(task.id, {
-                status: 'todo',
-            });
+            this.updateTasks(
+                task.id,
+                {
+                    status: 'todo',
+                },
+                index
+            );
         },
-        onTaskCheck(task: any) {
+        onTaskCheck(task: any, index: any) {
             // @ts-ignore
-            this.updateTasks(task.id, {
-                status: 'done',
-            });
+            this.updateTasks(
+                task.id,
+                {
+                    status: 'done',
+                },
+                index
+            );
         },
         deleteTask(task: any) {
             // @ts-ignore
             this.tasksUpdating = true;
-            this.$store.dispatch('LOADING', true);
             firebase
                 .deleteTask(task)
                 .then(() => {
@@ -283,12 +306,6 @@ export default Vue.extend({
                 })
                 .then((tasks: any) => {
                     this.$store.dispatch('SET_TASKS', tasks);
-                    return parseTasksByStatus(tasks);
-                })
-                .then((tasksByStatus: any) => {
-                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
-                    // @ts-ignore
-                    this.tasksByStatus = tasksByStatus;
                     this.$store.dispatch(
                         'SHOW_SNACK',
                         this.$t('toast.success.task.delete')
@@ -303,13 +320,11 @@ export default Vue.extend({
                 .finally(() => {
                     // @ts-ignore
                     this.tasksUpdating = false;
-                    this.$store.dispatch('LOADING', false);
                 });
         },
-        updateTasks(taskId: any, updatedTask: any) {
+        updateTasks(taskId: any, updatedTask: any, index: any) {
             // @ts-ignore
             this.tasksUpdating = true;
-            this.$store.dispatch('LOADING', true);
             firebase
                 .updateTask(taskId, updatedTask)
                 .then(() => {
@@ -321,12 +336,19 @@ export default Vue.extend({
                 })
                 .then((tasks) => {
                     this.$store.dispatch('SET_TASKS', tasks);
-                    return parseTasksByStatus(tasks);
-                })
-                .then((tasksByStatus: any) => {
-                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
-                    // @ts-ignore
-                    this.tasksByStatus = tasksByStatus;
+                    if (!isNaN(index) && index >= 0) {
+                        this.onTaskGridChange({
+                            moved: {
+                                element: {
+                                    id: taskId,
+                                    ...updatedTask,
+                                },
+                                oldIndex: this.tasksByStatus[updatedTask.status]
+                                    .length,
+                                newIndex: index,
+                            },
+                        });
+                    }
                     this.$store.dispatch(
                         'SHOW_SNACK',
                         this.$t('toast.success.task.edit')
@@ -341,7 +363,6 @@ export default Vue.extend({
                 .finally(() => {
                     // @ts-ignore
                     this.tasksUpdating = false;
-                    this.$store.dispatch('LOADING', false);
                 });
         },
         loadPage() {
@@ -374,12 +395,6 @@ export default Vue.extend({
                     this.$store.dispatch('SET_NOTIFICATIONS', response[2]);
                     // @ts-ignore
                     this.$store.dispatch('LANDING_VISITED', true);
-                    return parseTasksByStatus(response[0]);
-                })
-                .then((tasksByStatus: any) => {
-                    // @ts-ignore
-                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
-                    this.tasksByStatus = tasksByStatus;
                 })
                 .catch((err: any) => {
                     // @ts-ignore
@@ -388,11 +403,7 @@ export default Vue.extend({
                 .then(() => {
                     this.pageLoading = false;
                 });
-        } else {
-            this.tasksByStatus = this.$store.getters.tasksByStatus;
         }
-        let ct = localStorage.getItem('compact');
-        this.compact = ct ? ct == 'true' : true;
     },
 });
 </script>

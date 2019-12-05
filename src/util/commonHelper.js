@@ -85,21 +85,19 @@ export const getAllTaskTypesForUser = (user) => {
     })
 }
 
-export const parseTasksByStatus = (tasks) => {
-    return new Promise(resolve => {
-        resolve(
-            tasks.reduce((taskByStatus, task) => {
-                taskByStatus[task.status] =
-                    taskByStatus[task.status] || [];
-                taskByStatus[task.status].push(task);
-                return taskByStatus;
-            }, {
-                todo: [],
-                done: []
-            })
-        );
-    });
+export const getTasksByStatus = (tasks) => {
+    return (
+        tasks.reduce((taskByStatus, task) => {
+            taskByStatus[task.status] =
+                taskByStatus[task.status] || [];
+            taskByStatus[task.status].push(task);
+            return taskByStatus;
+        }, {
+            todo: [],
+            done: []
+        }))
 }
+
 
 export const updateTasks = (taskId, updatedTask, tasks) => {
     return new Promise(resolve => {

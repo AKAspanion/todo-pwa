@@ -128,7 +128,6 @@ import {
     getAllTasksForUser,
     getAllTaskTypesForUser,
     getAllNotificationsForUser,
-    parseTasksByStatus,
     getTextColorByBg,
     // @ts-ignore
 } from '@/util';
@@ -245,10 +244,6 @@ export default Vue.extend({
                     this.$store.dispatch('SET_NOTIFICATIONS', response[2]);
                     this.$store.dispatch('LANDING_VISITED', true);
                     this.types = response[1];
-                    return parseTasksByStatus(response[0]);
-                })
-                .then((tasksByStatus: any) => {
-                    this.$store.dispatch('SET_TASKS_BY_STATUS', tasksByStatus);
                 })
                 .catch((err) => {
                     console.log(err);

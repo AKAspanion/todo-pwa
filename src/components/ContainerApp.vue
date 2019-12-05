@@ -5,12 +5,12 @@
                 <div
                     v-if="elevatedBg"
                     class="elevated-bg"
-                    :style="{ height: `calc(${bgHeight} - 30px)`}"
+                    :style="{ height: `calc(${bgHeight} - 30px)` }"
                 ></div>
                 <div
                     class="content-bg"
-                    :class="[coloured? 'primary':'']"
-                    :style="{ height: `${bgHeight}`}"
+                    :class="[coloured ? 'primary' : '']"
+                    :style="{ height: `${bgHeight}` }"
                 ></div>
                 <div class="content">
                     <slot></slot>
@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
     props: {
@@ -30,9 +30,9 @@ export default Vue.extend({
         elevatedBg: [Boolean],
         bgHeight: {
             type: String,
-            default: "200px"
-        }
-    }
+            default: '200px',
+        },
+    },
 });
 </script>
 <style scoped>

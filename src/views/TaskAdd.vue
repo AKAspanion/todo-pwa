@@ -7,7 +7,7 @@
                 </v-btn>
             </template>
             <template #center>
-                <v-chip small outlined>{{$t('task.add')}}</v-chip>
+                <v-chip small outlined>{{ $t('task.add') }}</v-chip>
             </template>
             <template #right>
                 <container-menu></container-menu>
@@ -18,7 +18,7 @@
                 flat
                 tile
                 class="pt-3 pb-3 task-add-container"
-                :class="$vuetify.breakpoint.smAndUp ? 'mx-3':''"
+                :class="$vuetify.breakpoint.smAndUp ? 'mx-3' : ''"
             >
                 <v-form
                     v-model="addTaskForm"
@@ -27,7 +27,13 @@
                     @submit.prevent="onAddTaskSubmit"
                 >
                     <v-container grid-list-lg fluid>
-                        <v-layout row wrap fill-height justify-space-between class="ma-0">
+                        <v-layout
+                            row
+                            wrap
+                            fill-height
+                            justify-space-between
+                            class="ma-0"
+                        >
                             <v-flex xs12 sm12 md4 class="py-0">
                                 <v-text-field
                                     ref="titleField"
@@ -35,11 +41,17 @@
                                     prepend-inner-icon="mdi-format-title"
                                     v-model="task.title"
                                     :placeholder="$t('task.title-placeholder')"
-                                    :rules="[rules.empty.title, rules.nospace.field]"
+                                    :rules="[
+                                        rules.empty.title,
+                                        rules.nospace.field,
+                                    ]"
                                 ></v-text-field>
                             </v-flex>
                             <v-flex xs12 sm6 md4 class="py-0">
-                                <v-menu v-model="timeMenu" :close-on-content-click="false">
+                                <v-menu
+                                    v-model="timeMenu"
+                                    :close-on-content-click="false"
+                                >
                                     <template #activator="{ on }">
                                         <v-text-field
                                             v-on="on"
@@ -58,15 +70,22 @@
                                             class="pickerTime"
                                             v-model="task.time"
                                             :locale="$i18n.locale"
-                                            :ampm-in-title="$vuetify.breakpoint.mdAndUp"
-                                            :landscape="$vuetify.breakpoint.mdAndUp"
+                                            :ampm-in-title="
+                                                $vuetify.breakpoint.mdAndUp
+                                            "
+                                            :landscape="
+                                                $vuetify.breakpoint.mdAndUp
+                                            "
                                         ></v-time-picker>
                                     </v-card>
                                 </v-menu>
                             </v-flex>
 
                             <v-flex xs12 sm6 md4 class="py-0">
-                                <v-menu v-model="dateMenu" :close-on-content-click="false">
+                                <v-menu
+                                    v-model="dateMenu"
+                                    :close-on-content-click="false"
+                                >
                                     <template #activator="{ on }">
                                         <v-text-field
                                             v-on="on"
@@ -86,7 +105,9 @@
                                             ref="datePicker"
                                             v-model="task.date"
                                             :locale="$i18n.locale"
-                                            :landscape="$vuetify.breakpoint.mdAndUp"
+                                            :landscape="
+                                                $vuetify.breakpoint.mdAndUp
+                                            "
                                         ></v-date-picker>
                                     </v-card>
                                 </v-menu>
@@ -94,7 +115,11 @@
                             <v-flex xs12 class="py-0">
                                 <div
                                     class="px-3"
-                                    :class="!$vuetify.theme.dark ? 'light-type-card':'dark-type-card'"
+                                    :class="
+                                        !$vuetify.theme.dark
+                                            ? 'light-type-card'
+                                            : 'dark-type-card'
+                                    "
                                 >
                                     <v-layout
                                         justify-start
@@ -102,12 +127,20 @@
                                         row
                                         class="ma-0 type-layout label-container"
                                     >
-                                        <v-icon class="pr-3" style="margin-left: -2px;">mdi-label</v-icon>
+                                        <v-icon
+                                            class="pr-3"
+                                            style="margin-left: -2px;"
+                                            >mdi-label</v-icon
+                                        >
                                         <template v-if="taskTypesLoading">
-                                            <div class="animate label-shimmer"></div>
+                                            <div
+                                                class="animate label-shimmer"
+                                            ></div>
                                         </template>
                                         <template v-else>
-                                            <div style="width: calc(100% - 36px)">
+                                            <div
+                                                style="width: calc(100% - 36px)"
+                                            >
                                                 <v-chip-group
                                                     v-model="taskTypes"
                                                     multiple
@@ -119,18 +152,37 @@
                                                         light
                                                         :key="tag.id"
                                                         :color="tag.color"
-                                                        v-for="(tag, index) in types"
-                                                        @focus="onChipFocus(true)"
-                                                        @blur="onChipFocus(false)"
-                                                        @keyup.enter="updateTaskModel(index)"
-                                                        :small="$vuetify.breakpoint.xsOnly"
-                                                        :style="`color: ${getTextColor(tag.color)} !important`"
-                                                    >{{ tag.label }}</v-chip>
+                                                        v-for="(tag,
+                                                        index) in types"
+                                                        @focus="
+                                                            onChipFocus(true)
+                                                        "
+                                                        @blur="
+                                                            onChipFocus(false)
+                                                        "
+                                                        @keyup.enter="
+                                                            updateTaskModel(
+                                                                index
+                                                            )
+                                                        "
+                                                        :small="
+                                                            $vuetify.breakpoint
+                                                                .xsOnly
+                                                        "
+                                                        :style="
+                                                            `color: ${getTextColor(
+                                                                tag.color
+                                                            )} !important`
+                                                        "
+                                                        >{{ tag.label }}</v-chip
+                                                    >
                                                 </v-chip-group>
                                                 <div
                                                     v-if="!types.length"
                                                     class="overflow-text mt-n2 caption text-left warning--text"
-                                                >{{$t('label.no-label')}}</div>
+                                                >
+                                                    {{ $t('label.no-label') }}
+                                                </div>
                                             </div>
                                         </template>
                                     </v-layout>
@@ -147,21 +199,34 @@
                                 ></v-textarea>
                             </v-flex>
                             <v-flex xs12 class="py-0 mt-n5 pb-3">
-                                <v-layout row align-center justify-start class="ma-0">
-                                    <v-btn-toggle dense block v-model="task.status">
+                                <v-layout
+                                    row
+                                    align-center
+                                    justify-start
+                                    class="ma-0"
+                                >
+                                    <v-btn-toggle
+                                        dense
+                                        block
+                                        v-model="task.status"
+                                    >
                                         <v-btn left value="todo">
                                             <span
                                                 class="pl-1 error--text font-weight-bold"
-                                            >{{$t('todo')}}</span>
+                                                >{{ $t('todo') }}</span
+                                            >
                                         </v-btn>
                                         <v-btn value="done">
                                             <span
                                                 class="pl-1 success--text font-weight-bold"
-                                            >{{$t('done')}}</span>
+                                                >{{ $t('done') }}</span
+                                            >
                                         </v-btn>
                                     </v-btn-toggle>
                                     <v-spacer></v-spacer>
-                                    <div class="mx-2 subtitle-2">{{$t('task.indefinite')}}</div>
+                                    <div class="mx-2 subtitle-2">
+                                        {{ $t('task.indefinite') }}
+                                    </div>
                                     <v-switch
                                         color="primary"
                                         v-model="task.indefinite"
@@ -170,7 +235,12 @@
                                 </v-layout>
                             </v-flex>
                             <v-flex xs12 class="py-0">
-                                <v-layout row align-center justify-start class="ma-0 pb-5">
+                                <v-layout
+                                    row
+                                    align-center
+                                    justify-start
+                                    class="ma-0 pb-5"
+                                >
                                     <v-spacer></v-spacer>
                                     <v-btn
                                         large
@@ -178,7 +248,8 @@
                                         color="primary"
                                         :disabled="!addTaskForm"
                                         :loading="addTaskLoading"
-                                    >{{$t('task.add')}}</v-btn>
+                                        >{{ $t('task.add') }}</v-btn
+                                    >
                                 </v-layout>
                             </v-flex>
                         </v-layout>
@@ -190,13 +261,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import FirebaseWeb from "../firebase";
+import Vue from 'vue';
+import FirebaseWeb from '../firebase';
 const firebase = new FirebaseWeb();
 
-import BarTop from "@/components/BarTop.vue";
-import ContainerApp from "@/components/ContainerApp.vue";
-import ContainerMenu from "@/components/ContainerMenu.vue";
+import BarTop from '@/components/BarTop.vue';
+import ContainerApp from '@/components/ContainerApp.vue';
+import ContainerMenu from '@/components/ContainerMenu.vue';
 // @ts-ignore
 import {
     getMomentDate,
@@ -206,15 +277,14 @@ import {
     getAllTasksForUser,
     getAllTaskTypesForUser,
     getAllNotificationsForUser,
-    parseTasksByStatus,
-    getTextColorByBg
+    getTextColorByBg,
     // @ts-ignore
-} from "@/util";
+} from '@/util';
 export default Vue.extend({
     components: {
         BarTop,
         ContainerApp,
-        ContainerMenu
+        ContainerMenu,
     },
     data() {
         return {
@@ -224,33 +294,33 @@ export default Vue.extend({
             dateMenu: false,
             pageLoading: false,
             addTaskLoading: false,
-            newTypeColor: "#8E00FF",
-            typeSearch: "",
+            newTypeColor: '#8E00FF',
+            typeSearch: '',
             taskTypesLoading: false,
             task: {
-                title: "",
+                title: '',
                 date: getMomentDate(new Date()).substr(0, 10),
                 time: getMomentDate(new Date()).substr(11, 5),
-                status: "todo",
-                description: "",
+                status: 'todo',
+                description: '',
                 indefinite: false,
-                type: []
+                type: [],
             },
             types: [],
             taskTypeIndexHolder: [],
             textFieldAttributes: {
                 dense: !this.$vuetify.breakpoint.mdAndUp,
-                outlined: true
+                outlined: true,
             },
             rules: {
                 empty: {
-                    title: (v: any) => !!v || this.$t("rule.empty.title")
+                    title: (v: any) => !!v || this.$t('rule.empty.title'),
                 },
                 nospace: {
                     field: (v: any) =>
-                        (v && v.trim() !== "") || this.$t("rule.space.field")
-                }
-            }
+                        (v && v.trim() !== '') || this.$t('rule.space.field'),
+                },
+            },
         };
     },
     computed: {
@@ -264,8 +334,8 @@ export default Vue.extend({
                 this.taskTypeIndexHolder = val;
                 // @ts-ignore
                 this.updateType(val);
-            }
-        }
+            },
+        },
     },
     methods: {
         navigateTo(path: any) {
@@ -281,29 +351,29 @@ export default Vue.extend({
         onChipFocus(e: any) {
             this.$nextTick(() => {
                 let lightCard = document.getElementsByClassName(
-                    "light-type-card"
+                    'light-type-card'
                 );
                 let darkCard = document.getElementsByClassName(
-                    "dark-type-card"
+                    'dark-type-card'
                 );
-                let taskLayout = document.getElementsByClassName("type-layout");
+                let taskLayout = document.getElementsByClassName('type-layout');
                 if (lightCard.length) {
                     if (e) {
-                        lightCard[0].classList.add("light-focused");
+                        lightCard[0].classList.add('light-focused');
                     } else {
-                        lightCard[0].classList.remove("light-focused");
+                        lightCard[0].classList.remove('light-focused');
                     }
                 } else {
                     if (e) {
-                        darkCard[0].classList.add("dark-focused");
+                        darkCard[0].classList.add('dark-focused');
                     } else {
-                        darkCard[0].classList.remove("dark-focused");
+                        darkCard[0].classList.remove('dark-focused');
                     }
                 }
                 if (e) {
-                    taskLayout[0].classList.add("layout-focused");
+                    taskLayout[0].classList.add('layout-focused');
                 } else {
-                    taskLayout[0].classList.remove("layout-focused");
+                    taskLayout[0].classList.remove('layout-focused');
                 }
             });
         },
@@ -327,17 +397,17 @@ export default Vue.extend({
             firebase
                 .addTask(this.$store.getters.user, this.task)
                 .then(() => {
-                    this.$store.dispatch("LANDING_VISITED", false);
+                    this.$store.dispatch('LANDING_VISITED', false);
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        "Task addedd succesfully"
+                        'SHOW_SNACK',
+                        'Task addedd succesfully'
                     );
-                    this.navigateTo("/home");
+                    this.navigateTo('/home');
                 })
-                .catch(err => {
-                    this.$store.dispatch("SHOW_SNACK", err);
+                .catch((err) => {
+                    this.$store.dispatch('SHOW_SNACK', err);
                 })
-                .then(err => {
+                .then((err) => {
                     this.addTaskLoading = false;
                 });
         },
@@ -357,31 +427,26 @@ export default Vue.extend({
             return Promise.all([
                 getAllTasksForUser(this.$store.getters.user),
                 getAllTaskTypesForUser(this.$store.getters.user),
-                getAllNotificationsForUser(this.$store.getters.user)
+                getAllNotificationsForUser(this.$store.getters.user),
             ]);
         },
         getTextColor(color: any) {
             return getTextColorByBg(color);
-        }
+        },
     },
     mounted() {
         if (!this.$store.getters.landingVisited) {
             this.pageLoading = true;
             this.taskTypesLoading = true;
             this.loadPage()
-                .then(response => {
-                    this.$store.dispatch("SET_TASKS", response[0]);
-                    this.$store.dispatch("SET_TYPES", response[1]);
-                    this.$store.dispatch("SET_NOTIFICATIONS", response[2]);
-                    this.$store.dispatch("LANDING_VISITED", true);
-                    this.types = response[1];
-                    return parseTasksByStatus(response[0]);
+                .then((response) => {
+                    this.$store.dispatch('SET_TASKS', response[0]);
+                    this.$store.dispatch('SET_TYPES', response[1]);
+                    this.$store.dispatch('SET_NOTIFICATIONS', response[2]);
+                    this.$store.dispatch('LANDING_VISITED', true);
                 })
-                .then((tasksByStatus: any) => {
-                    this.$store.dispatch("SET_TASKS_BY_STATUS", tasksByStatus);
-                })
-                .catch(err => {
-                    this.$store.dispatch("SHOW_SNACK", err);
+                .catch((err) => {
+                    this.$store.dispatch('SHOW_SNACK', err);
                 })
                 .finally(() => {
                     this.pageLoading = false;
@@ -390,7 +455,7 @@ export default Vue.extend({
         } else {
             this.types = this.$store.getters.types;
         }
-    }
+    },
 });
 </script>
 <style scoped>
