@@ -6,7 +6,7 @@
             class="fixed-progress"
             height="4"
         ></v-progress-linear>
-        <v-snackbar v-model="snackbar.model" bottom :timeout="5000">
+        <v-snackbar v-model="snackbar.model" multi-line bottom :timeout="5000">
             {{ snackbar.text }}
             <v-btn dark text @click="snackbar.model = false">{{
                 $t('close')

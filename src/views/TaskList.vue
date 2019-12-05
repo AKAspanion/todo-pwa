@@ -44,9 +44,37 @@
                 :class="$vuetify.breakpoint.xsOnly ? 'mx-1 mb-6' : 'mx-4 mb-8'"
             ></bar-date>
             <div
-                style="width: 100%"
+                style="width: 100%;"
                 :class="$vuetify.breakpoint.xsOnly ? 'px-3' : 'px-4'"
             >
+                <v-row
+                    no-gutters
+                    justify="start"
+                    v-if="filters.length"
+                    :class="
+                        $vuetify.breakpoint.xsOnly ? 'px-1 pb-2' : 'px-3 pb-4'
+                    "
+                >
+                    <template v-for="(filter, index) in filters">
+                        <v-chip
+                            close
+                            label
+                            :key="index"
+                            class="mr-2"
+                            :color="filter.color"
+                            :small="$vuetify.breakpoint.xsOnly"
+                            @click:close="onFilterClose(filter)"
+                            :style="
+                                `color: ${getTextColor(
+                                    filter.color
+                                )} !important`
+                            "
+                            ><span class="px-1">{{
+                                filter.label
+                            }}</span></v-chip
+                        >
+                    </template>
+                </v-row>
                 <v-row no-gutters class="ma-0">
                     <v-col cols="12" md="6" class="pa-0">
                         <div
@@ -58,7 +86,6 @@
                             {{ $t('todo') }}
                         </div>
                         <task-card-grid
-                            class="pa-3 pb-6"
                             :task-list="todoList"
                             :loading="pageLoading"
                             :disabled="tasksUpdating"
@@ -66,10 +93,16 @@
                             @check="onTaskCheck"
                             @delete="onTaskDelete"
                             @change="onTaskGridChange"
+                            @type-select="onTypeSelect"
                             :no-data-object="{
                                 title: $t('no-task.todo.title'),
                                 caption: $t('no-task.todo.caption'),
                             }"
+                            :class="
+                                $vuetify.breakpoint.xsOnly
+                                    ? 'pa-1 pb-4'
+                                    : 'pa-3 pb-6'
+                            "
                         >
                             <template #no-data>
                                 <v-btn
@@ -92,17 +125,22 @@
                             {{ $t('done') }}
                         </div>
                         <task-card-grid
-                            class="pa-3 pb-6"
                             :task-list="doneList"
                             :loading="pageLoading"
                             :disabled="tasksUpdating"
                             @delete="onTaskDelete"
                             @uncheck="onTaskUncheck"
                             @change="onTaskGridChange"
+                            @type-select="onTypeSelect"
                             :no-data-object="{
                                 title: $t('no-task.done.title'),
                                 caption: $t('no-task.done.caption'),
                             }"
+                            :class="
+                                $vuetify.breakpoint.xsOnly
+                                    ? 'pa-1 pb-4'
+                                    : 'pa-3 pb-6'
+                            "
                         ></task-card-grid>
                     </v-col>
                 </v-row>
@@ -132,6 +170,7 @@ import {
     getMomentDate,
     getCalendarDate,
     getTasksByStatus,
+    getTextColorByBg,
     // @ts-ignore
 } from '@/util';
 
@@ -150,6 +189,7 @@ export default Vue.extend({
             pageLoading: false,
             refreshDates: false,
             tasksUpdating: false,
+            filters: [],
         };
     },
     watch: {
@@ -170,8 +210,31 @@ export default Vue.extend({
             // @ts-ignore
             return !this.selectedDate || this.selectedDate == '';
         },
+        tasks() {
+            return this.$store.getters.tasks;
+        },
+        filteredTasks() {
+            // @ts-ignore
+            let filterId = this.filters.reduce((text: any, type: any) => {
+                return (text += type.id);
+            }, '');
+            // @ts-ignore
+            return this.tasks.filter((task) => {
+                let found = false;
+                for (let i = 0; i < task.type.length; i++) {
+                    if (filterId.includes(task.type[i].id)) {
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            });
+        },
         tasksByStatus() {
-            return getTasksByStatus(this.$store.getters.tasks);
+            return getTasksByStatus(
+                // @ts-ignore
+                this.filters.length ? this.filteredTasks : this.tasks
+            );
         },
         todoList() {
             if (this.isSelectedDateValid) {
@@ -230,21 +293,13 @@ export default Vue.extend({
         },
     },
     methods: {
-        onTaskEdit(task: any) {
-            // @ts-ignore
-            if (this.isTaskValid(task)) {
-                let newTask = {
-                    ...task,
-                    time: task.indefinite ? 'NA' : task.time,
-                    date: task.indefinite ? 'NA' : task.date,
-                };
+        onFilterClose(type: any) {
+            this.removeFilter(type);
+        },
+        onTypeSelect(type: any) {
+            if (!this.isFilterActive(type)) {
                 // @ts-ignore
-                this.updateTasks(task.id, newTask);
-            } else {
-                this.$store.dispatch(
-                    'SHOW_SNACK',
-                    this.$t('toast.error.task.invalid')
-                );
+                this.filters.unshift(type);
             }
         },
         onTaskGridChange(change: any) {
@@ -270,6 +325,23 @@ export default Vue.extend({
                     break;
                 default:
                     break;
+            }
+        },
+        onTaskEdit(task: any) {
+            // @ts-ignore
+            if (this.isTaskValid(task)) {
+                let newTask = {
+                    ...task,
+                    time: task.indefinite ? 'NA' : task.time,
+                    date: task.indefinite ? 'NA' : task.date,
+                };
+                // @ts-ignore
+                this.updateTasks(task.id, newTask);
+            } else {
+                this.$store.dispatch(
+                    'SHOW_SNACK',
+                    this.$t('toast.error.task.invalid')
+                );
             }
         },
         onTaskDelete(task: any) {
@@ -302,7 +374,7 @@ export default Vue.extend({
             firebase
                 .deleteTask(task)
                 .then(() => {
-                    return deleteTasks(task.id, this.$store.getters.tasks);
+                    return deleteTasks(task.id, this.tasks);
                 })
                 .then((tasks: any) => {
                     this.$store.dispatch('SET_TASKS', tasks);
@@ -328,11 +400,7 @@ export default Vue.extend({
             firebase
                 .updateTask(taskId, updatedTask)
                 .then(() => {
-                    return updateTasks(
-                        taskId,
-                        updatedTask,
-                        this.$store.getters.tasks
-                    );
+                    return updateTasks(taskId, updatedTask, this.tasks);
                 })
                 .then((tasks) => {
                     this.$store.dispatch('SET_TASKS', tasks);
@@ -378,8 +446,18 @@ export default Vue.extend({
         navigateTo(path: any) {
             navigateToPath(path);
         },
+        getTextColor(color: any) {
+            return getTextColorByBg(color);
+        },
+        removeFilter(type: any) {
+            // @ts-ignore
+            this.filters.splice(this.filters.indexOf(type), 1);
+        },
         isTaskValid(task: any) {
             return task.title.trim() !== '';
+        },
+        isFilterActive(type: any) {
+            return this.filters.find((filter: any) => filter.id == type.id);
         },
     },
     mounted() {
