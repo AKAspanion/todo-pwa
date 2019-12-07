@@ -239,11 +239,12 @@
                                     row
                                     align-center
                                     justify-start
-                                    class="ma-0 pb-5"
+                                    class="ma-0"
                                 >
                                     <v-spacer></v-spacer>
                                     <v-btn
                                         large
+                                        block
                                         type="submit"
                                         color="primary"
                                         :disabled="!addTaskForm"

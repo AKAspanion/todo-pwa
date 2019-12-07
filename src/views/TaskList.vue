@@ -1,5 +1,37 @@
 <template>
     <div class="home">
+        <v-menu
+            left
+            depressed
+            nudge-top="4"
+            nudge-right="4"
+            :close-on-content-click="false"
+        >
+            <template #activator="{ on }">
+                <v-btn
+                    v-on="on"
+                    absolute
+                    small
+                    fab
+                    right
+                    elevation="2"
+                    class="search-fab"
+                    @click="onSearch"
+                    :class="$vuetify.breakpoint.xsOnly ? 'mr-n2' : 'mr-1'"
+                >
+                    <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+            </template>
+            <!-- <v-card> -->
+            <v-text-field
+                ref="searchBtn"
+                v-model="search"
+                hide-details
+                solo
+                append-icon="mdi-magnify"
+            ></v-text-field>
+            <!-- </v-card> -->
+        </v-menu>
         <bar-top dark primary>
             <template #left>
                 <v-avatar>
@@ -50,11 +82,25 @@
                 <v-row
                     no-gutters
                     justify="start"
-                    v-if="filters.length"
+                    v-if="filters.length || search !== ''"
                     :class="
                         $vuetify.breakpoint.xsOnly ? 'px-1 pb-2' : 'px-3 pb-4'
                     "
                 >
+                    <v-chip
+                        close
+                        label
+                        class="mr-2"
+                        color="primary"
+                        v-if="search !== ''"
+                        @click:close="search = ''"
+                        :small="$vuetify.breakpoint.xsOnly"
+                    >
+                        <v-icon left :small="$vuetify.breakpoint.xsOnly"
+                            >mdi-magnify</v-icon
+                        >
+                        {{ search }}
+                    </v-chip>
                     <template v-for="(filter, index) in filters">
                         <v-chip
                             close
@@ -190,6 +236,7 @@ export default Vue.extend({
             refreshDates: false,
             tasksUpdating: false,
             filters: [],
+            search: '',
         };
     },
     watch: {
@@ -218,23 +265,38 @@ export default Vue.extend({
             let filterId = this.filters.reduce((text: any, type: any) => {
                 return (text += type.id);
             }, '');
-            // @ts-ignore
-            return this.tasks.filter((task) => {
-                let found = false;
-                for (let i = 0; i < task.type.length; i++) {
-                    if (filterId.includes(task.type[i].id)) {
-                        found = true;
-                        break;
+            let searchedTask = [];
+            if (this.search !== '') {
+                // @ts-ignore
+                searchedTask = this.tasks.filter((task: any) => {
+                    let searchText = this.search.toLowerCase();
+                    return (
+                        task.title.toLowerCase().includes(searchText) ||
+                        task.description.toLowerCase().includes(searchText)
+                    );
+                });
+            } else {
+                // @ts-ignore
+                searchedTask = this.tasks;
+            }
+            if (this.filters.length) {
+                return searchedTask.filter((task: any) => {
+                    let found = false;
+                    for (let i = 0; i < task.type.length; i++) {
+                        if (filterId.includes(task.type[i].id)) {
+                            found = true;
+                            break;
+                        }
                     }
-                }
-                return found;
-            });
+                    return found;
+                });
+            } else {
+                return searchedTask;
+            }
         },
         tasksByStatus() {
-            return getTasksByStatus(
-                // @ts-ignore
-                this.filters.length ? this.filteredTasks : this.tasks
-            );
+            // @ts-ignore
+            return getTasksByStatus(this.filteredTasks);
         },
         todoList() {
             if (this.isSelectedDateValid) {
@@ -293,6 +355,16 @@ export default Vue.extend({
         },
     },
     methods: {
+        onSearch() {
+            setTimeout(() => {
+                this.$nextTick(() => {
+                    if (this.$refs.searchBtn) {
+                        // @ts-ignore
+                        this.$refs.searchBtn.focus();
+                    }
+                });
+            }, 250);
+        },
         onFilterClose(type: any) {
             this.removeFilter(type);
         },
@@ -511,5 +583,8 @@ export default Vue.extend({
 .content {
     position: absolute;
     z-index: 12;
+}
+.search-fab {
+    top: 80px;
 }
 </style>
