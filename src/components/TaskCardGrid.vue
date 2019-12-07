@@ -21,6 +21,7 @@
         <div>
             <draggable
                 group="tasks"
+                handle=".handle"
                 :value="taskList"
                 :disabled="disabled"
                 @change="(v) => $emit('change', v)"
@@ -34,7 +35,10 @@
                     :loading="loading"
                     :disabled="disabled"
                     v-for="task in taskList"
-                    :class="disabled ? 'disabled-list' : ''"
+                    :class="[
+                        disabled ? 'disabled-list' : '',
+                        $vuetify.breakpoint.xsOnly ? '' : 'handle',
+                    ]"
                     @type-select="(v) => $emit('type-select', v)"
                     @uncheck="(v) => $emit('uncheck', v)"
                     @delete="(v) => $emit('delete', v)"
