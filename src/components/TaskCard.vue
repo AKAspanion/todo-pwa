@@ -52,7 +52,7 @@
         </v-card>
         <v-hover v-else #default="{ hover }">
             <v-card
-                :elevation="hover && $vuetify.breakpoint.smAndUp? 5 : 2"
+                :elevation="hover && $vuetify.breakpoint.smAndUp? 12 : 3"
                 :light="getTextColor() !== '#ffffff' ? true : false"
                 :dark="getTextColor() === '#ffffff' ? true : false"
                 height="100%"
@@ -124,10 +124,9 @@
                                 >
                                     <v-layout row wrap align-center class="ma-0">
                                         <v-flex
-                                            xs12
-                                            md6
+                                            xs6
                                             py-0
-                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'px-0'"
+                                            class="pl-0"
                                         >
                                             <v-menu :close-on-content-click="false">
                                                 <template #activator="{ on }">
@@ -141,7 +140,6 @@
                                                         :value="readableTime"
                                                         :disabled="localTask.indefinite"
                                                         prepend-inner-icon="mdi-clock"
-                                                        :class="$vuetify.breakpoint.xsOnly? 'mb-n4 ':''"
                                                     ></v-text-field>
                                                 </template>
                                                 <v-card>
@@ -157,10 +155,9 @@
                                             </v-menu>
                                         </v-flex>
                                         <v-flex
-                                            xs12
-                                            md6
+                                            xs6
                                             py-0
-                                            :class="$vuetify.breakpoint.xsOnly? 'mr-n1 px-0':'px-0'"
+                                            class="pr-0"
                                         >
                                             <v-menu :close-on-content-click="false">
                                                 <template #activator="{ on }">
@@ -174,7 +171,6 @@
                                                         :value="readableDate"
                                                         :disabled="localTask.indefinite"
                                                         prepend-inner-icon="mdi-calendar"
-                                                        :class="$vuetify.breakpoint.xsOnly? 'mb-n6':''"
                                                     ></v-text-field>
                                                 </template>
                                                 <v-card>
@@ -192,7 +188,7 @@
                                 </div>
                                 <div
                                     v-if="isEdit"
-                                    :class="$vuetify.breakpoint.xsOnly? 'mt-n2 ml-1':'mt-0'"
+                                    class="mt-n7 ml-1"
                                 >
                                     <v-layout class="ma-0" align-center>
                                         <div>Indefinte task?</div>
@@ -286,7 +282,8 @@
                         </v-card-text>
                         <v-divider light></v-divider>
                         <v-card-actions
-                            :class="$vuetify.breakpoint.xsOnly ? 'px-2 py-0':'px-3'"
+                            class="task-card-action"
+                            :class="$vuetify.breakpoint.xsOnly ? 'px-3 py-0':'px-4'"
                             :style="`min-height: ${$vuetify.breakpoint.xsOnly ? '36px':'52px'}`"
                         >
                             <div v-if="!isEdit && !isDelete">
@@ -310,48 +307,12 @@
                             </v-tooltip>
                             <v-spacer v-if="!isEdit && !isDelete"></v-spacer>
                             <template v-if="!isEdit && !isDelete">
-                                <v-menu v-if="task.status == 'todo'">
-                                    <template #activator="{ on }">
-                                        <v-btn
-                                            icon
-                                            small
-                                            v-on="on"
-                                            v-show="$vuetify.breakpoint.xsOnly"
-                                            :disabled="disabled"
-                                            :color="getTextColor() === '#ffffff' ? 'white':'black'"
-                                        >
-                                            <v-icon
-                                                :small="$vuetify.breakpoint.xsOnly"
-                                            >mdi-dots-vertical</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <v-card width="72">
-                                        <v-layout row class="mx-0">
-                                            <v-btn
-                                                icon
-                                                small
-                                                class="ma-1"
-                                                @click.stop="onModalCancel(); isEdit = true"
-                                            >
-                                                <v-icon small>mdi-pencil</v-icon>
-                                            </v-btn>
-                                            <v-btn
-                                                icon
-                                                small
-                                                class="ma-1"
-                                                @click.stop="isDelete = true"
-                                            >
-                                                <v-icon small>mdi-delete</v-icon>
-                                            </v-btn>
-                                        </v-layout>
-                                    </v-card>
-                                </v-menu>
                                 <v-btn
                                     icon
                                     :disabled="disabled"
                                     v-if="task.status == 'todo'"
                                     :small="$vuetify.breakpoint.xsOnly"
-                                    v-show="hover && !$vuetify.breakpoint.xsOnly"
+                                    v-show="hover || $vuetify.breakpoint.xsOnly"
                                     @click.stop="onModalCancel(); isEdit = true"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 >
@@ -362,7 +323,7 @@
                                     :disabled="disabled"
                                     @click.stop="isDelete = true"
                                     :small="$vuetify.breakpoint.xsOnly"
-                                    v-show="(hover && !$vuetify.breakpoint.xsOnly) || task.status == 'done'"
+                                    v-show="hover || $vuetify.breakpoint.xsOnly || task.status == 'done'"
                                     :color="getTextColor() === '#ffffff' ? 'white':'black'"
                                 >
                                     <v-icon :small="$vuetify.breakpoint.xsOnly">mdi-delete</v-icon>
@@ -595,8 +556,11 @@ export default Vue.extend({
 .pickerTime {
     width: 100%;
 }
+.task-card-action{
+    margin-left: -1px !important;
+}
 .type-card{
-    background-color: rgba(0,0,0,.06) !important;
+    background-color: rgba(24, 15, 15, 0.06) !important;
     border-color: rgba(0,0,0,.06) !important;
     transition: all 0.3s ease;
 }

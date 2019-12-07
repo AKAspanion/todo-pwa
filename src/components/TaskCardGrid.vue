@@ -24,6 +24,8 @@
                 :value="taskList"
                 :disabled="disabled"
                 @change="(v) => $emit('change', v)"
+                @start="(v) => $emit('change', { start: v })"
+                @end="(v) => $emit('change', { end: v })"
             >
                 <task-card
                     class="py-2"

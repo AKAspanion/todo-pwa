@@ -323,6 +323,12 @@ export default Vue.extend({
                             break;
                     }
                     break;
+                case 'start':
+                    document.body.style.cursor = 'grabbing';
+                    break;
+                case 'end':
+                    document.body.style.cursor = 'default';
+                    break;
                 default:
                     break;
             }
