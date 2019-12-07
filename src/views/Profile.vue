@@ -70,9 +70,95 @@
             <div class="subtitle-2 mt-3 white--text text-item">
                 {{ currentUser.email || 'NA' }}
             </div>
-            <v-card-text class="mt-8">
-                <v-card outlined class="py-4 mx-3">
-                    <div style="margin: 0 auto; width: 300px;">
+            <v-row no-gutters align="center" justify="center">
+                <v-card-text class="mt-6" style="max-width: 500px;">
+                    <div class="overline text-left py-3">LABELS</div>
+                    <v-card outlined>
+                        <v-list>
+                            <v-list-item dense>
+                                <v-list-item-avatar>
+                                    <v-icon
+                                        :disabled="taskTypesLoading"
+                                        :color="newTypeColor"
+                                        >mdi-plus-circle</v-icon
+                                    >
+                                </v-list-item-avatar>
+                                <v-list-item-content class="py-1">
+                                    <v-text-field
+                                        solo
+                                        flat
+                                        dense
+                                        hide-details
+                                        v-model="taskTypeLabel"
+                                        :disabled="taskTypesLoading"
+                                        @keyup.enter="onAddTaskTypeSubmit"
+                                        :placeholder="$t('label.create')"
+                                    >
+                                    </v-text-field>
+                                </v-list-item-content>
+                                <v-list-item-action>
+                                    <v-menu
+                                        left
+                                        nudge-top="16"
+                                        :close-on-content-click="false"
+                                    >
+                                        <template #activator="{ on }">
+                                            <v-btn
+                                                icon
+                                                small
+                                                v-on="on"
+                                                :color="newTypeColor"
+                                                :disabled="taskTypesLoading"
+                                            >
+                                                <v-icon>
+                                                    mdi-palette
+                                                </v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <v-card width="250">
+                                            <v-color-picker
+                                                v-model="newTypeColor"
+                                                hide-canvas
+                                                hide-inputs
+                                                hide-swatches
+                                            ></v-color-picker>
+                                        </v-card>
+                                    </v-menu>
+                                </v-list-item-action>
+                            </v-list-item>
+                            <template v-if="taskTypesLoading">
+                                <v-row
+                                    no-gutters
+                                    align="center"
+                                    class="px-6 py-4"
+                                    v-for="i in 3"
+                                    :key="i"
+                                >
+                                    <div class="animate icon-shimmer"></div>
+                                    <div
+                                        class="animate title-shimmer ml-11"
+                                        style="width: 50%;"
+                                    ></div>
+                                </v-row>
+                            </template>
+                            <template v-else>
+                                <v-list-item
+                                    dense
+                                    :key="type.id"
+                                    v-for="type in types"
+                                >
+                                    <v-list-item-avatar>
+                                        <v-icon :color="type.color"
+                                            >mdi-label</v-icon
+                                        >
+                                    </v-list-item-avatar>
+                                    <v-list-item-content class="pl-3 py-1">{{
+                                        type.label
+                                    }}</v-list-item-content>
+                                </v-list-item>
+                            </template>
+                        </v-list>
+                        <!-- <div style="margin: 0 auto; width: 300px;">
                         <v-card-text>
                             <div class="pb-4">
                                 <v-text-field
@@ -90,12 +176,7 @@
                                     >{{ taskTypeLabel }}</v-chip
                                 >
                             </div>
-                            <v-color-picker
-                                v-model="newTypeColor"
-                                hide-canvas
-                                hide-inputs
-                                hide-swatches
-                            ></v-color-picker>
+                            
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
@@ -108,9 +189,10 @@
                             >
                             <v-spacer></v-spacer>
                         </v-card-actions>
-                    </div>
-                </v-card>
-            </v-card-text>
+                    </div> -->
+                    </v-card>
+                </v-card-text>
+            </v-row>
         </container-app>
     </div>
 </template>
@@ -129,6 +211,7 @@ import {
     getAllTaskTypesForUser,
     getAllNotificationsForUser,
     getTextColorByBg,
+    getRandomHexColor,
     // @ts-ignore
 } from '@/util';
 export default Vue.extend({
@@ -256,6 +339,7 @@ export default Vue.extend({
             this.types = this.$store.getters.types;
         }
         this.user = this.$store.getters.user;
+        this.newTypeColor = getRandomHexColor();
     },
 });
 </script>

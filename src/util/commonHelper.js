@@ -10,6 +10,15 @@ export const navigateToPath = (path) => {
         .catch(err => {})
 }
 
+export const getRandomHexColor = () => {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 export const getTextColorByBg = (color) => {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
     let rgb = result ? {

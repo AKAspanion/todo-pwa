@@ -5,7 +5,7 @@
     "label": {
         "label": "Label",
         "edit": "Edit labels",
-        "create": "Create a new label type",
+        "create": "Create a new label",
         "no-label": "No label available, create one in profile page"
     },
     "ok": "OK",

@@ -1,5 +1,10 @@
 <template>
-    <v-menu z-index="999" transition="scale-transition" origin="top right" min-width="348">
+    <v-menu
+        z-index="999"
+        transition="scale-transition"
+        origin="top right"
+        min-width="348"
+    >
         <template #activator="{ on }">
             <v-btn icon v-on="on">
                 <v-icon>mdi-dots-horizontal</v-icon>
@@ -7,35 +12,44 @@
         </template>
         <v-list>
             <slot name="top-list-item"></slot>
-            <v-subheader class="overline">{{$t('options')}}</v-subheader>
+            <v-subheader class="overline">{{ $t('options') }}</v-subheader>
             <v-list-item>
                 <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('language.label')}}</v-list-item-title>
+                    <v-list-item-title>{{
+                        $t('language.label')
+                    }}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
-                    <v-btn-toggle v-model="langModel" mandatory class="lnl-lang-btn">
+                    <v-btn-toggle
+                        v-model="langModel"
+                        mandatory
+                        class="lnl-lang-btn"
+                    >
                         <v-btn
                             v-for="(lang, i) in langs"
                             :key="`Lang${i}`"
                             :value="lang"
                             small
-                        >{{ lang }}</v-btn>
+                            >{{ lang }}</v-btn
+                        >
                     </v-btn-toggle>
                 </v-list-item-action>
             </v-list-item>
             <v-list-item>
                 <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('dark.mode')}}</v-list-item-title>
+                    <v-list-item-title>{{ $t('dark.mode') }}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action class="mr-2">
                     <v-switch color="primary" v-model="themeModel"></v-switch>
                 </v-list-item-action>
             </v-list-item>
             <!-- TODO implement -->
-            <v-subheader class="overline">{{$t('label.label')}}</v-subheader>
-            <v-list-item link>
+            <v-subheader class="overline">{{ $t('label.label') }}</v-subheader>
+            <v-list-item link @click="routeTo('/profile')">
                 <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('label.edit')}}</v-list-item-title>
+                    <v-list-item-title>{{
+                        $t('label.edit')
+                    }}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-avatar>
                     <v-avatar small size="36">
@@ -43,10 +57,10 @@
                     </v-avatar>
                 </v-list-item-avatar>
             </v-list-item>
-            <v-subheader class="overline">{{$t('settings')}}</v-subheader>
+            <v-subheader class="overline">{{ $t('settings') }}</v-subheader>
             <v-list-item link @click="onSignoutClick">
                 <v-list-item-content class="text-left">
-                    <v-list-item-title>{{$t('sign-out')}}</v-list-item-title>
+                    <v-list-item-title>{{ $t('sign-out') }}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-avatar>
                     <v-avatar small size="36">
@@ -61,21 +75,26 @@
                     made with
                     <span class="px-1">
                         <img src="../assets/heart-icon.png" />
-                    </span> by
-                    <span class="selectable" @click="routeToSpanion">ankit</span>
+                    </span>
+                    by
+                    <span class="selectable" @click="routeToSpanion"
+                        >ankit</span
+                    >
                 </div>
             </v-list-item-content>
         </v-list>
     </v-menu>
 </template>
 <script lang="ts">
-import Vue from "vue";
-import FirebaseWeb from "../firebase";
+import Vue from 'vue';
+import FirebaseWeb from '../firebase';
 const firebase = new FirebaseWeb();
+// @ts-ignore
+import { navigateToPath } from '@/util';
 export default Vue.extend({
     data() {
         return {
-            langs: ["en", "hi"]
+            langs: ['en', 'hi'],
         };
     },
     computed: {
@@ -86,10 +105,10 @@ export default Vue.extend({
             set(val: boolean) {
                 this.$vuetify.theme.dark = val;
                 localStorage.setItem(
-                    "dark",
+                    'dark',
                     JSON.stringify(this.$vuetify.theme.dark)
                 );
-            }
+            },
         },
         langModel: {
             get() {
@@ -97,38 +116,43 @@ export default Vue.extend({
             },
             set(val: string) {
                 this.$i18n.locale = val;
-                localStorage.setItem("lang", this.$i18n.locale);
-            }
-        }
+                localStorage.setItem('lang', this.$i18n.locale);
+            },
+        },
     },
     methods: {
         onSignoutClick() {
             this.logout();
         },
-        routeToSpanion() {},
+        routeToSpanion() {
+            window.open('http://www.spanion.xyz', '_blank');
+        },
+        routeTo(path: any) {
+            navigateToPath(path);
+        },
         logout() {
             firebase
                 .signOut()
                 .then(() => {
-                    this.$store.dispatch("RESET_STORE");
+                    this.$store.dispatch('RESET_STORE');
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.success.sign-out")
+                        'SHOW_SNACK',
+                        this.$t('toast.success.sign-out')
                     );
                 })
                 .catch(() => {
                     this.$store.dispatch(
-                        "SHOW_SNACK",
-                        this.$t("toast.error.sign-out")
+                        'SHOW_SNACK',
+                        this.$t('toast.error.sign-out')
                     );
                 });
-        }
+        },
     },
     mounted() {
-        this.langModel = localStorage.getItem("lang") == "hi" ? "hi" : "en";
+        this.langModel = localStorage.getItem('lang') == 'hi' ? 'hi' : 'en';
         this.themeModel =
-            localStorage.getItem("dark") == "false" ? false : true;
-    }
+            localStorage.getItem('dark') == 'false' ? false : true;
+    },
 });
 </script>
 <style scoped>

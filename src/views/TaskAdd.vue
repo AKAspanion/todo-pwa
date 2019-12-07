@@ -134,6 +134,9 @@
                                         >
                                         <template v-if="taskTypesLoading">
                                             <div
+                                                class="animate label-shimmer mr-2"
+                                            ></div>
+                                            <div
                                                 class="animate label-shimmer"
                                             ></div>
                                         </template>
@@ -176,13 +179,25 @@
                                                         "
                                                         >{{ tag.label }}</v-chip
                                                     >
+                                                    <v-chip
+                                                        label
+                                                        :small="
+                                                            $vuetify.breakpoint
+                                                                .xsOnly
+                                                        "
+                                                        @click="
+                                                            navigateTo(
+                                                                '/profile'
+                                                            )
+                                                        "
+                                                    >
+                                                        <v-icon
+                                                            small
+                                                            color="primary"
+                                                            >mdi-plus-circle</v-icon
+                                                        >
+                                                    </v-chip>
                                                 </v-chip-group>
-                                                <div
-                                                    v-if="!types.length"
-                                                    class="overflow-text mt-n2 caption text-left warning--text"
-                                                >
-                                                    {{ $t('label.no-label') }}
-                                                </div>
                                             </div>
                                         </template>
                                     </v-layout>
@@ -307,7 +322,6 @@ export default Vue.extend({
                 indefinite: false,
                 type: [],
             },
-            types: [],
             taskTypeIndexHolder: [],
             textFieldAttributes: {
                 dense: !this.$vuetify.breakpoint.mdAndUp,
@@ -325,6 +339,9 @@ export default Vue.extend({
         };
     },
     computed: {
+        types(){
+            return this.$store.getters.types;
+        },
         taskTypes: {
             get() {
                 // @ts-ignore
@@ -337,6 +354,7 @@ export default Vue.extend({
                 this.updateType(val);
             },
         },
+        
     },
     methods: {
         navigateTo(path: any) {
@@ -453,8 +471,6 @@ export default Vue.extend({
                     this.pageLoading = false;
                     this.taskTypesLoading = false;
                 });
-        } else {
-            this.types = this.$store.getters.types;
         }
     },
 });
