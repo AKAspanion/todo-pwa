@@ -38,17 +38,17 @@
                 wrap
                 align-center
                 justify-center
-                class="ma-0 mr-n8 editable-item mb-n2"
                 style="min-height: 40px;"
+                class="ma-0 mr-n8 editable-item mb-n2"
             >
                 <v-text-field
+                    solo
                     light
+                    dense
+                    class="mb-n6"
                     ref="nameEdit"
                     v-if="editName"
-                    solo
-                    dense
                     v-model="user.displayName"
-                    class="mb-n6"
                     style="max-width: 300px"
                 ></v-text-field>
                 <div v-else class="title white--text text-item">
@@ -158,38 +158,6 @@
                                 </v-list-item>
                             </template>
                         </v-list>
-                        <!-- <div style="margin: 0 auto; width: 300px;">
-                        <v-card-text>
-                            <div class="pb-4">
-                                <v-text-field
-                                    dense
-                                    outlined
-                                    v-model="taskTypeLabel"
-                                    :placeholder="$t('label.create')"
-                                ></v-text-field>
-                                <v-chip
-                                    label
-                                    :small="$vuetify.breakpoint.xsOnly"
-                                    class="ml-2"
-                                    :color="newTypeColor"
-                                    :text-color="getTextColor(newTypeColor)"
-                                    >{{ taskTypeLabel }}</v-chip
-                                >
-                            </div>
-                            
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn
-                                color="primary"
-                                :loading="taskTypesLoading"
-                                :disabled="taskTypeLabel.trim() == ''"
-                                @click="onAddTaskTypeSubmit"
-                                >{{ $t('create') }}</v-btn
-                            >
-                            <v-spacer></v-spacer>
-                        </v-card-actions>
-                    </div> -->
                     </v-card>
                 </v-card-text>
             </v-row>
@@ -246,11 +214,6 @@ export default Vue.extend({
             this.resetEditFlags();
             this.editName = true;
             this.focusByRef('nameEdit');
-        },
-        onEmailEdit() {
-            this.resetEditFlags();
-            this.editEmail = true;
-            this.focusByRef('emailEdit');
         },
         resetEditFlags() {
             this.editName = false;
