@@ -2,7 +2,7 @@
 
 ![](https://firebasestorage.googleapis.com/v0/b/spanion-todo.appspot.com/o/smartmockups_k4fmi3on.png?alt=media&token=81bb0c3d-eeab-401b-b933-8622e3d7cf94)
 
-#About
+# About
 This is a simple Task Manager progressive web application.
 
 ## Production View
@@ -15,7 +15,7 @@ This is a simple Task Manager progressive web application.
 * Drag and drop function in desktop.
 * Search by text, date and label.
 
-#Development
+# Development
 
 ## Getting Started
 
