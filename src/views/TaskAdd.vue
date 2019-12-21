@@ -339,7 +339,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        types(){
+        types() {
             return this.$store.getters.types;
         },
         taskTypes: {
@@ -354,7 +354,6 @@ export default Vue.extend({
                 this.updateType(val);
             },
         },
-        
     },
     methods: {
         navigateTo(path: any) {
@@ -472,6 +471,10 @@ export default Vue.extend({
                     this.taskTypesLoading = false;
                 });
         }
+        this.$nextTick(() => {
+            //@ts-ignore
+            this.$refs['titleField'].focus();
+        });
     },
 });
 </script>

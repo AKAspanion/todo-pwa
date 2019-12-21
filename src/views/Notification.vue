@@ -191,10 +191,6 @@ export default Vue.extend({
                 })
                 .then((notifications: any) => {
                     this.$store.dispatch('SET_NOTIFICATIONS', notifications);
-                    this.$store.dispatch(
-                        'SHOW_SNACK',
-                        this.$t('toast.success.notification.delete')
-                    );
                 })
                 .catch((err: any) => {
                     this.$store.dispatch(

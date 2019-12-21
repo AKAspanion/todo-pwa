@@ -92,7 +92,7 @@
                 :elevation="hover && $vuetify.breakpoint.smAndUp ? 12 : 3"
                 :light="getTextColor() !== '#ffffff' ? true : false"
                 :dark="getTextColor() === '#ffffff' ? true : false"
-                :class="$vuetify.breakpoint.xsOnly ? '':'mb-2'"
+                :class="$vuetify.breakpoint.xsOnly ? '' : 'mb-2'"
                 class="text-left"
                 height="100%"
                 :color="bg"
@@ -406,14 +406,10 @@
                                     :value="tag.id"
                                     :title="tag.label"
                                     :disabled="disabled"
+                                    :text-color="tag.color"
                                     v-for="tag in task.type"
                                     :small="$vuetify.breakpoint.xsOnly"
                                     @click.stop="$emit('type-select', tag)"
-                                    :text-color="
-                                        task.status == 'done'
-                                            ? '#808080'
-                                            : tag.color
-                                    "
                                     :color="getTextColorForBg(tag.color)"
                                     >{{ tag.label }}</v-chip
                                 >
@@ -490,10 +486,7 @@
                                     :disabled="disabled"
                                     @click.stop="isDelete = true"
                                     :small="$vuetify.breakpoint.xsOnly"
-                                    v-show="
-                                        hover ||
-                                            $vuetify.breakpoint.xsOnly
-                                    "
+                                    v-show="hover || $vuetify.breakpoint.xsOnly"
                                     :color="
                                         getTextColor() === '#ffffff'
                                             ? 'white'
@@ -633,25 +626,20 @@ export default Vue.extend({
         // @ts-ignore
         getBgColor() {
             // @ts-ignore
-            if (this.task.status === 'todo') {
-                // @ts-ignore
-                if (this.task.type.length) {
-                    // @ts-ignore
-                    return this.task.type[0].color;
-                } else {
-                    if (this.$vuetify.theme.dark) {
-                        return '#303030';
-                    } else {
-                        return '#ffffff';
-                    }
-                }
-            }
-            // @ts-ignore
             if (this.loading) {
                 // @ts-ignore
                 return this.$vuetify.theme.dark ? '#303030' : '#ffffff';
+            }
+            // @ts-ignore
+            if (this.task.type.length) {
+                // @ts-ignore
+                return this.task.type[0].color;
             } else {
-                return '#808080';
+                if (this.$vuetify.theme.dark) {
+                    return '#303030';
+                } else {
+                    return '#ffffff';
+                }
             }
         },
         getTextColorForBg(color: any) {

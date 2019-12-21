@@ -14,7 +14,8 @@
                     small
                     fab
                     right
-                    elevation="2"
+                    elevation="0"
+                    color="primary"
                     class="search-fab"
                     @click="onSearch"
                     :class="$vuetify.breakpoint.xsOnly ? 'mr-n2' : 'mr-1'"
@@ -456,10 +457,6 @@ export default Vue.extend({
                 })
                 .then((tasks: any) => {
                     this.$store.dispatch('SET_TASKS', tasks);
-                    this.$store.dispatch(
-                        'SHOW_SNACK',
-                        this.$t('toast.success.task.delete')
-                    );
                 })
                 .catch((err: any) => {
                     this.$store.dispatch(

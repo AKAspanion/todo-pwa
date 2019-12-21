@@ -162,7 +162,7 @@ class FirebaseWeb {
 
     public updateUserProfile = (updatedUser: any) => {
         const user: any = firebase.auth().currentUser;
-        return user.updateProfile(updatedUser);
+        return user.updateProfile({ ...updatedUser });
     }
 
     public signInWithEmail = (user: any) => {

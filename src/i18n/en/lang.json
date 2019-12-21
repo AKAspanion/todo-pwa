@@ -65,7 +65,7 @@
         "singular": "task",
         "plural": "tasks",
         "add": "Add Task",
-        "indefinite": "Indefinite task?",
+        "indefinite": "No due date?",
         "no-due": "No due date",
         "delete": "Delete this task?",
         "title-placeholder": "Name your task",
@@ -103,6 +103,9 @@
             },
             "notification": {
                 "delete": "Error deleting notification"
+            },
+            "name": {
+                "edit": "Error updating name"
             },
             "sign-in": "Sign in failure",
             "sign-up": "Sign up failure",

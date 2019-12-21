@@ -54,11 +54,7 @@
                 <div v-else class="title white--text text-item">
                     {{ currentUser.displayName || 'NA' }}
                 </div>
-                <v-icon
-                    dark
-                    class="mx-2"
-                    v-if="editName"
-                    @click="resetEditFlags()"
+                <v-icon dark class="mx-2" v-if="editName" @click="onUserEdit()"
                     >mdi-check</v-icon
                 >
                 <div v-else class="px-2 edit-button">
@@ -193,11 +189,9 @@ export default Vue.extend({
         return {
             newTypeColor: '#8E00FF',
             taskTypeLabel: '',
-            types: [],
-            pageLoading: false,
             taskTypesLoading: false,
             editName: false,
-            editEmail: false,
+            userUpdating: false,
             user: {
                 displayName: '',
                 email: '',
@@ -208,6 +202,9 @@ export default Vue.extend({
         currentUser() {
             return this.$store.getters.user;
         },
+        types() {
+            return this.$store.getters.types;
+        },
     },
     methods: {
         onNameEdit() {
@@ -215,9 +212,22 @@ export default Vue.extend({
             this.editName = true;
             this.focusByRef('nameEdit');
         },
+        onUserEdit() {
+            firebase
+                .updateUserProfile(this.user)
+                .then(() => {})
+                .catch(() => {
+                    this.$store.dispatch(
+                        'SHOW_SNACK',
+                        this.$t('toast.error.name.edit')
+                    );
+                })
+                .finally(() => {
+                    this.resetEditFlags();
+                });
+        },
         resetEditFlags() {
             this.editName = false;
-            this.editEmail = false;
         },
         navigateToHome() {
             navigateToPath('/home');
@@ -255,11 +265,6 @@ export default Vue.extend({
                         },
                         ...this.types,
                     ]);
-                    this.types = this.$store.getters.types;
-                    this.$store.dispatch(
-                        'SHOW_SNACK',
-                        this.$t('toast.success.label')
-                    );
                     this.taskTypeLabel = '';
                 })
                 .catch((err) => {
@@ -281,27 +286,23 @@ export default Vue.extend({
     },
     mounted() {
         if (!this.$store.getters.landingVisited) {
-            this.pageLoading = true;
             this.taskTypesLoading = true;
             this.loadPage()
+                .catch((e) => e)
                 .then((response) => {
                     this.$store.dispatch('SET_TASKS', response[0]);
                     this.$store.dispatch('SET_TYPES', response[1]);
                     this.$store.dispatch('SET_NOTIFICATIONS', response[2]);
                     this.$store.dispatch('LANDING_VISITED', true);
-                    this.types = response[1];
                 })
                 .catch((err) => {
                     console.log(err);
                 })
                 .finally(() => {
-                    this.pageLoading = false;
                     this.taskTypesLoading = false;
                 });
-        } else {
-            this.types = this.$store.getters.types;
         }
-        this.user = this.$store.getters.user;
+        this.user = this.currentUser;
         this.newTypeColor = getRandomHexColor();
     },
 });
