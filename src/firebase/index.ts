@@ -18,9 +18,15 @@ class FirebaseWeb {
     public isAppInitialized() {
         return firebase.apps.length;
     }
+
     public fetchAllNotificationByUID = (user: any) => {
         const notificationRef = firebase.firestore().collection('notifications');
         return notificationRef.where('uid', '==', user.uid).get();
+    }
+
+    public deleteNotification = (notification: any) => {
+        const notificationRef = firebase.firestore().collection('notifications').doc(notification.id);
+        return notificationRef.delete();
     }
 
     public fetchAllTaskTypeByUID = (user: any) => {
