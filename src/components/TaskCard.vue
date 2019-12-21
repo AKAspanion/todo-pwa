@@ -492,8 +492,7 @@
                                     :small="$vuetify.breakpoint.xsOnly"
                                     v-show="
                                         hover ||
-                                            $vuetify.breakpoint.xsOnly ||
-                                            task.status == 'done'
+                                            $vuetify.breakpoint.xsOnly
                                     "
                                     :color="
                                         getTextColor() === '#ffffff'

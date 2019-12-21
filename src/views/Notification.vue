@@ -33,11 +33,6 @@
                                     >
                                 </v-layout>
                             </v-list-item-content>
-                            <v-list-item-avatar>
-                                <v-avatar small size="36">
-                                    <v-icon>mdi-pencil</v-icon>
-                                </v-avatar>
-                            </v-list-item-avatar>
                         </v-list-item>
                     </template>
                 </container-menu>

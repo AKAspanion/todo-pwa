@@ -495,10 +495,6 @@ export default Vue.extend({
                             },
                         });
                     }
-                    this.$store.dispatch(
-                        'SHOW_SNACK',
-                        this.$t('toast.success.task.edit')
-                    );
                 })
                 .catch((err) => {
                     this.$store.dispatch(
