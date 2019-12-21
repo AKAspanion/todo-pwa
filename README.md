@@ -71,15 +71,15 @@ npm run serve
 ```
 Project will launch at http://localhost:8080
 
-## Deployment
+# Deployment
 ```bash
 #compiles and minifies for production
 npm run buid
 ```
 The `/dist` directory is ready to be deployed
-## Built With
+# Built With
 * [Vue.js]() - SPA JavaScript Framework
 * [Vuetify]() - Frontend Components Framework
 * [Firebase]() - Backend and Hosting
-## Author
+# Author
 [**Ankit Kumar Pandit**](http://spanion.xyz)
