@@ -29,10 +29,10 @@ To use this project, you must create a web-app project on firebase.
 
 ```bash
 # clone the project
-git clone https://github.com/AKAspanion/Lens-n-Light.git
+git clone https://github.com/AKAspanion/todo-pwa.git
 
 # enter the project directory
-cd Lens-n-Light
+cd todo-pwa
 ```
 
 Before going into development, you need to configure .env file.
