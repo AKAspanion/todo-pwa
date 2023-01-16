@@ -10,7 +10,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "firebase": "^6.6.2",
-    "firebase-admin": "^8.6.1",
+    "firebase-admin": "^11.4.1",
     "firebase-functions": "^3.3.0",
     "moment": "^2.29.4",
     "register-service-worker": "^1.6.2",
