@@ -27,10 +27,10 @@
   },
   "devDependencies": {
     "@mdi/font": "^4.4.95",
-    "@vue/cli-plugin-babel": "^3.11.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-pwa": "^3.11.0",
     "@vue/cli-plugin-typescript": "^3.11.0",
-    "@vue/cli-service": "^3.11.0",
+    "@vue/cli-service": "^5.0.8",
     "typescript": "^3.4.3",
     "vue-template-compiler": "^2.6.10"
   }
