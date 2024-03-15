@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.web.spanion_todo.twa",
+      "sha256_cert_fingerprints": [
+        "01:C6:DD:FE:78:5B:44:73:09:DF:8B:6C:02:F0:72:AE:E2:C2:1F:C5:C0:F1:68:AC:E5:DA:53:EF:EF:C3:40:1C"
+      ]
+    }
+  }
+]

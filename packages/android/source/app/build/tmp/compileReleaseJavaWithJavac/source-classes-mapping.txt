@@ -1,0 +1,8 @@
+app/web/spanion_todo/twa/LauncherActivity.java
+ app.web.spanion_todo.twa.LauncherActivity
+app/web/spanion_todo/twa/BuildConfig.java
+ app.web.spanion_todo.twa.BuildConfig
+app/web/spanion_todo/twa/Application.java
+ app.web.spanion_todo.twa.Application
+app/web/spanion_todo/twa/DelegationService.java
+ app.web.spanion_todo.twa.DelegationService

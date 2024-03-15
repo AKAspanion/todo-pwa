@@ -1,0 +1,291 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<!--
+3    Copyright 2019 Google Inc. All Rights Reserved.
+4
+5     Licensed under the Apache License, Version 2.0 (the "License");
+6     you may not use this file except in compliance with the License.
+7     You may obtain a copy of the License at
+8
+9         http://www.apache.org/licenses/LICENSE-2.0
+10
+11     Unless required by applicable law or agreed to in writing, software
+12     distributed under the License is distributed on an "AS IS" BASIS,
+13     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+14     See the License for the specific language governing permissions and
+15     limitations under the License.
+16-->
+17<!--
+18 The "package" attribute is rewritten by the Gradle build with the value of applicationId.
+19     It is still required here, as it is used to derive paths, for instance when referring
+20     to an Activity by ".MyActivity" instead of the full name. If more Activities are added to the
+21     application, the package attribute will need to reflect the correct path in order to use
+22     the abbreviated format.
+23-->
+24<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+25    package="app.web.spanion_todo.twa"
+26    android:versionCode="1"
+27    android:versionName="1.0.0.0" >
+28
+29    <uses-sdk
+30        android:minSdkVersion="19"
+30-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+31        android:targetSdkVersion="33" />
+31-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+32
+33    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+33-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:26:9-80
+33-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:26:26-78
+34
+35    <queries>
+35-->[com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/transforms-2/files-2.1/816850808f9de9e670a4838cd1f96218/androidbrowserhelper-2.5.0/AndroidManifest.xml:26:5-34:15
+36        <intent>
+36-->[com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/transforms-2/files-2.1/816850808f9de9e670a4838cd1f96218/androidbrowserhelper-2.5.0/AndroidManifest.xml:27:9-33:18
+37            <action android:name="android.intent.action.VIEW" />
+37-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:137:17-68
+37-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:137:25-66
+38
+39            <category android:name="android.intent.category.BROWSABLE" />
+39-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:139:17-77
+39-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:139:27-75
+40
+41            <data android:scheme="https" />
+41-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:140:17-141:54
+41-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:140:23-45
+42        </intent>
+43    </queries>
+44
+45    <application
+45-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:35:5-184:19
+46        android:name="app.web.spanion_todo.twa.Application"
+46-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:36:9-35
+47        android:allowBackup="true"
+47-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:37:9-35
+48        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+48-->[androidx.core:core:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/e601daed4ba62929db8b322b2974c8f8/core-1.1.0/AndroidManifest.xml:24:18-86
+49        android:icon="@mipmap/ic_launcher"
+49-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:38:9-43
+50        android:label="@string/appName"
+50-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:39:9-40
+51        android:manageSpaceActivity="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
+51-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:41:9-105
+52        android:supportsRtl="true"
+52-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:43:9-35
+53        android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+53-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:44:9-68
+54        <meta-data
+54-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:46:9-48:58
+55            android:name="asset_statements"
+55-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:47:13-44
+56            android:resource="@string/assetStatements" />
+56-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:48:13-55
+57        <meta-data
+57-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:51:13-53:58
+58            android:name="web_manifest_url"
+58-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:52:17-48
+59            android:value="@string/webManifestUrl" />
+59-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:53:17-55
+60        <meta-data
+60-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:56:9-58:52
+61            android:name="twa_generator"
+61-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:57:13-41
+62            android:value="@string/generatorApp" />
+62-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:58:13-49
+63
+64        <activity android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity" >
+64-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:65:13-69:24
+64-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:65:23-104
+65            <meta-data
+65-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:66:13-68:53
+66                android:name="android.support.customtabs.trusted.MANAGE_SPACE_URL"
+66-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:67:17-83
+67                android:value="@string/launchUrl" />
+67-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:68:17-50
+68        </activity>
+69        <activity
+69-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:72:9-145:20
+70            android:name="app.web.spanion_todo.twa.LauncherActivity"
+70-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:72:19-50
+71            android:alwaysRetainTaskState="true"
+71-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:73:13-49
+72            android:exported="true"
+72-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:75:13-36
+73            android:label="@string/launcherName" >
+73-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:74:13-49
+74            <meta-data
+74-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:76:13-77:53
+75                android:name="android.support.customtabs.trusted.DEFAULT_URL"
+75-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:76:24-85
+76                android:value="@string/launchUrl" />
+76-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:77:17-50
+77            <meta-data
+77-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:79:13-81:58
+78                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+78-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:80:17-83
+79                android:resource="@color/colorPrimary" />
+79-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:81:17-55
+80            <meta-data
+80-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:83:13-85:62
+81                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
+81-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:84:17-88
+82                android:resource="@color/colorPrimaryDark" />
+82-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:85:17-59
+83            <meta-data
+83-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:87:13-89:61
+84                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+84-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:88:17-87
+85                android:resource="@color/navigationColor" />
+85-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:89:17-58
+86            <meta-data
+86-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:91:13-93:65
+87                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
+87-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:92:17-92
+88                android:resource="@color/navigationColorDark" />
+88-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:93:17-62
+89            <meta-data
+89-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:95:13-97:68
+90                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR"
+90-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:96:17-84
+91                android:resource="@color/navigationDividerColor" />
+91-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:97:17-65
+92            <meta-data
+92-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:99:13-101:72
+93                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR_DARK"
+93-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:100:17-89
+94                android:resource="@color/navigationDividerColorDark" />
+94-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:101:17-69
+95            <meta-data
+95-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:103:13-104:54
+96                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+96-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:103:24-95
+97                android:resource="@drawable/splash" />
+97-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:104:17-52
+98            <meta-data
+98-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:106:13-107:60
+99                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+99-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:106:24-104
+100                android:resource="@color/backgroundColor" />
+100-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:107:17-58
+101            <meta-data
+101-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:109:13-110:71
+102                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_FADE_OUT_DURATION"
+102-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:109:24-105
+103                android:value="@integer/splashScreenFadeOutDuration" />
+103-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:110:17-69
+104            <meta-data
+104-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:112:13-113:60
+105                android:name="android.support.customtabs.trusted.FILE_PROVIDER_AUTHORITY"
+105-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:112:24-97
+106                android:value="@string/providerAuthority" />
+106-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:113:17-58
+107            <meta-data
+107-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:115:13-97
+108                android:name="android.app.shortcuts"
+108-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:115:24-60
+109                android:resource="@xml/shortcuts" />
+109-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:115:61-94
+110            <meta-data
+110-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:117:13-118:56
+111                android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
+111-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:117:24-91
+112                android:value="@string/fallbackType" />
+112-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:118:17-53
+113            <meta-data
+113-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:124:13-125:54
+114                android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
+114-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:124:24-92
+115                android:value="@string/orientation" />
+115-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:125:17-52
+116
+117            <intent-filter>
+117-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:131:13-134:29
+118                <action android:name="android.intent.action.MAIN" />
+118-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:132:17-69
+118-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:132:25-66
+119
+120                <category android:name="android.intent.category.LAUNCHER" />
+120-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:133:17-77
+120-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:133:27-74
+121            </intent-filter>
+122            <intent-filter android:autoVerify="true" >
+122-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:136:13-142:29
+122-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:136:28-53
+123                <action android:name="android.intent.action.VIEW" />
+123-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:137:17-68
+123-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:137:25-66
+124
+125                <category android:name="android.intent.category.DEFAULT" />
+125-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:138:17-76
+125-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:138:27-73
+126                <category android:name="android.intent.category.BROWSABLE" />
+126-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:139:17-77
+126-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:139:27-75
+127
+128                <data
+128-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:140:17-141:54
+129                    android:host="@string/hostName"
+129-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:141:21-52
+130                    android:scheme="https" />
+130-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:140:23-45
+131            </intent-filter>
+132        </activity>
+133        <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" />
+133-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:147:9-90
+133-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:147:19-87
+134        <activity
+134-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:149:9-150:62
+135            android:name="com.google.androidbrowserhelper.trusted.WebViewFallbackActivity"
+135-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:149:19-97
+136            android:configChanges="orientation|screenSize" />
+136-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:150:13-59
+137
+138        <provider
+138-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:152:9-160:20
+139            android:name="androidx.core.content.FileProvider"
+139-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:153:13-62
+140            android:authorities="@string/providerAuthority"
+140-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:154:13-60
+141            android:exported="false"
+141-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:156:13-37
+142            android:grantUriPermissions="true" >
+142-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:155:13-47
+143            <meta-data
+143-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:157:13-159:53
+144                android:name="android.support.FILE_PROVIDER_PATHS"
+144-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:158:17-67
+145                android:resource="@xml/filepaths" />
+145-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:159:17-50
+146        </provider>
+147
+148        <service
+148-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:162:9-177:19
+149            android:name="app.web.spanion_todo.twa.DelegationService"
+149-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:163:13-46
+150            android:enabled="@bool/enableNotification"
+150-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:164:13-55
+151            android:exported="@bool/enableNotification" >
+151-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:165:13-56
+152            <meta-data
+152-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:168:17-170:73
+153                android:name="android.support.customtabs.trusted.SMALL_ICON"
+153-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:169:21-81
+154                android:resource="@drawable/ic_notification_icon" />
+154-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:170:21-70
+155
+156            <intent-filter>
+156-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:173:13-176:29
+157                <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE" />
+157-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:174:17-105
+157-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:174:25-103
+158
+159                <category android:name="android.intent.category.DEFAULT" />
+159-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:138:17-76
+159-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:138:27-73
+160            </intent-filter>
+161        </service>
+162
+163        <activity android:name="com.google.androidbrowserhelper.trusted.NotificationPermissionRequestActivity" />
+163-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:180:13-118
+163-->/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:180:23-115
+164    </application>
+165
+166</manifest>

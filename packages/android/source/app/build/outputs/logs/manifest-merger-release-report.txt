@@ -1,0 +1,289 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+MERGED from [com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/transforms-2/files-2.1/816850808f9de9e670a4838cd1f96218/androidbrowserhelper-2.5.0/AndroidManifest.xml:17:1-36:12
+MERGED from [androidx.browser:browser:1.4.0] /root/.gradle/caches/transforms-2/files-2.1/b76183546e9802347e4b2c9dd5e9649b/browser-1.4.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/e601daed4ba62929db8b322b2974c8f8/core-1.1.0/AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/90ecde5404179819368e2359ab771b50/versionedparcelable-1.1.0/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /root/.gradle/caches/transforms-2/files-2.1/722883bbeda4a23af2c332d7342ff3d3/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /root/.gradle/caches/transforms-2/files-2.1/1fed12a61eaf3956026778ada29c2705/lifecycle-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+	package
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:23:5-39
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:1-185:12
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:22:11-69
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:26:9-80
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:26:26-78
+application
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:35:5-184:19
+MERGED from [androidx.core:core:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/e601daed4ba62929db8b322b2974c8f8/core-1.1.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/e601daed4ba62929db8b322b2974c8f8/core-1.1.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/90ecde5404179819368e2359ab771b50/versionedparcelable-1.1.0/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/90ecde5404179819368e2359ab771b50/versionedparcelable-1.1.0/AndroidManifest.xml:24:5-25:19
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/e601daed4ba62929db8b322b2974c8f8/core-1.1.0/AndroidManifest.xml:24:18-86
+	android:supportsRtl
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:43:9-35
+	android:label
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:39:9-40
+	android:manageSpaceActivity
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:41:9-105
+	android:icon
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:38:9-43
+	android:allowBackup
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:37:9-35
+	android:theme
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:44:9-68
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:36:9-35
+meta-data#asset_statements
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:46:9-48:58
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:48:13-55
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:47:13-44
+meta-data#web_manifest_url
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:51:13-53:58
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:53:17-55
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:52:17-48
+meta-data#twa_generator
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:56:9-58:52
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:58:13-49
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:57:13-41
+activity#com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:65:13-69:24
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:65:23-104
+meta-data#android.support.customtabs.trusted.MANAGE_SPACE_URL
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:66:13-68:53
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:68:17-50
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:67:17-83
+activity#app.web.spanion_todo.twa.LauncherActivity
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:72:9-145:20
+	android:label
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:74:13-49
+	android:exported
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:75:13-36
+	android:alwaysRetainTaskState
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:73:13-49
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:72:19-50
+meta-data#android.support.customtabs.trusted.DEFAULT_URL
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:76:13-77:53
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:77:17-50
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:76:24-85
+meta-data#android.support.customtabs.trusted.STATUS_BAR_COLOR
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:79:13-81:58
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:81:17-55
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:80:17-83
+meta-data#android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:83:13-85:62
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:85:17-59
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:84:17-88
+meta-data#android.support.customtabs.trusted.NAVIGATION_BAR_COLOR
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:87:13-89:61
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:89:17-58
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:88:17-87
+meta-data#android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:91:13-93:65
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:93:17-62
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:92:17-92
+meta-data#androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:95:13-97:68
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:97:17-65
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:96:17-84
+meta-data#androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR_DARK
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:99:13-101:72
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:101:17-69
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:100:17-89
+meta-data#android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:103:13-104:54
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:104:17-52
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:103:24-95
+meta-data#android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:106:13-107:60
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:107:17-58
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:106:24-104
+meta-data#android.support.customtabs.trusted.SPLASH_SCREEN_FADE_OUT_DURATION
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:109:13-110:71
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:110:17-69
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:109:24-105
+meta-data#android.support.customtabs.trusted.FILE_PROVIDER_AUTHORITY
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:112:13-113:60
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:113:17-58
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:112:24-97
+meta-data#android.app.shortcuts
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:115:13-97
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:115:61-94
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:115:24-60
+meta-data#android.support.customtabs.trusted.FALLBACK_STRATEGY
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:117:13-118:56
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:118:17-53
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:117:24-91
+meta-data#android.support.customtabs.trusted.SCREEN_ORIENTATION
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:124:13-125:54
+	android:value
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:125:17-52
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:124:24-92
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:131:13-134:29
+action#android.intent.action.MAIN
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:132:17-69
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:132:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:133:17-77
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:133:27-74
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:@string/hostName+data:scheme:https
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:136:13-142:29
+	android:autoVerify
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:136:28-53
+action#android.intent.action.VIEW
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:137:17-68
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:137:25-66
+category#android.intent.category.DEFAULT
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:138:17-76
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:138:27-73
+category#android.intent.category.BROWSABLE
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:139:17-77
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:139:27-75
+data
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:140:17-141:54
+	android:host
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:141:21-52
+	android:scheme
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:140:23-45
+activity#com.google.androidbrowserhelper.trusted.FocusActivity
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:147:9-90
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:147:19-87
+activity#com.google.androidbrowserhelper.trusted.WebViewFallbackActivity
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:149:9-150:62
+	android:configChanges
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:150:13-59
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:149:19-97
+provider#androidx.core.content.FileProvider
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:152:9-160:20
+	android:grantUriPermissions
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:155:13-47
+	android:authorities
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:154:13-60
+	android:exported
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:156:13-37
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:153:13-62
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:157:13-159:53
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:159:17-50
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:158:17-67
+service#app.web.spanion_todo.twa.DelegationService
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:162:9-177:19
+	android:enabled
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:164:13-55
+	android:exported
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:165:13-56
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:163:13-46
+meta-data#android.support.customtabs.trusted.SMALL_ICON
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:168:17-170:73
+	android:resource
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:170:21-70
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:169:21-81
+intent-filter#action:name:android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE+category:name:android.intent.category.DEFAULT
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:173:13-176:29
+action#android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:174:17-105
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:174:25-103
+activity#com.google.androidbrowserhelper.trusted.NotificationPermissionRequestActivity
+ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:180:13-118
+	android:name
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml:180:23-115
+uses-sdk
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+MERGED from [com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/transforms-2/files-2.1/816850808f9de9e670a4838cd1f96218/androidbrowserhelper-2.5.0/AndroidManifest.xml:22:5-24:41
+MERGED from [com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/transforms-2/files-2.1/816850808f9de9e670a4838cd1f96218/androidbrowserhelper-2.5.0/AndroidManifest.xml:22:5-24:41
+MERGED from [androidx.browser:browser:1.4.0] /root/.gradle/caches/transforms-2/files-2.1/b76183546e9802347e4b2c9dd5e9649b/browser-1.4.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.browser:browser:1.4.0] /root/.gradle/caches/transforms-2/files-2.1/b76183546e9802347e4b2c9dd5e9649b/browser-1.4.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/e601daed4ba62929db8b322b2974c8f8/core-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/e601daed4ba62929db8b322b2974c8f8/core-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/90ecde5404179819368e2359ab771b50/versionedparcelable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] /root/.gradle/caches/transforms-2/files-2.1/90ecde5404179819368e2359ab771b50/versionedparcelable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] /root/.gradle/caches/transforms-2/files-2.1/722883bbeda4a23af2c332d7342ff3d3/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /root/.gradle/caches/transforms-2/files-2.1/722883bbeda4a23af2c332d7342ff3d3/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /root/.gradle/caches/transforms-2/files-2.1/1fed12a61eaf3956026778ada29c2705/lifecycle-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /root/.gradle/caches/transforms-2/files-2.1/1fed12a61eaf3956026778ada29c2705/lifecycle-runtime-2.0.0/AndroidManifest.xml:20:5-44
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+		ADDED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+		INJECTED from /tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/AndroidManifest.xml
+queries
+ADDED from [com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/transforms-2/files-2.1/816850808f9de9e670a4838cd1f96218/androidbrowserhelper-2.5.0/AndroidManifest.xml:26:5-34:15
+intent#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+data:scheme:https
+ADDED from [com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/transforms-2/files-2.1/816850808f9de9e670a4838cd1f96218/androidbrowserhelper-2.5.0/AndroidManifest.xml:27:9-33:18

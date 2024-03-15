@@ -19,3 +19,8 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+*.apk
+*.aab
+signing-key-info.txt
+*.keystore

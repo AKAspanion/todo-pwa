@@ -1,0 +1,78 @@
+[
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/xml_filepaths.xml.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/xml/filepaths.xml"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-hdpi_ic_notification_icon.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-hdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-xxxhdpi_splash.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-xxxhdpi/splash.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/xml_shortcuts.xml.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/xml/shortcuts.xml"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-xxhdpi_ic_notification_icon.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-xxhdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-xxhdpi_splash.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-xxhdpi/splash.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-xhdpi_splash.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-xhdpi/splash.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-hdpi_splash.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-hdpi/splash.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-mdpi_splash.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-mdpi/splash.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-mdpi_ic_notification_icon.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-mdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-xhdpi_ic_notification_icon.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-xhdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-xxxhdpi_ic_notification_icon.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-xxxhdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/raw_web_app_manifest.json.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/raw/web_app_manifest.json"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/drawable-anydpi_shortcut_legacy_background.xml.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/drawable-anydpi/shortcut_legacy_background.xml"
+    },
+    {
+        "merged": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/build/intermediates/res/merged/release/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "/tmp/pwabuilder-cloudapk--18-riP8uxBzVdbZ/app/src/main/res/mipmap-hdpi/ic_launcher.png"
+    }
+]
