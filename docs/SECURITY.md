@@ -8,8 +8,9 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
 
 1. **Restrict the Firebase browser API key** (Google Cloud console > APIs & Services >
    Credentials, the "Browser key" of `spanion-todo`):
-   - Application restrictions: HTTP referrers `https://spanion-todo.web.app/*`,
-     `https://spanion-todo.firebaseapp.com/*`, `http://localhost/*` and `http://localhost:*/*`
+   - Application restrictions: HTTP referrers `https://todo.spanion.in/*`,
+     `https://spanion-todo.web.app/*`, `https://spanion-todo.firebaseapp.com/*`,
+     `http://localhost/*` and `http://localhost:*/*`
      (the dev server and the e2e server).
    - API restrictions: only the APIs the app calls: Identity Toolkit API, Token Service API,
      Cloud Firestore API, Firebase Installations API and FCM Registration API (add others only if

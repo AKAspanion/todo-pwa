@@ -27,8 +27,8 @@ export interface ReminderRunResult {
   removedTokens: number;
 }
 
-/** The live site, used when `APP_URL` isn't set. */
-const DEFAULT_APP_URL = 'https://spanion-todo.web.app';
+/** The live site's primary address, used when `APP_URL` isn't set. */
+const DEFAULT_APP_URL = 'https://todo.spanion.in';
 
 /**
  * The web app's address (`functions/.env`, see `functions/.env.example`). The CLI resolves it at

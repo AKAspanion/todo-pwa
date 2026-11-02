@@ -5,7 +5,8 @@
 A task manager that installs as a progressive web app, and on Android from the Play Store (a
 Trusted Web Activity, `packages/android`).
 
-- Live site: [spanion-todo.web.app](https://spanion-todo.web.app/)
+- Live site: [todo.spanion.in](https://todo.spanion.in/), also at
+  [spanion-todo.web.app](https://spanion-todo.web.app/) (the Play Store app opens that one).
 - Sign in with Google, or with an email and password. (Facebook sign-in has been removed.)
 
 ## Features
@@ -193,7 +194,7 @@ Variables, not secrets: the Firebase web config is public and ships in every pag
 | Variable | Value |
 |---|---|
 | `FIREBASE_PROJECT_ID` | `spanion-todo`: the project hosting, rules and functions deploy to |
-| `APP_URL` | `https://spanion-todo.web.app`: the site address, shown on the deployment and written to `functions/.env` for the functions |
+| `APP_URL` | `https://todo.spanion.in`: the site's primary address, shown on the deployment and written to `functions/.env` for the functions (`https://spanion-todo.web.app` serves the same site) |
 | `VITE_FIREBASE_API_KEY` | Firebase console > Project settings > Your apps > SDK config |
 | `VITE_FIREBASE_AUTH_DOMAIN` | as above (`spanion-todo.firebaseapp.com`): the auth domain on any host not in the next variable |
 | `VITE_FIREBASE_AUTH_DOMAINS` | `todo.spanion.in,spanion-todo.web.app,spanion-todo.firebaseapp.com`: the Hosting domains that use their own host as the auth domain. Optional: without it the deploy warns, and Google redirect sign-in can fail where third-party storage is blocked. |
@@ -209,7 +210,7 @@ Set them all at once from a dotenv file kept outside the repository:
 VARS_FILE="$(mktemp -d)/deploy-vars.env"
 cat > "$VARS_FILE" <<'VARS'
 FIREBASE_PROJECT_ID=spanion-todo
-APP_URL=https://spanion-todo.web.app
+APP_URL=https://todo.spanion.in
 VITE_FIREBASE_API_KEY=<from the console>
 VITE_FIREBASE_AUTH_DOMAIN=spanion-todo.firebaseapp.com
 VITE_FIREBASE_AUTH_DOMAINS=todo.spanion.in,spanion-todo.web.app,spanion-todo.firebaseapp.com
@@ -222,7 +223,7 @@ VARS
 gh variable set --repo AKAspanion/todo-pwa -f "$VARS_FILE"
 ```
 
-One at a time: `gh variable set APP_URL --repo AKAspanion/todo-pwa --body https://spanion-todo.web.app`.
+One at a time: `gh variable set APP_URL --repo AKAspanion/todo-pwa --body https://todo.spanion.in`.
 The workflow's "Check deploy configuration" step stops before building and names any variable
 that is missing, or the missing secret (it never prints a value).
 
@@ -298,12 +299,22 @@ Workload Identity Federation is the keyless alternative (short-lived tokens, no 
    (The first functions deploy from Actions would also delete them, as it runs with `--force`.)
 2. **Move `spanion-todo` to the Blaze plan** (Firebase console > Usage and billing). Scheduled
    functions need it.
-3. **Deploy:** the push that brings this workflow to `master` deploys the rules and indexes, then
+3. **Let Google sign-in work on both domains.** The app uses each Hosting domain as its own auth
+   domain (`VITE_FIREBASE_AUTH_DOMAINS`), so:
+   - Firebase console > Authentication > Settings > Authorized domains: `todo.spanion.in` and
+     `spanion-todo.web.app` are listed (`spanion-todo.firebaseapp.com` is by default).
+   - Google Cloud console > APIs & Services > Credentials, the OAuth 2.0 web client Firebase
+     created: add `https://todo.spanion.in/__/auth/handler` and
+     `https://spanion-todo.web.app/__/auth/handler` to Authorized redirect URIs. Until then,
+     Google sign-in on those domains fails with `redirect_uri_mismatch`.
+   - Restrict the browser API key's referrers to the app's domains
+     ([docs/SECURITY.md](docs/SECURITY.md), item 1).
+4. **Deploy:** the push that brings this workflow to `master` deploys the rules and indexes, then
    hosting. Hosting carries the kill switches (`public/service-worker.js` and
    `public/firebase-messaging-sw.js`) that take installed copies of the old app off its old
    service workers, so the old app stops writing against the new rules. Then deploy the
    functions: Actions > Deploy > Run workflow on `master`, with **deploy_functions** ticked.
-4. **Run the data migration** once, after that deploy (Deployment, step 4 above), first with
+5. **Run the data migration** once, after that deploy (Deployment, step 4 above), first with
    `--dry-run`.
 
 If the functions deploy log warns that no container image cleanup policy is set, set one once:

@@ -244,7 +244,7 @@ describe('runReminders: sending', () => {
   it.each([
     ['https://todo.example', 'https://todo.example/img/icons/android-chrome-192x192.png'],
     ['https://todo.example/', 'https://todo.example/img/icons/android-chrome-192x192.png'],
-    ['', 'https://spanion-todo.web.app/img/icons/android-chrome-192x192.png'],
+    ['', 'https://todo.spanion.in/img/icons/android-chrome-192x192.png'],
   ])('with APP_URL=%j, the web push icon is %s', async (appUrl, icon) => {
     vi.stubEnv('APP_URL', appUrl);
     try {
