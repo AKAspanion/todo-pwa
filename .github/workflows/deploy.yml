@@ -1,38 +1,52 @@
 name: Deploy
 
-# Deploys what CI tested on master: hosting, Firestore rules and indexes, and the functions, to the
-# live project. Setup (environment, variables, the service account secret): README.md.
+# Every push to master runs the full CI suite, then deploys hosting.
+# Firestore rules + indexes, and the Cloud Functions, deploy only when started by hand
+# (Actions > Deploy > Run workflow) with "deploy_rules" or "deploy_functions" ticked.
+# Setup (repository variables, the FIREBASE_SERVICE_ACCOUNT secret): README.md > Deploy & CI setup.
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
+  push:
     branches: [master]
   workflow_dispatch:
-
-# One deploy at a time, and a running deploy is never cancelled halfway.
-concurrency:
-  group: deploy-production
-  cancel-in-progress: false
+    inputs:
+      deploy_rules:
+        description: Also deploy firestore.rules and firestore.indexes.json
+        type: boolean
+        default: false
+      deploy_functions:
+        description: Also deploy the Cloud Functions (Blaze plan)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    # ci.yml's gitleaks job reads pull request commits; a called workflow gets no more than this.
+    permissions:
+      contents: read
+      pull-requests: read
+
   deploy:
-    # After a green CI run on a push to master, or by hand from master.
-    if: >-
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_branch == 'master') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+    name: Build and deploy to Firebase
+    needs: ci
+    # A manual run deploys only from master.
+    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment:
       name: production
-      url: ${{ vars.APP_URL }}
+      # Primary address; set the APP_URL variable to change it (the .web.app address keeps working).
+      url: ${{ vars.APP_URL || format('https://{0}.web.app', vars.FIREBASE_PROJECT_ID) }}
     env:
-      # Public web config, the same values every visitor's browser receives: variables, not secrets.
+      # Public Firebase web config, kept in repository Variables (Settings > Secrets and variables >
+      # Actions): the same values every visitor's browser receives, so variables, not secrets.
       VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
       VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
       VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
@@ -41,66 +55,78 @@ jobs:
       VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
       VITE_FIREBASE_VAPID_KEY: ${{ vars.VITE_FIREBASE_VAPID_KEY }}
       VITE_USE_EMULATORS: 'false'
-      APP_URL: ${{ vars.APP_URL }}
     steps:
-      # Exactly the commit CI tested; a manual run deploys the head of master.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-
-      - name: Check the deploy settings
-        env:
-          # Only whether the secret is set, never its value.
-          HAS_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
-        run: |
-          missing=0
-          for name in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID \
-            VITE_FIREBASE_STORAGE_BUCKET VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID \
-            VITE_FIREBASE_VAPID_KEY APP_URL; do
-            if [ -z "${!name}" ]; then
-              echo "::error::The production environment has no variable $name (see README.md)."
-              missing=1
-            fi
-          done
-          if [ "$HAS_SERVICE_ACCOUNT" != 'true' ]; then
-            echo "::error::The production environment has no secret FIREBASE_SERVICE_ACCOUNT (see README.md)."
-            missing=1
-          fi
-          exit "$missing"
-
-      - uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: |
             package-lock.json
             functions/package-lock.json
-
-      - name: Install
-        run: npm ci
-
-      # firebase.json's predeploy step builds the functions with these.
-      - name: Install (functions)
-        run: npm --prefix functions ci
-
-      - name: Build
-        run: npm run build
-
-      # The functions read APP_URL as a firebase-functions param (functions/.env.example).
-      - name: Write functions/.env
-        run: printf 'APP_URL=%s\n' "$APP_URL" > functions/.env
-
-      # The deploy service account's JSON key, an environment secret (README.md: rotate it; Workload
-      # Identity Federation is the keyless alternative).
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      # Names what is missing; never prints a value.
+      - name: Check deploy configuration
+        env:
+          HAS_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          missing=""
+          for v in FIREBASE_PROJECT_ID APP_URL VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN \
+            VITE_FIREBASE_PROJECT_ID VITE_FIREBASE_STORAGE_BUCKET \
+            VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID; do
+            [ -n "${!v}" ] || missing="$missing $v"
+          done
+          [ "$HAS_SERVICE_ACCOUNT" = "true" ] || missing="$missing FIREBASE_SERVICE_ACCOUNT(secret)"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository settings:$missing. See README > Deploy & CI setup."
+            exit 1
+          fi
+          if [ -z "$VITE_FIREBASE_VAPID_KEY" ]; then
+            echo "::warning::VITE_FIREBASE_VAPID_KEY is not set: the site deploys, but push reminders won't work."
+          fi
+      - run: npm ci
+      - run: npm run build
+      # The rules and functions steps use the project's own firebase-tools (npm ci above), signed
+      # in with the service account key written to a temporary file that is removed afterwards.
+      - name: Deploy Firestore rules and indexes
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_rules }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: |
+          creds="$RUNNER_TEMP/sa.json"
+          trap 'rm -f "$creds"' EXIT
+          (umask 077; printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$creds")
+          GOOGLE_APPLICATION_CREDENTIALS="$creds" npx firebase deploy \
+            --only firestore:rules,firestore:indexes --project "$PROJECT_ID" --non-interactive
+      # Functions need the Blaze (pay as you go) plan. The first functions deploy deletes the legacy
+      # functions testFunction (public, leaked data) and testSchedule (the old hourly reminder),
+      # which the code no longer has: --force lets the non-interactive deploy delete them.
+      - name: Deploy Cloud Functions
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_functions }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          # The functions read APP_URL as a firebase-functions param (functions/.env.example).
+          printf 'APP_URL=%s\n' "$APP_URL" > functions/.env
+          # firebase.json's predeploy step builds the functions with these.
+          npm --prefix functions ci
+          creds="$RUNNER_TEMP/sa.json"
+          trap 'rm -f "$creds"' EXIT
+          (umask 077; printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$creds")
+          GOOGLE_APPLICATION_CREDENTIALS="$creds" npx firebase deploy \
+            --only functions --project "$PROJECT_ID" --non-interactive --force
+      # Last, so new rules, indexes and functions are live before the app that needs them.
+      - name: Deploy hosting
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
         with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      # The project's own firebase-tools (devDependencies), with the credentials above.
-      - name: Deploy
-        run: >-
-          npx firebase deploy
-          --only hosting,firestore:rules,firestore:indexes,functions
-          --project spanion-todo
-          --non-interactive
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live
+          # Matches the firebase-tools devDependency in package.json.
+          firebaseToolsVersion: 15.34.2
