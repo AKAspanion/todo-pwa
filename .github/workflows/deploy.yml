@@ -1,0 +1,103 @@
+name: Deploy
+
+# Deploys what CI tested on master: hosting, Firestore rules and indexes, and the functions, to the
+# live project. Setup (environment, variables, Workload Identity Federation): README.md.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+
+# One deploy at a time, and a running deploy is never cancelled halfway.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    # After a green CI run on a push to master, or by hand from master.
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'master') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+    env:
+      # Public web config, the same values every visitor's browser receives: variables, not secrets.
+      VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+      VITE_FIREBASE_VAPID_KEY: ${{ vars.VITE_FIREBASE_VAPID_KEY }}
+      VITE_USE_EMULATORS: 'false'
+      APP_URL: ${{ vars.APP_URL }}
+    steps:
+      # Exactly the commit CI tested; a manual run deploys the head of master.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Check the deploy variables
+        env:
+          GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+        run: |
+          missing=0
+          for name in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID \
+            VITE_FIREBASE_STORAGE_BUCKET VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID \
+            VITE_FIREBASE_VAPID_KEY APP_URL GCP_WORKLOAD_IDENTITY_PROVIDER GCP_SERVICE_ACCOUNT; do
+            if [ -z "${!name}" ]; then
+              echo "::error::The production environment has no variable $name (see README.md)."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      # firebase.json's predeploy step builds the functions with these.
+      - name: Install (functions)
+        run: npm --prefix functions ci
+
+      - name: Build
+        run: npm run build
+
+      # The functions read APP_URL as a firebase-functions param (functions/.env.example).
+      - name: Write functions/.env
+        run: printf 'APP_URL=%s\n' "$APP_URL" > functions/.env
+
+      # Short-lived credentials through Workload Identity Federation: no service account key.
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      # The project's own firebase-tools (devDependencies), with the credentials above.
+      - name: Deploy
+        run: >-
+          npx firebase deploy
+          --only hosting,firestore:rules,firestore:indexes,functions
+          --project spanion-todo
+          --non-interactive
