@@ -35,7 +35,7 @@
         ]
       },
       {
-        "source": "/@(sw.js|index.html)",
+        "source": "/@(sw.js|index.html|service-worker.js|firebase-messaging-sw.js)",
         "headers": [
           {
             "key": "Cache-Control",

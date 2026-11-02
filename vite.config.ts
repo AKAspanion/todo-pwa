@@ -116,6 +116,9 @@ export default defineConfig({
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webmanifest}'],
+        // Workbox's default ignore, plus the old app's two workers, which public/ now holds as
+        // kill switches (C1): they must stay on the network, served no-cache, never precached.
+        globIgnores: ['**/node_modules/**/*', 'service-worker.js', 'firebase-messaging-sw.js'],
         maximumFileSizeToCacheInBytes: MAX_PRECACHE_BYTES,
         sourcemap: 'hidden',
       },
