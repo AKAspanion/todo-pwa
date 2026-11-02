@@ -37,7 +37,7 @@
     "@firebase/rules-unit-testing": "^6.0.0",
     "@playwright/test": "^1.64.1",
     "@types/markdown-it": "^14.2.0",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.6",
     "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-vue": "^6.0.10",
     "@vue/eslint-config-prettier": "^10.2.0",
