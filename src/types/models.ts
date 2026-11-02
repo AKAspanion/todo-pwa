@@ -23,7 +23,7 @@ export interface Task {
   time: string | null;
   /** The IANA time zone the date and time were entered in, such as 'Asia/Kolkata'. */
   timeZone: string;
-  /** When the reminder is due (one hour before the task), or null when no reminder applies. */
+  /** The task's due instant (UTC), or null; the reminder is sent within the hour before it. */
   remindAt: Date | null;
   reminded: boolean;
   labelIds: string[];

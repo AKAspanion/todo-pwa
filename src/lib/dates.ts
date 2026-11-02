@@ -15,8 +15,6 @@ const RELATIVE_DAY_NAMES: Record<DateLocale, typeof enDates> = { en: enDates, hi
 /** Intl locale tags for times, which dayjs's Hindi locale has no AM/PM words for. */
 const TIME_LOCALE_TAGS: Record<DateLocale, string> = { en: 'en-US', hi: 'hi-IN' };
 
-/** A reminder is due this long before the task (P5, P6). */
-export const REMINDER_LEAD_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** The midnight timer fires this long after midnight, so a slightly early timer still sees the new day. */
 const MIDNIGHT_SLACK_MS = 1000;
@@ -177,9 +175,9 @@ export function zonedTimeToUtc(day: Ymd, time: Hm & { s?: number }, timeZone: st
 }
 
 /**
- * When a task's reminder is due: its local date and time in `t.timeZone`, less one hour, as a UTC
- * instant (P6). Null for indefinite and done tasks, and for a task without a usable date, time or
- * zone.
+ * A task's `remindAt`: the instant it is due, its local date and time in `t.timeZone` as UTC (P6).
+ * The reminder run sends it within the hour before this instant (P5). Null for indefinite and done
+ * tasks, and for a task without a usable date, time or zone.
  */
 export function computeRemindAt(
   t: Pick<Task, 'date' | 'time' | 'indefinite' | 'status' | 'timeZone'>,
@@ -188,7 +186,7 @@ export function computeRemindAt(
   const day = parseYmd(t.date);
   const time = parseHm(t.time);
   if (!day || !time || !isValidTimeZone(t.timeZone)) return null;
-  return new Date(zonedTimeToUtc(day, time, t.timeZone).getTime() - REMINDER_LEAD_MS);
+  return zonedTimeToUtc(day, time, t.timeZone);
 }
 
 function msUntilNextLocalMidnight(now: Date): number {

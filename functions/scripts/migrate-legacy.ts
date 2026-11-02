@@ -6,8 +6,8 @@
  *   npm --prefix functions run migrate -- --tz Asia/Kolkata [--dry-run]
  *
  * - Tasks lacking `timeZone`, `remindAt` or `reminded` get the missing ones: `timeZone` is `--tz`,
- *   `remindAt` is an hour before the task's date and time in its zone (null for done, indefinite or
- *   undated tasks), `reminded` is false. Fields a task already has are left alone.
+ *   `remindAt` is the task's due instant, its date and time in its zone as UTC (null for done,
+ *   indefinite or undated tasks), `reminded` is false. Fields a task already has are left alone.
  * - Each `fcm/{uid}` token is copied to `users/{uid}/devices/{token}`; null or malformed tokens are
  *   skipped. The `fcm` documents themselves stay.
  * - Notifications without `createdAt` get one from their legacy `timestamp` text, read as wall time
@@ -48,8 +48,6 @@ const USAGE = 'Usage: npm --prefix functions run migrate -- --tz <IANA time zone
 const PAGE_SIZE = 300;
 /** Writes per batch, under Firestore's limit of 500. */
 const BATCH_SIZE = 400;
-/** A task's reminder comes this long before its date and time (as the client's computeRemindAt). */
-const REMINDER_LEAD_MS = 60 * 60 * 1000;
 /** The `userAgent` of a device copied from `fcm/{uid}`, which never recorded one. */
 const LEGACY_USER_AGENT = 'unknown (migrated from fcm)';
 /** FCM registration tokens use only these characters, which also keeps them valid document ids. */
@@ -156,8 +154,9 @@ function wallTimeToUtc(wall: WallTime, timeZone: string): Date | null {
 }
 
 /**
- * A legacy task's `remindAt`: an hour before its `date` ('YYYY-MM-DD') and `time` ('HH:mm') in
- * `timeZone`. Null for done or indefinite tasks and for any other date or time (`'NA'`, null).
+ * A legacy task's `remindAt`, as the client's computeRemindAt: the instant its `date`
+ * ('YYYY-MM-DD') and `time` ('HH:mm') in `timeZone` are due. Null for done or indefinite tasks
+ * and for any other date or time (`'NA'`, null).
  */
 export function legacyRemindAt(fields: Record<string, unknown>, timeZone: string): Date | null {
   if (fields.indefinite === true || fields.status === 'done') return null;
@@ -166,7 +165,7 @@ export function legacyRemindAt(fields: Record<string, unknown>, timeZone: string
   const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   const t = /^(\d{2}):(\d{2})$/.exec(time);
   if (!d || !t) return null;
-  const at = wallTimeToUtc(
+  return wallTimeToUtc(
     {
       year: Number(d[1]),
       month: Number(d[2]),
@@ -177,7 +176,6 @@ export function legacyRemindAt(fields: Record<string, unknown>, timeZone: string
     },
     timeZone,
   );
-  return at ? new Date(at.getTime() - REMINDER_LEAD_MS) : null;
 }
 
 /** A legacy notification `timestamp` (`11/2/2026, 3:30:00 PM`) read as wall time in `timeZone`. */

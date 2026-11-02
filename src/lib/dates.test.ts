@@ -94,14 +94,14 @@ describe('formatTime12 and formatLongDate', () => {
 describe('computeRemindAt (P6)', () => {
   const base = { indefinite: false, status: 'todo' as const };
 
-  it('is one hour before 09:00 in Asia/Kolkata, as a UTC instant', () => {
+  it('is 09:00 in Asia/Kolkata, the due instant, as UTC', () => {
     const at = computeRemindAt({
       ...base,
       date: '2026-11-02',
       time: '09:00',
       timeZone: 'Asia/Kolkata',
     });
-    expect(at?.toISOString()).toBe('2026-11-02T02:30:00.000Z');
+    expect(at?.toISOString()).toBe('2026-11-02T03:30:00.000Z');
   });
 
   it('uses the offset in force on a DST-start day in America/New_York', () => {
@@ -111,7 +111,7 @@ describe('computeRemindAt (P6)', () => {
       time: '09:00',
       timeZone: 'America/New_York',
     });
-    expect(at?.toISOString()).toBe('2026-03-08T12:00:00.000Z');
+    expect(at?.toISOString()).toBe('2026-03-08T13:00:00.000Z');
   });
 
   it('does not depend on the device time zone', () => {
@@ -122,7 +122,7 @@ describe('computeRemindAt (P6)', () => {
       time: '09:00',
       timeZone: 'Asia/Kolkata',
     });
-    expect(at?.toISOString()).toBe('2026-11-02T02:30:00.000Z');
+    expect(at?.toISOString()).toBe('2026-11-02T03:30:00.000Z');
   });
 
   it.each([

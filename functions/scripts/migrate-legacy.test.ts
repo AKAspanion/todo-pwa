@@ -107,7 +107,7 @@ describe('migrateLegacy on the seeded legacy data', () => {
     const taskDoc = await db.doc('tasks/alice-task').get();
     expect(taskDoc.get('timeZone')).toBe('Asia/Kolkata');
     expect((taskDoc.get('remindAt') as Timestamp).toDate().toISOString()).toBe(
-      '2026-11-03T02:30:00.000Z',
+      '2026-11-03T03:30:00.000Z',
     );
     expect(taskDoc.get('reminded')).toBe(false);
     // Fields the old app wrote stay as they were: readers accept them (spec §10).
@@ -190,9 +190,9 @@ describe('migrateLegacy on other legacy shapes', () => {
     const partial = await db.doc('tasks/partial').get();
     expect(partial.get('timeZone')).toBe('America/New_York');
     expect(partial.get('reminded')).toBe(true);
-    // 09:00 EST is 14:00 UTC; the reminder is an hour before.
+    // 09:00 EST is 14:00 UTC, the due instant.
     expect((partial.get('remindAt') as Timestamp).toDate().toISOString()).toBe(
-      '2026-11-03T13:00:00.000Z',
+      '2026-11-03T14:00:00.000Z',
     );
   });
 
@@ -241,14 +241,14 @@ describe('migrateLegacy on other legacy shapes', () => {
 });
 
 describe('legacyRemindAt', () => {
-  it('is an hour before the local date and time, as a UTC instant', () => {
+  it('is the local date and time, the due instant, as UTC', () => {
     const at = legacyRemindAt({ date: '2026-11-02', time: '09:00', status: 'todo' }, IST);
-    expect(at?.toISOString()).toBe('2026-11-02T02:30:00.000Z');
+    expect(at?.toISOString()).toBe('2026-11-02T03:30:00.000Z');
   });
 
   it('follows daylight saving time', () => {
     const at = legacyRemindAt({ date: '2026-03-08', time: '09:00' }, 'America/New_York');
-    expect(at?.toISOString()).toBe('2026-03-08T12:00:00.000Z');
+    expect(at?.toISOString()).toBe('2026-03-08T13:00:00.000Z');
   });
 
   it.each([

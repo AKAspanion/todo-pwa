@@ -145,7 +145,7 @@ describe('updateTask (D7, P6)', () => {
     expect(stored.labelIds).toEqual(['a']);
     // The schedule didn't change, so the old app's zone (§11.3) still applies.
     expect(stored.timeZone).toBe('Asia/Kolkata');
-    expect((stored.remindAt as Timestamp).toDate().toISOString()).toBe('2026-11-03T02:30:00.000Z');
+    expect((stored.remindAt as Timestamp).toDate().toISOString()).toBe('2026-11-03T03:30:00.000Z');
   });
 
   it('resets reminded when the time changes, and keeps it when only the title does', async () => {

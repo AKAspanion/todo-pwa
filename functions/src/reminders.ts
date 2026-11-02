@@ -1,7 +1,8 @@
 /**
- * Push reminders (spec P5, P3, S1, S4): every 5 minutes, find the tasks whose reminder falls in the
- * coming hour, send one FCM HTTP v1 message to each of the owner's devices, leave a notification
- * document and mark the task reminded. One task's or one device's failure never stops the others.
+ * Push reminders (spec P5, P3, S1, S4): every 5 minutes, find the tasks due in the coming hour
+ * (`remindAt`, the due instant, in `(now, now + 60 min]`), send one FCM HTTP v1 message to each of
+ * the owner's devices, leave a notification document and mark the task reminded. One task's or one
+ * device's failure never stops the others.
  */
 import {
   FieldValue,

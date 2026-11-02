@@ -15,11 +15,9 @@ packages/
 public/
 .firebase/
 
-# Kept as written: the legacy function (Task 10 replaces it), the planning documents and local tooling
-functions/index.js
+# Kept as written: the planning documents and local tooling
 docs/
 .ga/
 .claude/
-functions/.eslintrc.json
 src/assets/style.css
 *.md
