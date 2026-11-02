@@ -1,0 +1,20 @@
+{
+  "push": {
+    "label": "Reminders on this device",
+    "hint": "Get a notification on this device before a task is due.",
+    "unsupported": "Notifications aren't supported on this browser.",
+    "blocked": "Notifications are blocked for this site. Allow them in your browser's site settings, then try again.",
+    "enableFailed": "Couldn't turn on notifications. Try again.",
+    "disableFailed": "Couldn't turn off notifications. Try again."
+  },
+  "list": {
+    "heading": "Reminders",
+    "loading": "Loading notifications",
+    "empty": "No notifications",
+    "emptyHint": "Task reminder notifications will appear here.",
+    "loadFailed": "Couldn't load your data. Try again.",
+    "retry": "Retry",
+    "delete": "Delete notification",
+    "deleteFailed": "Couldn't delete. Try again."
+  }
+}
