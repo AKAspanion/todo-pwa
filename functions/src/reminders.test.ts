@@ -462,10 +462,17 @@ describe('runReminders: limits (review I7)', () => {
 });
 
 describe('functions entry point', () => {
-  it('exports only the scheduled sendReminders, and no HTTP trigger', async () => {
+  it('exports the scheduled reminders and the budget kill-switch, and no HTTP trigger (S1)', async () => {
     const entry = await import('./index');
 
-    expect(Object.keys(entry)).toEqual(['sendReminders']);
+    // A new export must be added here on purpose; none may answer HTTP or callable requests.
+    expect(Object.keys(entry).sort()).toEqual(['sendReminders', 'stopBillingOnBudget']);
+    for (const fn of Object.values(entry)) {
+      expect(fn.__endpoint.httpsTrigger).toBeUndefined();
+      expect(fn.__endpoint.callableTrigger).toBeUndefined();
+    }
+    expect(entry.stopBillingOnBudget.__endpoint.eventTrigger).toBeDefined();
+
     const endpoint = entry.sendReminders.__endpoint;
     expect(endpoint.httpsTrigger).toBeUndefined();
     expect(endpoint.callableTrigger).toBeUndefined();
