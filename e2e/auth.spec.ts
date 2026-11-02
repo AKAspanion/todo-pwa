@@ -66,8 +66,8 @@ async function signUpWithForm(page: Page, email: string, password: string): Prom
   await page.getByRole('button', { name: EN.signUp.submit, exact: true }).click();
 }
 
-function abortAuthRequests(page: Page): Promise<void> {
-  return page.route('**/identitytoolkit**', (route) => route.abort('internetdisconnected'));
+async function abortAuthRequests(page: Page): Promise<void> {
+  await page.route('**/identitytoolkit**', (route) => route.abort('internetdisconnected'));
 }
 
 async function openMenu(page: Page, s: AuthStrings = EN): Promise<void> {

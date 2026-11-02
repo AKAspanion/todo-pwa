@@ -1,7 +1,12 @@
 import type { User } from 'firebase/auth';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMemoryHistory, createRouter, type RouteLocationRaw } from 'vue-router';
+import {
+  createMemoryHistory,
+  createRouter,
+  type RouteLocationNormalized,
+  type RouteLocationRaw,
+} from 'vue-router';
 import { onUserChanged, waitForAuthReady } from '@/services/auth';
 import { routes } from './index';
 import { authGuard, safeRedirect } from './guard';
@@ -27,7 +32,32 @@ const alice = { uid: 'alice', email: 'a@example.com', displayName: 'Alice', phot
 
 /** The app's own routes, resolved as the router resolves them before running the guard. */
 const resolver = createRouter({ history: createMemoryHistory(), routes });
-const to = (path: string) => resolver.resolve(path);
+
+/** The location the router hands its guards for `path`, built from the app's own route table. */
+function to(path: string): RouteLocationNormalized {
+  const {
+    name,
+    path: resolvedPath,
+    params,
+    query,
+    hash,
+    fullPath,
+    meta,
+    matched,
+    redirectedFrom,
+  } = resolver.resolve(path);
+  return {
+    name: name ?? undefined,
+    path: resolvedPath,
+    params,
+    query,
+    hash,
+    fullPath,
+    meta,
+    matched,
+    redirectedFrom,
+  };
+}
 
 function signedIn(): void {
   vi.mocked(waitForAuthReady).mockResolvedValue(alice as unknown as User);

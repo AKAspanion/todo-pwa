@@ -310,8 +310,7 @@ export async function migrateLegacy(
 async function main(argv: readonly string[]): Promise<void> {
   const options = parseArgs(argv);
   const app = initializeApp();
-  const project =
-    app.options.projectId ?? process.env.GOOGLE_CLOUD_PROJECT ?? '(from credentials)';
+  const project = app.options.projectId ?? process.env.GOOGLE_CLOUD_PROJECT ?? '(from credentials)';
   console.log(`Migrating project ${project} with time zone ${options.timeZone}.`);
   const report = await migrateLegacy(getFirestore(app), options);
   console.log(JSON.stringify(report, null, 2));

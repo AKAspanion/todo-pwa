@@ -388,7 +388,7 @@ describe('the foreground handler (P2)', () => {
 });
 
 describe('permission is asked for only from the toggle (P1)', () => {
-  it('mounting the notifications screen and changing user never calls enable()', async () => {
+  it('mounting the notifications screen and changing user never calls enable(); one click on the toggle calls it once', async () => {
     const l = await loadFresh();
     const { requestPermission } = supportedBrowser(l);
     const [{ default: NotificationsView }, { i18n }, { vuetify }] = await Promise.all([
@@ -401,7 +401,10 @@ describe('permission is asked for only from the toggle (P1)', () => {
 
     l.setupPwa();
     l.signIn(alice);
+    // Attached to the document: jsdom fires a checkbox's input and change events on a click only
+    // when the checkbox is connected, so a detached switch would never see the click.
     const wrapper = mount(NotificationsView, {
+      attachTo: document.body,
       global: { plugins: [l.activePinia, i18n, vuetify] },
     });
     await flushPromises();
@@ -415,11 +418,16 @@ describe('permission is asked for only from the toggle (P1)', () => {
     expect(l.fm.getToken).not.toHaveBeenCalled();
 
     // A click on the toggle is what asks.
-    await wrapper.get('[data-testid="push-toggle"] input').trigger('click');
+    const toggle = wrapper.get<HTMLInputElement>('[data-testid="push-toggle"] input');
+    expect(toggle.element.checked).toBe(false);
+    expect(toggle.element.disabled).toBe(false);
+    await toggle.trigger('click');
     await flushPromises();
 
     expect(enable).toHaveBeenCalledTimes(1);
     expect(requestPermission).toHaveBeenCalledTimes(1);
+    expect(l.devices.saveDevice).toHaveBeenCalledWith('bob', TOKEN_A);
+    expect(toggle.element.checked).toBe(true);
     wrapper.unmount();
   });
 });
