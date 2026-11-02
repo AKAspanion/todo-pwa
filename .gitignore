@@ -14,6 +14,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *-debug.log
+firebase-debug.log
+
+# Firebase CLI deploy caches
+.firebase/
 
 # Test output
 /coverage
@@ -35,3 +39,14 @@ yarn-error.log*
 *.aab
 signing-key-info.txt
 *.keystore
+
+# Android (TWA) build outputs and Gradle caches: the source and its Readme stay tracked
+packages/android/source/.gradle/
+packages/android/source/build/
+packages/android/source/app/build/
+packages/android/source/local.properties
+*.idsig
+
+# Local tooling: Claude Code worktrees and the ga run workspace
+.claude/worktrees/
+.ga/runs/
