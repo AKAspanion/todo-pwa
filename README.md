@@ -179,6 +179,51 @@ hand. To deploy from your own machine instead:
 
    Running it again changes nothing.
 
+### Budget kill-switch
+
+Blaze has no spending cap. `stopBillingOnBudget` (`functions/src/budget.ts`) caps it: a Cloud
+Billing budget publishes to the `billing-budget-alerts` topic, and once the month's **actual**
+cost reaches the budget amount, the function unlinks the project's billing account. Forecasts never
+set it off. With billing unlinked, the functions (reminders included) stop, Firestore and Hosting
+are held to the no-cost limits, and Google may delete some resources if billing stays off. Nothing
+comes back until someone links the account again.
+
+Set it up once, before the first functions deploy that includes it:
+
+1. Create the account the function runs as. Give it Project Billing Manager, which can unlink
+   billing and nothing else, and turn on the Cloud Billing API:
+
+   ```bash
+   gcloud iam service-accounts create budget-kill-switch --project spanion-todo --display-name "Budget kill-switch"
+   gcloud projects add-iam-policy-binding spanion-todo --member serviceAccount:budget-kill-switch@spanion-todo.iam.gserviceaccount.com --role roles/billing.projectManager
+   gcloud services enable cloudbilling.googleapis.com --project spanion-todo
+   ```
+
+2. Whoever deploys the functions (you, or the deploy workflow's `FIREBASE_SERVICE_ACCOUNT`) needs
+   permission to deploy a function that runs as that account:
+
+   ```bash
+   gcloud iam service-accounts add-iam-policy-binding budget-kill-switch@spanion-todo.iam.gserviceaccount.com --project spanion-todo --member serviceAccount:DEPLOYER_EMAIL --role roles/iam.serviceAccountUser
+   ```
+
+3. Deploy the functions (above). The deploy creates the `billing-budget-alerts` topic.
+4. In the console, open Billing > Budgets & alerts and edit the budget (scoped to `spanion-todo`
+   only). Under **Manage notifications**, tick **Connect a Pub/Sub topic to this budget**, pick
+   project `spanion-todo` and topic `billing-budget-alerts`, and save. Any budget connected to this
+   topic can turn billing off, so connect only this project's budget.
+5. Check the wiring with a notification under the budget, which changes nothing:
+
+   ```bash
+   gcloud pubsub topics publish billing-budget-alerts --project spanion-todo --message '{"budgetDisplayName":"test","costAmount":1,"budgetAmount":5,"currencyCode":"USD"}'
+   ```
+
+   `npm --prefix functions run logs` should then show `budget: notification handled` with outcome
+   `under-budget`. A message with `costAmount` at or above `budgetAmount` really turns billing off.
+
+To turn billing back on: Billing > Account management > link `spanion-todo` again, or
+`gcloud billing projects link spanion-todo --billing-account ACCOUNT_ID`. If the budget still
+counts the month's cost as over, the next notification unlinks it again. Raise the budget first.
+
 `/.well-known/assetlinks.json` (in `public/`) holds the Play Store app's signing-key fingerprints,
 so the Android app opens without a URL bar.
 

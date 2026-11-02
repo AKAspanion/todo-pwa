@@ -1,7 +1,7 @@
 /**
- * The deployed Cloud Functions: only the scheduled reminder run. The old public HTTP
- * `testFunction`, which returned every user's FCM token and task titles (spec S1), is gone, and
- * nothing here answers HTTP requests.
+ * The deployed Cloud Functions: the scheduled reminder run and the budget kill-switch. The old
+ * public HTTP `testFunction`, which returned every user's FCM token and task titles (spec S1), is
+ * gone, and nothing here answers HTTP requests.
  */
 import { initializeApp } from 'firebase-admin/app';
 
@@ -9,3 +9,4 @@ import { initializeApp } from 'firebase-admin/app';
 initializeApp();
 
 export { sendReminders } from './reminders';
+export { stopBillingOnBudget } from './budget';
