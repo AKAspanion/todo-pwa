@@ -46,6 +46,7 @@ jobs:
       # Actions): the same values every visitor's browser receives, so variables, not secrets.
       VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
       VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_AUTH_DOMAINS: ${{ vars.VITE_FIREBASE_AUTH_DOMAINS }}
       VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
       VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
       VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
@@ -83,6 +84,9 @@ jobs:
           fi
           if [ -z "$VITE_FIREBASE_VAPID_KEY" ]; then
             echo "::warning::VITE_FIREBASE_VAPID_KEY is not set: the site deploys, but push reminders won't work."
+          fi
+          if [ -z "$VITE_FIREBASE_AUTH_DOMAINS" ]; then
+            echo "::warning::VITE_FIREBASE_AUTH_DOMAINS is not set: Google sign-in uses VITE_FIREBASE_AUTH_DOMAIN on every domain, and redirect sign-in can fail where third-party storage is blocked."
           fi
       # Installs run before any step that holds the deploy key, and without dependency install
       # scripts, so no third-party package code runs while the key is on the runner. None of these

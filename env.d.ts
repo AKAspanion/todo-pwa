@@ -3,6 +3,8 @@
 interface ImportMetaEnv {
   readonly VITE_FIREBASE_API_KEY: string;
   readonly VITE_FIREBASE_AUTH_DOMAIN: string;
+  /** Comma-separated Hosting domains that serve the auth handler themselves (src/lib/authDomain.ts). */
+  readonly VITE_FIREBASE_AUTH_DOMAINS?: string;
   readonly VITE_FIREBASE_PROJECT_ID: string;
   readonly VITE_FIREBASE_STORAGE_BUCKET: string;
   readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string;

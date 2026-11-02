@@ -52,6 +52,7 @@ Copy `.env.example` to `.env.local` (it is git-ignored). Every variable starts w
 |---|---|
 | `VITE_FIREBASE_API_KEY` | Firebase console > Project settings > Your apps > SDK config |
 | `VITE_FIREBASE_AUTH_DOMAIN` | as above |
+| `VITE_FIREBASE_AUTH_DOMAINS` | Optional. The app's Hosting domains, comma-separated (live: `todo.spanion.in,spanion-todo.web.app,spanion-todo.firebaseapp.com`). On one of them the app uses the page's own host as its auth domain, so Google sign-in's handler is same-origin; anywhere else it uses `VITE_FIREBASE_AUTH_DOMAIN`. |
 | `VITE_FIREBASE_PROJECT_ID` | as above |
 | `VITE_FIREBASE_STORAGE_BUCKET` | as above |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | as above |
@@ -194,7 +195,8 @@ Variables, not secrets: the Firebase web config is public and ships in every pag
 | `FIREBASE_PROJECT_ID` | `spanion-todo`: the project hosting, rules and functions deploy to |
 | `APP_URL` | `https://spanion-todo.web.app`: the site address, shown on the deployment and written to `functions/.env` for the functions |
 | `VITE_FIREBASE_API_KEY` | Firebase console > Project settings > Your apps > SDK config |
-| `VITE_FIREBASE_AUTH_DOMAIN` | as above (`spanion-todo.firebaseapp.com`) |
+| `VITE_FIREBASE_AUTH_DOMAIN` | as above (`spanion-todo.firebaseapp.com`): the auth domain on any host not in the next variable |
+| `VITE_FIREBASE_AUTH_DOMAINS` | `todo.spanion.in,spanion-todo.web.app,spanion-todo.firebaseapp.com`: the Hosting domains that use their own host as the auth domain. Optional: without it the deploy warns, and Google redirect sign-in can fail where third-party storage is blocked. |
 | `VITE_FIREBASE_PROJECT_ID` | as above (`spanion-todo`) |
 | `VITE_FIREBASE_STORAGE_BUCKET` | as above |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | as above |
@@ -210,6 +212,7 @@ FIREBASE_PROJECT_ID=spanion-todo
 APP_URL=https://spanion-todo.web.app
 VITE_FIREBASE_API_KEY=<from the console>
 VITE_FIREBASE_AUTH_DOMAIN=spanion-todo.firebaseapp.com
+VITE_FIREBASE_AUTH_DOMAINS=todo.spanion.in,spanion-todo.web.app,spanion-todo.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=spanion-todo
 VITE_FIREBASE_STORAGE_BUCKET=<from the console>
 VITE_FIREBASE_MESSAGING_SENDER_ID=<from the console>

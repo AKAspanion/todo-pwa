@@ -6,6 +6,7 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore, type Firestore } from 'firebase/firestore';
+import { pickAuthDomain } from './authDomain';
 
 const env = import.meta.env;
 const useEmulators = env.VITE_USE_EMULATORS === 'true';
@@ -15,7 +16,12 @@ const EMULATOR_DEFAULTS = { apiKey: 'demo-api-key', projectId: 'demo-todo' };
 
 const config = {
   apiKey: env.VITE_FIREBASE_API_KEY || (useEmulators ? EMULATOR_DEFAULTS.apiKey : ''),
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+  // The page's own host on the app's Hosting domains, so the auth handler is same-origin (I5).
+  authDomain: pickAuthDomain(
+    typeof location === 'undefined' ? '' : location.host,
+    env.VITE_FIREBASE_AUTH_DOMAINS,
+    env.VITE_FIREBASE_AUTH_DOMAIN,
+  ),
   projectId: env.VITE_FIREBASE_PROJECT_ID || (useEmulators ? EMULATOR_DEFAULTS.projectId : ''),
   storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
