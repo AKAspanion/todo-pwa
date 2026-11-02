@@ -20,7 +20,9 @@ import { dragCard } from './support/drag';
 import { readDoc, signInAs, type TestUser } from './support/emulator';
 import {
   VISUAL_CLOCK,
+  VISUAL_SKIP_REASON,
   VISUAL_WIDTHS,
+  canCompareVisuals,
   prepareVisualPage,
   runVisualCompare,
   settleVisualPage,
@@ -458,6 +460,7 @@ async function captureHomeStates(
 
 test.describe('home visual states', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'one browser captures the references');
+  test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 600_000 });
 
   test('home-empty, home-loading, home-tasks, home-editing, home-load-error and home-hi match their references at 390 and 1280', async ({

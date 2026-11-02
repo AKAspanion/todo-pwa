@@ -12,7 +12,9 @@ import {
 } from './fixtures/home';
 import { signInAs, type TestUser } from './support/emulator';
 import {
+  VISUAL_SKIP_REASON,
   VISUAL_WIDTHS,
+  canCompareVisuals,
   prepareVisualPage,
   runVisualCompare,
   settleVisualPage,
@@ -404,6 +406,7 @@ async function captureCalendarStates(
 
 test.describe('calendar visual states', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'one browser captures the references');
+  test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 600_000 });
 
   test('calendar-month, calendar-week, calendar-day, calendar-details and calendar-hi match their references at 390 and 1280', async ({

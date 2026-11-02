@@ -105,6 +105,21 @@ The emulators start empty every time. Sign up in the app to create an account.
 `test`, `test:rules` and `e2e` start and stop the emulators themselves, so nothing else needs to be
 running. Pass file names after `--` to run some of them: `npm run e2e -- e2e/smoke.spec.ts`.
 
+#### Visual tests
+
+Each screen's e2e spec has one visual test (Chromium only) that captures its states at 390 and
+1280 px into `design/modernize/<screen>/`, keeps a state's first capture as its reference in
+`refs/`, and compares later captures with the references through ga's `visual-compare.mjs`
+script. Run just those with `npm run e2e -- --project=chromium --grep visual`; delete a screen's
+`refs/` to capture new references.
+
+- **Where the script is:** set `VISUAL_COMPARE_SCRIPT` to the path of `visual-compare.mjs`. Without
+  it, the tests look in the ga plugin's folder on the maintainer's machine
+  (`…/plugins/ga/skills/verify-work/scripts/visual-compare.mjs`).
+- **Where they run:** visual comparison runs only where that script exists, and never on CI. On CI
+  (`CI` set), or wherever the script is missing, each visual test is skipped with the reason
+  "visual baselines are captured on macOS and compared locally; Linux font rendering differs".
+
 Cloud Functions (`functions/`):
 
 | Command | What it does |

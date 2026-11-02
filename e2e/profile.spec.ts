@@ -1,6 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 import { createUser, resetEmulators, seedDoc, signInAs, type TestUser } from './support/emulator';
-import { compareScreen, type VisualState } from './support/visual';
+import {
+  VISUAL_SKIP_REASON,
+  canCompareVisuals,
+  compareScreen,
+  type VisualState,
+} from './support/visual';
 
 const PASSWORD = 'abc-def_9';
 
@@ -157,6 +162,7 @@ test.describe('profile', () => {
 
 test.describe('profile visual', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'captured once, in Chromium');
+  test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 600_000 });
 
   const email = 'visual@example.info';

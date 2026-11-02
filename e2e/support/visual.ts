@@ -21,8 +21,22 @@ import type { Browser, BrowserContextOptions, Page } from '@playwright/test';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const VISUAL_DIR = join(ROOT, 'design', 'modernize');
-const COMPARE_SCRIPT =
+/** Where the ga plugin keeps its visual-compare script on the developer's machine. */
+const DEFAULT_COMPARE_SCRIPT =
   '/Users/ankitkumarpandit/Documents/work/geekyants/claude-plugin/geekyants-claude-plugin/plugins/ga/skills/verify-work/scripts/visual-compare.mjs';
+/** Why a visual test skips, on CI or where the compare script is missing (the visual-CI ruling). */
+export const VISUAL_SKIP_REASON =
+  'visual baselines are captured on macOS and compared locally; Linux font rendering differs';
+
+/** ga's visual-compare script: VISUAL_COMPARE_SCRIPT when set, else the plugin's own path. */
+export function compareScriptPath(): string {
+  return process.env.VISUAL_COMPARE_SCRIPT || DEFAULT_COMPARE_SCRIPT;
+}
+
+/** Whether this run can compare visuals: never on CI, and only where the compare script exists. */
+export function canCompareVisuals(): boolean {
+  return !process.env.CI && existsSync(compareScriptPath());
+}
 /** The origin visual-setup.mjs serves the captured images from, on the "app" side. */
 const CAPTURE_ORIGIN = 'http://visual.test';
 
@@ -185,7 +199,7 @@ export function runVisualCompare(screen: string): { status: number; output: stri
   const result = spawnSync(
     process.execPath,
     [
-      COMPARE_SCRIPT,
+      compareScriptPath(),
       join('design', 'modernize', screen, 'compare.json'),
       '--widths',
       VISUAL_WIDTHS.join(','),

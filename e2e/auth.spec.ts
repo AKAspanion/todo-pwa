@@ -9,7 +9,12 @@ import {
   resetEmulators,
   seedDoc,
 } from './support/emulator';
-import { compareScreen, type VisualState } from './support/visual';
+import {
+  VISUAL_SKIP_REASON,
+  canCompareVisuals,
+  compareScreen,
+  type VisualState,
+} from './support/visual';
 
 /** The strings these tests look for, read from the app's own locale files. */
 interface AuthStrings {
@@ -551,6 +556,7 @@ function authStates(): VisualState[] {
 
 test.describe('visual', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'captured once, in Chromium');
+  test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 600_000 });
 
   test('sign-in and sign-up match the approved references at 390 and 1280', async ({

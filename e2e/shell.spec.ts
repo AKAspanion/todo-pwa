@@ -1,7 +1,15 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, relative } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { parseEnv } from 'node:util';
 import { expect, test, type Page } from '@playwright/test';
 import {
@@ -15,6 +23,7 @@ import {
   seedDoc,
   signInAs,
 } from './support/emulator';
+import { canCompareVisuals, compareScriptPath } from './support/visual';
 
 const MAX_PRECACHE_BYTES = 2 * 1024 * 1024;
 
@@ -236,6 +245,48 @@ test.describe('CI workflow', () => {
       );
     }
     expect(jobs.secrets).toMatch(/uses: gitleaks\/gitleaks-action@/);
+  });
+});
+
+test.describe('visual harness', () => {
+  test.skip(({ browserName }) => browserName !== 'chromium', 'checks settings, not a browser');
+
+  const saved = { ci: process.env.CI, script: process.env.VISUAL_COMPARE_SCRIPT };
+  test.afterEach(() => {
+    for (const [name, value] of [
+      ['CI', saved.ci],
+      ['VISUAL_COMPARE_SCRIPT', saved.script],
+    ] as const) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  });
+
+  test("finds the compare script through VISUAL_COMPARE_SCRIPT, else at the ga plugin's path", () => {
+    delete process.env.VISUAL_COMPARE_SCRIPT;
+    expect(compareScriptPath()).toMatch(
+      /\/plugins\/ga\/skills\/verify-work\/scripts\/visual-compare\.mjs$/,
+    );
+
+    process.env.VISUAL_COMPARE_SCRIPT = '/opt/ga/visual-compare.mjs';
+    expect(compareScriptPath()).toBe('/opt/ga/visual-compare.mjs');
+  });
+
+  test('compares visuals only off CI and where the compare script exists', () => {
+    const script = join(mkdtempSync(join(tmpdir(), 'visual-')), 'visual-compare.mjs');
+    writeFileSync(script, '');
+    delete process.env.CI;
+
+    process.env.VISUAL_COMPARE_SCRIPT = script;
+    expect(canCompareVisuals()).toBe(true);
+
+    process.env.VISUAL_COMPARE_SCRIPT = `${script}.missing`;
+    expect(canCompareVisuals()).toBe(false);
+
+    process.env.VISUAL_COMPARE_SCRIPT = script;
+    process.env.CI = 'true';
+    expect(canCompareVisuals()).toBe(false);
+    rmSync(dirname(script), { recursive: true, force: true });
   });
 });
 

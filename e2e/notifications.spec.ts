@@ -12,7 +12,12 @@ import {
   signInAs,
   type TestUser,
 } from './support/emulator';
-import { compareScreen, type VisualState } from './support/visual';
+import {
+  VISUAL_SKIP_REASON,
+  canCompareVisuals,
+  compareScreen,
+  type VisualState,
+} from './support/visual';
 
 const TIME_ZONE = 'Asia/Tokyo';
 const PASSWORD = 'abc-def_9';
@@ -237,6 +242,7 @@ test.describe('notifications screen', () => {
 
 test.describe('notifications visuals', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'one capture per state');
+  test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 300_000 });
 
   test('notifications-empty, -list, -unsupported and -hi match their references at 390 and 1280', async ({

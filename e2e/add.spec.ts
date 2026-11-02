@@ -13,7 +13,12 @@ import {
   signInAs,
   type TestUser,
 } from './support/emulator';
-import { compareScreen, type VisualState } from './support/visual';
+import {
+  VISUAL_SKIP_REASON,
+  canCompareVisuals,
+  compareScreen,
+  type VisualState,
+} from './support/visual';
 
 const TIME_ZONE = 'America/New_York';
 const PASSWORD = 'abc-def_9';
@@ -325,6 +330,7 @@ test.describe('add task', () => {
 
 test.describe('add task visuals', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'one capture per state');
+  test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 300_000 });
 
   test('add-empty, add-filled, add-error and add-hi match their references at 390 and 1280', async ({
