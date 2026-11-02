@@ -14,3 +14,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** The emulator hosts (`host:port`), read from firebase.json at build time by vite.config.ts. */
+declare const __FIREBASE_EMULATOR_HOSTS__: { auth: string; firestore: string };

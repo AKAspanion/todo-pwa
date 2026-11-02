@@ -16,6 +16,25 @@ const MAX_PRECACHE_BYTES = 2 * 1024 * 1024;
 /** Demo Firebase settings for unit tests: always the emulators, never a real project, whatever `.env.local` holds. */
 const testEnv = parseEnv(readFileSync(join(root, '.env.ci'), 'utf8')) as Record<string, string>;
 
+interface EmulatorSettings {
+  emulators: { auth: { port: number }; firestore: { port: number } };
+}
+
+/**
+ * Where the app finds the emulators when `VITE_USE_EMULATORS` is 'true'. The ports have one
+ * source, firebase.json (this project runs on its own ports, beside other projects on the default
+ * ones); `firebase emulators:exec` sets the same hosts in the environment, which win when present.
+ */
+function emulatorHosts(): { auth: string; firestore: string } {
+  const { emulators } = JSON.parse(
+    readFileSync(join(root, 'firebase.json'), 'utf8'),
+  ) as EmulatorSettings;
+  return {
+    auth: process.env.FIREBASE_AUTH_EMULATOR_HOST ?? `127.0.0.1:${emulators.auth.port}`,
+    firestore: process.env.FIRESTORE_EMULATOR_HOST ?? `127.0.0.1:${emulators.firestore.port}`,
+  };
+}
+
 function listFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
@@ -59,6 +78,9 @@ function vendorChunk(test: RegExp, name: string, priority: number) {
 }
 
 export default defineConfig({
+  define: {
+    __FIREBASE_EMULATOR_HOSTS__: JSON.stringify(emulatorHosts()),
+  },
   plugins: [
     vue(),
     vuetify({ autoImport: true }),
