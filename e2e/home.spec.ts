@@ -217,7 +217,11 @@ test.describe('home board', () => {
     page,
   }) => {
     const pageErrors: Error[] = [];
-    page.on('pageerror', (error) => pageErrors.push(error));
+    page.on('pageerror', (error) => {
+      // The browser reports a resize it deferred to the next frame (WebKit raises it as a page
+      // error): a notice from layout, not an error the search threw.
+      if (!/ResizeObserver loop/.test(error.message)) pageErrors.push(error);
+    });
     await seedTask(user.uid, {
       id: 'milk',
       title: 'Buy Milk',
@@ -234,12 +238,12 @@ test.describe('home board', () => {
     await openHome(page, user);
     await expect(page.getByTestId('task-card')).toHaveCount(3);
 
-    await page.getByLabel('Search tasks').fill('milk');
+    await page.getByLabel('Search tasks', { exact: true }).fill('milk');
 
     await expect(cardByTitle(page, 'Buy Milk')).toBeVisible();
     await expect(page.getByTestId('task-card')).toHaveCount(1);
 
-    await page.getByLabel('Search tasks').fill('park');
+    await page.getByLabel('Search tasks', { exact: true }).fill('park');
 
     await expect(cardByTitle(page, 'Walk the dog')).toBeVisible();
     await expect(page.getByTestId('task-card')).toHaveCount(1);

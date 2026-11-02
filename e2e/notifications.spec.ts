@@ -41,11 +41,27 @@ async function seedNotes(user: TestUser): Promise<void> {
   }
 }
 
-/** The time as the screen shows it in `timeZone`, with every kind of space made one space. */
+const SHOWN_FORMAT: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' };
+
+/** The time as Node formats it in `timeZone`, with every kind of space made one space. */
 function shownIn(timeZone: string, iso: string): string {
-  return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone })
+  return new Intl.DateTimeFormat('en-US', { ...SHOWN_FORMAT, timeZone })
     .format(new Date(iso))
     .replace(/\s+/g, ' ');
+}
+
+/**
+ * The time as the browser formats it in `timeZone`: each engine's ICU words it its own way
+ * (WebKit writes "Oct 31, 2026 at 8:45 AM", Chromium "Oct 31, 2026, 8:45 AM").
+ */
+function shownInBrowser(page: Page, timeZone: string, iso: string): Promise<string> {
+  return page.evaluate(
+    ([options, zone, at]) =>
+      new Intl.DateTimeFormat('en-US', { ...options, timeZone: zone })
+        .format(new Date(at))
+        .replace(/\s+/g, ' '),
+    [SHOWN_FORMAT, timeZone, iso] as const,
+  );
 }
 
 const cards = (page: Page) => page.getByTestId('notification');
@@ -62,6 +78,13 @@ async function withoutNotificationApi(page: Page): Promise<void> {
   });
 }
 
+/** Removes the Push API before the app loads, so Firebase's isSupported() is false. */
+async function withoutPushApi(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    delete (window as { PushManager?: unknown }).PushManager;
+  });
+}
+
 test.describe('notifications screen', () => {
   test.use({ timezoneId: TIME_ZONE });
 
@@ -74,11 +97,12 @@ test.describe('notifications screen', () => {
     await signInAs(page, user.email, user.password);
   });
 
-  test('the toggle is disabled with the unsupported message on WebKit (P1)', async ({
+  // Playwright's WebKit has the Push API, and Firebase's isSupported() is true there, as in Safari
+  // 16.4 and later: a browser without it stands in for the browsers that have none.
+  test("the toggle is disabled with the unsupported message where Firebase's isSupported() is false (P1)", async ({
     page,
-    browserName,
   }) => {
-    test.skip(browserName !== 'webkit', 'Playwright WebKit has no web push');
+    await withoutPushApi(page);
 
     await page.goto('/notification');
 
@@ -132,7 +156,7 @@ test.describe('notifications screen', () => {
       await expect(card(page, note.id)).toContainText(note.body);
       await expect(time).toHaveAttribute('datetime', new Date(note.at).toISOString());
       const text = ((await time.textContent()) ?? '').replace(/\s+/g, ' ').trim();
-      expect(text).toBe(shownIn(TIME_ZONE, note.at));
+      expect(text).toBe(await shownInBrowser(page, TIME_ZONE, note.at));
     }
     // 2026-10-30 23:45 UTC is already 31 Oct in Tokyo.
     expect(shownIn(TIME_ZONE, NOTES[0].at)).toContain('Oct 31, 2026');
