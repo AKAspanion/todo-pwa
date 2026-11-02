@@ -5,6 +5,8 @@ import { join, relative } from 'node:path';
 import { parseEnv } from 'node:util';
 import { expect, test, type Page } from '@playwright/test';
 import {
+  AUTH_EMULATOR_HOST,
+  FIRESTORE_EMULATOR_HOST,
   createUser,
   docRef,
   listUserEmails,
@@ -176,6 +178,15 @@ test.describe('CI workflow', () => {
     for (const gate of ['typecheck', 'lint', 'format:check', 'test', 'e2e']) {
       expect(ci, gate).toContain(`npm run ${gate}\n`);
     }
+  });
+});
+
+test.describe('emulator ports', () => {
+  test.skip(({ browserName }) => browserName !== 'chromium', 'checks settings, not a browser');
+
+  test("are this project's own, not the defaults another project may hold", () => {
+    expect(AUTH_EMULATOR_HOST).toMatch(/:9199$/);
+    expect(FIRESTORE_EMULATOR_HOST).toMatch(/:8180$/);
   });
 });
 

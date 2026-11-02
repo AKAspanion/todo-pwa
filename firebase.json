@@ -59,13 +59,13 @@
   "emulators": {
     "singleProjectMode": true,
     "auth": {
-      "port": 9099
+      "port": 9199
     },
     "firestore": {
-      "port": 8080
+      "port": 8180
     },
     "functions": {
-      "port": 5001
+      "port": 5101
     },
     "ui": {
       "enabled": false

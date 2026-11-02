@@ -1,15 +1,29 @@
 /**
  * Test data in the Firebase Emulator Suite, for project `demo-todo` only: never a real project.
  *
- * `firebase emulators:exec` (the `e2e` and `test` npm scripts) sets the emulator hosts in the
- * environment; the defaults are the ports in firebase.json.
+ * The emulator ports have one source, firebase.json (this project uses its own ports, auth 9199
+ * and firestore 8180, so it can run beside other projects on the default ones).
+ * `firebase emulators:exec` (the `e2e` and `test` npm scripts) also sets the hosts in the
+ * environment, from the same file.
  */
+import { readFileSync } from 'node:fs';
 import type { Page } from '@playwright/test';
 
 export const PROJECT_ID = 'demo-todo';
 
-const AUTH_HOST = process.env.FIREBASE_AUTH_EMULATOR_HOST ?? '127.0.0.1:9099';
-const FIRESTORE_HOST = process.env.FIRESTORE_EMULATOR_HOST ?? '127.0.0.1:8080';
+interface EmulatorSettings {
+  emulators: { auth: { port: number }; firestore: { port: number } };
+}
+const { emulators } = JSON.parse(
+  readFileSync(new URL('../../firebase.json', import.meta.url), 'utf8'),
+) as EmulatorSettings;
+
+export const AUTH_EMULATOR_HOST =
+  process.env.FIREBASE_AUTH_EMULATOR_HOST ?? `127.0.0.1:${emulators.auth.port}`;
+export const FIRESTORE_EMULATOR_HOST =
+  process.env.FIRESTORE_EMULATOR_HOST ?? `127.0.0.1:${emulators.firestore.port}`;
+const AUTH_HOST = AUTH_EMULATOR_HOST;
+const FIRESTORE_HOST = FIRESTORE_EMULATOR_HOST;
 /** The emulators accept any API key; the app's demo key is used for symmetry. */
 const API_KEY = 'demo-api-key';
 /** No call to an emulator should take long; one that hangs fails the test instead of the suite. */
