@@ -1,0 +1,76 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # A dependency joins the first group it matches.
+    groups:
+      firebase:
+        patterns:
+          - firebase
+          - firebase-*
+          - '@firebase/*'
+      dev-tooling:
+        patterns:
+          - eslint
+          - eslint-*
+          - '@eslint/*'
+          - typescript-eslint
+          - '@typescript-eslint/*'
+          - '@vue/eslint-config-*'
+          - prettier
+          - vitest
+          - '@vitest/*'
+          - playwright
+          - '@playwright/*'
+          - '@axe-core/playwright'
+      minor-and-patch:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # vue-tsc doesn't support TS 7 yet
+      - dependency-name: typescript
+        versions: ['>=7.0.0']
+
+  - package-ecosystem: npm
+    directory: /functions
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      firebase:
+        patterns:
+          - firebase-admin
+          - firebase-functions
+      dev-tooling:
+        patterns:
+          - eslint
+          - '@eslint/*'
+          - typescript-eslint
+          - vitest
+      minor-and-patch:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # vue-tsc doesn't support TS 7 yet (the functions stay on the app's TypeScript)
+      - dependency-name: typescript
+        versions: ['>=7.0.0']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - '*'
