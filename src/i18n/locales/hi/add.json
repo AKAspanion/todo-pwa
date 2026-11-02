@@ -10,13 +10,6 @@
     "placeholder": "विवरण, Markdown में",
     "tooLong": "विवरण 5000 अक्षरों से कम रखें"
   },
-  "date": {
-    "label": "तारीख चुनें"
-  },
-  "time": {
-    "label": "समय चुनें",
-    "done": "हो गया"
-  },
   "indefinite": "अनिश्चित टास्क?",
   "labels": {
     "label": "लेबल",

@@ -87,6 +87,19 @@ export async function prepareVisualPage(page: Page): Promise<void> {
   });
 }
 
+/**
+ * Waits for what the page shows to settle before a capture: its fonts, the pointer, and every
+ * click ripple. With transitions off, a ripple stays at full size until Vuetify's hide timers run
+ * (about half a second after the click), so a capture right after a click showed a lighter disc
+ * over the clicked control, such as the selected label chip on Add task. The pointer moves to the
+ * page's corner, so the last clicked control isn't captured in its hover state either.
+ */
+export async function settleVisualPage(page: Page): Promise<void> {
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await page.mouse.move(0, 0);
+  await page.locator('.v-ripple__animation').first().waitFor({ state: 'detached', timeout: 5_000 });
+}
+
 function checkName(kind: string, name: string): void {
   if (!NAME.test(name))
     throw new Error(`${kind} "${name}" must be letters, digits, ".", "_" or "-"`);
@@ -124,7 +137,7 @@ export async function captureScreen(
         // network never idles and the capture hung until the test timed out. Each state's `act`
         // waits on its own locator instead (the visual-capture ruling).
         await act(page);
-        await page.evaluate(() => document.fonts.ready.then(() => undefined));
+        await settleVisualPage(page);
         const file = `${state.name}-${width}.png`;
         await page.screenshot({
           path: join(dir, 'app', file),

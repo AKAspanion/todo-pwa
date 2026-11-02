@@ -6,6 +6,8 @@
  */
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import DateField from '@/components/fields/DateField.vue';
+import TimeField from '@/components/fields/TimeField.vue';
 import { vFocusOnMount } from '@/directives/focusOnMount';
 import { todayYmd } from '@/lib/dates';
 import type { Label, Task, TaskInput } from '@/types/models';
@@ -92,7 +94,6 @@ function onSubmit(): void {
         v-if="labels.length"
         v-model="selectedLabelIds"
         multiple
-        filter
         column
         :disabled="saving"
       >
@@ -101,10 +102,12 @@ function onSubmit(): void {
           :key="label.id"
           :value="label.id"
           :color="safeColor(label.color)"
+          :variant="selectedLabelIds.includes(label.id) ? 'flat' : 'tonal'"
+          :data-label-id="label.id"
+          class="label-choice"
           size="small"
+          filter
           label
-          variant="flat"
-          border
         >
           {{ label.label }}
         </v-chip>
@@ -123,26 +126,23 @@ function onSubmit(): void {
       inset
     />
     <div class="task-edit-form__when">
-      <v-text-field
+      <DateField
         v-model="date"
         name="date"
-        type="date"
         :label="t('tasks.form.date')"
         :disabled="indefinite"
         :readonly="saving"
         :error-messages="dateError"
         density="compact"
-        variant="outlined"
       />
-      <v-text-field
+      <TimeField
         v-model="time"
         name="time"
-        type="time"
         :label="t('tasks.form.time')"
         :disabled="indefinite"
         :readonly="saving"
         density="compact"
-        variant="outlined"
+        clearable
       />
     </div>
 
@@ -174,9 +174,19 @@ function onSubmit(): void {
   padding: 0;
   min-width: 0;
 }
+/*
+ * A selected label chip shows the label's own colour: the check mark and the solid fill already
+ * say it is selected. The chip group's selected overlay would tint it with the text colour,
+ * changing the label's colour and lowering the text's contrast on it. Hover and keyboard focus
+ * keep their overlay, so a selected chip still shows where the pointer and the focus are.
+ */
+.label-choice.v-chip--selected:not(:hover, :focus-visible) > :deep(.v-chip__overlay) {
+  opacity: 0;
+}
 .task-edit-form__when {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  /* Side by side when the card is wide enough for a long date, else one above the other. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  column-gap: 8px;
 }
 </style>

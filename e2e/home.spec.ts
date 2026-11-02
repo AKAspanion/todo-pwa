@@ -22,6 +22,7 @@ import {
   VISUAL_WIDTHS,
   prepareVisualPage,
   runVisualCompare,
+  settleVisualPage,
   visualContextOptions,
   writeComparePairs,
   type VisualState,
@@ -456,7 +457,7 @@ async function captureHomeStates(
           await page.goto(state.path, { waitUntil: 'load' });
           await state.ready(page);
           await state.act?.(page);
-          await page.evaluate(() => document.fonts.ready.then(() => undefined));
+          await settleVisualPage(page);
           const file = `${state.name}-${width}.png`;
           await page.screenshot({
             path: join(VISUAL_DIR, 'app', file),

@@ -10,13 +10,6 @@
     "placeholder": "Details, in Markdown",
     "tooLong": "Keep the description under 5000 characters"
   },
-  "date": {
-    "label": "Select date"
-  },
-  "time": {
-    "label": "Select time",
-    "done": "Done"
-  },
   "indefinite": "Indefinite task?",
   "labels": {
     "label": "Labels",

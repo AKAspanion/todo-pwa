@@ -1,5 +1,8 @@
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { VDatePicker } from 'vuetify/components';
+import DateField from '@/components/fields/DateField.vue';
+import TimeField from '@/components/fields/TimeField.vue';
 import { i18n } from '@/plugins/i18n';
 import { vuetify } from '@/plugins/vuetify';
 import type { Label, Task } from '@/types/models';
@@ -12,6 +15,19 @@ class ResizeObserverStub {
   unobserve(): void {}
   disconnect(): void {}
 }
+
+/** Vuetify's menus place themselves in the visual viewport; jsdom has none. */
+const visualViewportStub = {
+  width: 1024,
+  height: 768,
+  offsetLeft: 0,
+  offsetTop: 0,
+  pageLeft: 0,
+  pageTop: 0,
+  scale: 1,
+  addEventListener(): void {},
+  removeEventListener(): void {},
+};
 
 function makeTask(overrides: Partial<Task> = {}): Task {
   return {
@@ -44,8 +60,11 @@ function mountCard(task: Task, labels: Label[] = [], attach = false) {
   });
 }
 
-function mountForm(props: { task: Task; labels: Label[]; saving: boolean; error: string | null }) {
-  return mount(TaskEditForm, { props, global });
+function mountForm(
+  props: { task: Task; labels: Label[]; saving: boolean; error: string | null },
+  attach = false,
+) {
+  return mount(TaskEditForm, { props, global, ...(attach ? { attachTo: document.body } : {}) });
 }
 
 function inputValue(wrapper: ReturnType<typeof mountForm>, selector: string): string {
@@ -54,6 +73,7 @@ function inputValue(wrapper: ReturnType<typeof mountForm>, selector: string): st
 
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', ResizeObserverStub);
+  vi.stubGlobal('visualViewport', visualViewportStub);
   i18n.global.locale.value = 'en';
 });
 
@@ -233,6 +253,73 @@ describe('TaskEditForm', () => {
     await wrapper.find('form').trigger('submit');
 
     expect(wrapper.emitted('submit')).toBeUndefined();
+  });
+
+  it('uses the shared date and time fields, never native date or time inputs', () => {
+    const wrapper = mountForm({ task: makeTask(), labels: [], saving: false, error: null });
+
+    expect(wrapper.find('input[type="date"]').exists()).toBe(false);
+    expect(wrapper.find('input[type="time"]').exists()).toBe(false);
+    expect(inputValue(wrapper, 'input[name="date"]')).toBe('Monday, 2 November 2026');
+    expect(inputValue(wrapper, 'input[name="time"]')).toBe('9:00 AM');
+  });
+
+  it('submits a day picked in the date picker as that local day (D1)', async () => {
+    const wrapper = mountForm({ task: makeTask(), labels: [], saving: false, error: null }, true);
+    await wrapper.find('input[name="date"]').trigger('keydown', { key: 'Enter' });
+    await flushPromises();
+
+    wrapper.findComponent(VDatePicker).vm.$emit('update:modelValue', new Date(2026, 10, 5));
+    await wrapper.find('form').trigger('submit');
+
+    expect(wrapper.emitted('submit')?.[0]?.[0]).toMatchObject({
+      date: '2026-11-05',
+      time: '09:00',
+    });
+    wrapper.unmount();
+  });
+
+  it('submits no time once the time is cleared', async () => {
+    const wrapper = mountForm({ task: makeTask(), labels: [], saving: false, error: null });
+
+    wrapper.findComponent(TimeField).vm.$emit('update:modelValue', '');
+    await wrapper.find('form').trigger('submit');
+
+    expect(wrapper.emitted('submit')?.[0]?.[0]).toMatchObject({ date: '2026-11-02', time: null });
+  });
+
+  it('disables the date and time fields for an indefinite task, and keeps them read-only while saving', async () => {
+    const wrapper = mountForm({
+      task: makeTask({ indefinite: true, date: null, time: null }),
+      labels: [],
+      saving: false,
+      error: null,
+    });
+    expect(wrapper.findComponent(DateField).props('disabled')).toBe(true);
+    expect(wrapper.findComponent(TimeField).props('disabled')).toBe(true);
+
+    await wrapper.setProps({ task: makeTask(), saving: true });
+
+    expect(wrapper.findComponent(DateField).props('readonly')).toBe(true);
+    expect(wrapper.findComponent(TimeField).props('readonly')).toBe(true);
+  });
+
+  it('shows a selected label chip filled with its colour and an unselected one tonal, as Add task does', () => {
+    const work: Label = { id: 'w', uid: 'u1', label: 'Work', color: '#1976D2' };
+    const wrapper = mountForm({
+      task: makeTask({ labelIds: ['a'] }),
+      labels: [HOME, work],
+      saving: false,
+      error: null,
+    });
+
+    const home = wrapper.find('[data-label-id="a"]');
+    const other = wrapper.find('[data-label-id="w"]');
+    expect(home.classes()).toEqual(
+      expect.arrayContaining(['v-chip--selected', 'v-chip--variant-flat']),
+    );
+    expect(other.classes()).toContain('v-chip--variant-tonal');
+    expect(other.classes()).not.toContain('v-chip--selected');
   });
 
   it('emits cancel from the cancel button', async () => {

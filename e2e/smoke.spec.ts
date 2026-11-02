@@ -35,11 +35,14 @@ const AUTH = readLocale<{
 }>('en', 'auth');
 const ADD = readLocale<{
   title: { label: string };
-  date: { label: string };
-  time: { label: string; done: string };
   submit: string;
   added: string;
 }>('en', 'add');
+/** The shared date and time fields' strings. */
+const FIELDS = readLocale<{
+  date: { label: string };
+  time: { label: string; done: string };
+}>('en', 'fields');
 const CALENDAR = readLocale<{ next: { month: string } }>('en', 'calendar');
 
 /** The calendar date ('YYYY-MM-DD') that `timeZone`'s wall clock shows at `at`. */
@@ -109,7 +112,7 @@ async function drag(page: Page, source: Locator, target: Locator): Promise<void>
 
 /** Picks a day in the add form's date picker, moving to the next month when the day is in it. */
 async function pickDate(page: Page, ymd: string): Promise<void> {
-  await page.getByLabel(ADD.date.label, { exact: true }).click();
+  await page.getByLabel(FIELDS.date.label, { exact: true }).click();
   await expect(page.locator('.v-date-picker')).toBeVisible();
   // Vuetify puts data-v-date on each day's button itself.
   const day = page.locator(`.v-date-picker button[data-v-date="${ymd}"]`);
@@ -122,12 +125,12 @@ async function pickDate(page: Page, ymd: string): Promise<void> {
 
 /** Types a 24-hour time into the add form's time picker. */
 async function pickTime(page: Page, hour: string, minute: string): Promise<void> {
-  await page.getByLabel(ADD.time.label, { exact: true }).click();
+  await page.getByLabel(FIELDS.time.label, { exact: true }).click();
   const picker = page.locator('.v-time-picker');
   await expect(picker).toBeVisible();
   await picker.getByRole('textbox', { name: 'Hour' }).fill(hour);
   await picker.getByRole('textbox', { name: 'Minute' }).fill(minute);
-  await picker.getByRole('button', { name: ADD.time.done }).click();
+  await picker.getByRole('button', { name: FIELDS.time.done }).click();
   await expect(picker).toBeHidden();
 }
 
@@ -167,7 +170,7 @@ test.describe('smoke', () => {
       await page.getByLabel(ADD.title.label, { exact: true }).fill(TITLE);
       await pickDate(page, tomorrow);
       await pickTime(page, '09', '00');
-      await expect(page.getByLabel(ADD.date.label, { exact: true })).toHaveValue(
+      await expect(page.getByLabel(FIELDS.date.label, { exact: true })).toHaveValue(
         longDate(tomorrow),
       );
       await page.getByRole('button', { name: ADD.submit, exact: true }).click();

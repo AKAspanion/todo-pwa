@@ -9,18 +9,15 @@
  * rejected (Review Focus 1).
  */
 import dayjs from 'dayjs';
-import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
+import { onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { VForm } from 'vuetify/components';
+import DateField from '@/components/fields/DateField.vue';
+import TimeField from '@/components/fields/TimeField.vue';
+import { safeColor } from '@/components/tasks/labels';
 import { vFocusOnMount } from '@/directives/focusOnMount';
-import {
-  formatLongDate,
-  formatTime12,
-  parseLocalDate,
-  todayYmd,
-  type DateLocale,
-} from '@/lib/dates';
+import { todayYmd } from '@/lib/dates';
 import { useLabelsStore } from '@/stores/labels';
 import { errorCode, useSessionStore } from '@/stores/session';
 import { useTasksStore } from '@/stores/tasks';
@@ -44,7 +41,7 @@ interface AddTaskForm {
   labelIds: string[];
 }
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const router = useRouter();
 const session = useSessionStore();
 const labels = useLabelsStore();
@@ -62,18 +59,11 @@ const form = reactive<AddTaskForm>({
 });
 
 const formRef = ref<InstanceType<typeof VForm> | null>(null);
-const dateMenu = ref(false);
-const timeMenu = ref(false);
 const saving = ref(false);
 const stillSaving = ref(false);
 const saveFailed = ref(false);
 let stillSavingTimer: ReturnType<typeof setTimeout> | undefined;
 let left = false;
-
-const dateLocale = computed<DateLocale>(() => (locale.value === 'hi' ? 'hi' : 'en'));
-const dateText = computed(() => formatLongDate(form.date, dateLocale.value));
-const timeText = computed(() => formatTime12(form.time, dateLocale.value));
-const pickerDate = computed(() => parseLocalDate(form.date).toDate());
 
 /** Characters as a person counts them (code points), as the rules count them. */
 const length = (value: string): number => [...value].length;
@@ -95,25 +85,6 @@ watch(
   },
   { immediate: true },
 );
-
-/** The picker gives a Date at local midnight; it is kept as that local day, never via UTC (D1). */
-function onPickDate(value: unknown): void {
-  if (!(value instanceof Date) || Number.isNaN(value.getTime())) return;
-  form.date = todayYmd(value);
-  dateMenu.value = false;
-}
-
-/** A cleared picker field gives null: the last full time stays. */
-function onPickTime(value: unknown): void {
-  if (typeof value === 'string' && /^\d{2}:\d{2}$/.test(value)) form.time = value;
-}
-
-/** Opens a picker from the keyboard, as a click does. */
-function openMenu(menu: 'date' | 'time'): void {
-  if (form.indefinite || saving.value) return;
-  if (menu === 'date') dateMenu.value = true;
-  else timeMenu.value = true;
-}
 
 async function submit(): Promise<void> {
   if (saving.value) return;
@@ -183,67 +154,11 @@ onBeforeUnmount(() => {
         </v-col>
 
         <v-col cols="12" sm="6">
-          <v-menu
-            v-model="dateMenu"
-            :close-on-content-click="false"
-            :disabled="form.indefinite || saving"
-          >
-            <template #activator="{ props: menuProps }">
-              <v-text-field
-                v-bind="menuProps"
-                :model-value="form.indefinite ? '' : dateText"
-                :label="t('add.date.label')"
-                :disabled="form.indefinite"
-                prepend-inner-icon="mdi-calendar"
-                variant="outlined"
-                readonly
-                @keydown.enter.prevent="openMenu('date')"
-                @keydown.space.prevent="openMenu('date')"
-              />
-            </template>
-            <v-date-picker
-              :model-value="pickerDate"
-              :title="t('add.date.label')"
-              color="primary"
-              hide-header
-              @update:model-value="onPickDate"
-            />
-          </v-menu>
+          <DateField v-model="form.date" :disabled="form.indefinite" :readonly="saving" />
         </v-col>
 
         <v-col cols="12" sm="6">
-          <v-menu
-            v-model="timeMenu"
-            :close-on-content-click="false"
-            :disabled="form.indefinite || saving"
-          >
-            <template #activator="{ props: menuProps }">
-              <v-text-field
-                v-bind="menuProps"
-                :model-value="form.indefinite ? '' : timeText"
-                :label="t('add.time.label')"
-                :disabled="form.indefinite"
-                prepend-inner-icon="mdi-clock-outline"
-                variant="outlined"
-                readonly
-                @keydown.enter.prevent="openMenu('time')"
-                @keydown.space.prevent="openMenu('time')"
-              />
-            </template>
-            <v-time-picker
-              :model-value="form.time"
-              :title="t('add.time.label')"
-              format="24hr"
-              color="primary"
-              @update:model-value="onPickTime"
-            >
-              <template #actions>
-                <v-btn color="primary" variant="text" @click="timeMenu = false">
-                  {{ t('add.time.done') }}
-                </v-btn>
-              </template>
-            </v-time-picker>
-          </v-menu>
+          <TimeField v-model="form.time" :disabled="form.indefinite" :readonly="saving" />
         </v-col>
 
         <v-col cols="12">
@@ -289,9 +204,10 @@ onBeforeUnmount(() => {
                 v-for="label in labels.labels"
                 :key="label.id"
                 :value="label.id"
-                :color="label.color"
+                :color="safeColor(label.color)"
                 :variant="form.labelIds.includes(label.id) ? 'flat' : 'tonal'"
                 :data-label-id="label.id"
+                class="label-choice"
                 filter
                 label
               >
@@ -342,5 +258,14 @@ onBeforeUnmount(() => {
 <style scoped>
 .add-task {
   max-width: 760px;
+}
+/*
+ * A selected label chip shows the label's own colour: the check mark and the solid fill already
+ * say it is selected. The chip group's selected overlay would tint it with the text colour,
+ * changing the label's colour and lowering the text's contrast on it. Hover and keyboard focus
+ * keep their overlay, so a selected chip still shows where the pointer and the focus are.
+ */
+.label-choice.v-chip--selected:not(:hover, :focus-visible) > :deep(.v-chip__overlay) {
+  opacity: 0;
 }
 </style>

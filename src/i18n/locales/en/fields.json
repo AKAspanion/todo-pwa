@@ -1,0 +1,9 @@
+{
+  "date": {
+    "label": "Select date"
+  },
+  "time": {
+    "label": "Select time",
+    "done": "Done"
+  }
+}
