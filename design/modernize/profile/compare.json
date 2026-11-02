@@ -1,0 +1,31 @@
+{
+  "appBase": "http://visual.test/design/modernize/",
+  "clock": "2026-11-02T09:00:00Z",
+  "setup": "../../../e2e/support/visual-setup.mjs",
+  "pairs": [
+    {
+      "name": "profile",
+      "design": "../reference.html?screen=profile&side=refs&state=profile",
+      "app": "reference.html?screen=profile&side=app&state=profile",
+      "fullPage": true
+    },
+    {
+      "name": "profile-editing",
+      "design": "../reference.html?screen=profile&side=refs&state=profile-editing",
+      "app": "reference.html?screen=profile&side=app&state=profile-editing",
+      "fullPage": true
+    },
+    {
+      "name": "profile-label-error",
+      "design": "../reference.html?screen=profile&side=refs&state=profile-label-error",
+      "app": "reference.html?screen=profile&side=app&state=profile-label-error",
+      "fullPage": true
+    },
+    {
+      "name": "profile-hi",
+      "design": "../reference.html?screen=profile&side=refs&state=profile-hi",
+      "app": "reference.html?screen=profile&side=app&state=profile-hi",
+      "fullPage": true
+    }
+  ]
+}

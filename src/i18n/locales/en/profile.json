@@ -1,0 +1,22 @@
+{
+  "na": "NA",
+  "stillSaving": "Still saving. Check your connection.",
+  "name": {
+    "field": "Your name",
+    "edit": "Edit name",
+    "save": "Save name",
+    "cancel": "Cancel editing the name",
+    "error": "Couldn't update your name. Try again."
+  },
+  "labels": {
+    "heading": "LABELS",
+    "create": "Create a new label",
+    "color": "Label colour",
+    "add": "Add label",
+    "required": "Enter a label name",
+    "tooLong": "Keep it under {max} characters",
+    "error": "Couldn't create the label. Try again.",
+    "loadError": "Couldn't load your data. Try again.",
+    "retry": "Retry"
+  }
+}
