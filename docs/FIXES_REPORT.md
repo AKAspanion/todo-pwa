@@ -176,14 +176,16 @@ These were ruled during the run; each differs from, or adds to, what the plan or
 
 Smaller follow-ups the tasks reported:
 
-- CI (`.github/workflows/ci.yml`) runs typecheck, lint, format check, unit and e2e tests, but not
-  `test:rules` or the functions' build, lint and tests.
+- ~~CI lacked `test:rules` and the functions' build, lint and tests.~~ Done: `ci.yml` now runs
+  them (the `checks` and `functions` jobs), plus `npm audit --omit=dev`; see
+  [SECURITY.md](SECURITY.md).
 - `e2e/support/visual.ts` calls the visual-compare script by an absolute path on the developer's
   machine, so the visual step runs only there.
 - `@firebase/rules-unit-testing` declares Node 24.12 or later, while the functions target Node 22.
 - `.prettierignore` still lists the deleted `functions/index.js` and `functions/.eslintrc.json`.
-- `npm audit` reported 47 vulnerabilities (5 high) in transitive dependencies, mostly under
-  `firebase-tools`.
+- `npm audit` now reports 7 in the root (0 high, 3 moderate, 4 low; all in dev-only tooling,
+  mostly under `firebase-tools`) and 0 in `functions/`, down from 47 (5 high). What was fixed and
+  what is left: [SECURITY.md](SECURITY.md).
 - The week and day calendar views open at 00:00 rather than scrolling to working hours.
 - Profile's load-failure alert (D12) has no e2e test: aborted requests fall back to the cache
   instead of failing.

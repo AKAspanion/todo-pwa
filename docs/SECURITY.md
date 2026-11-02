@@ -23,30 +23,42 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
    serves. It is not a secret and is not worth rewriting history for; restricting the key (1) is
    the fix. `.gitleaks.toml` allowlists exactly those commits and files, plus Firebase Storage
    download-token URLs of public images, so the secret scan still catches anything new.
-4. **Give the deploy service account only these roles** (README.md, "Deploy & CI setup"):
-   Firebase Hosting Admin, Cloud Functions Developer, Firebase Rules Admin, Cloud Datastore Index
-   Admin, and Service Account User. If the first functions deploy stops on a missing permission
-   for Cloud Scheduler (the scheduled reminder) or Service Usage, add Cloud Scheduler Admin or
-   Service Usage Consumer rather than a broad role such as Editor.
+4. **Give the deploy service account only the roles for what Actions deploys** (README.md,
+   "Deploy & CI setup"):
+   - Hosting only (every push to `master`): Firebase Hosting Admin and API Keys Viewer.
+   - Rules and indexes (`deploy_rules`): add Firebase Rules Admin and Cloud Datastore Index Admin.
+   - Functions (`deploy_functions`): add Cloud Functions Developer, Service Account User and Cloud
+     Scheduler Admin (the scheduled reminder).
+
+   If you never deploy rules or functions from Actions, leave those roles off. If a functions
+   deploy stops on a missing permission (Service Usage, Artifact Registry), add that one role,
+   such as Service Usage Consumer, rather than a broad role such as Editor.
 5. **Look after the deploy key.** The deploy workflow signs in with the service account's JSON
-   key, stored only as the `production` environment secret `FIREBASE_SERVICE_ACCOUNT`. It is a
-   long-lived credential: never commit it (`.gitignore` covers `*-firebase-adminsdk-*.json`,
-   `spanion-todo-*.json` and `service-account*.json`, and the gitleaks scan looks for private
-   keys), rotate it periodically (every 90 days or so, and at once if it may have leaked), and
-   delete old keys. Workload Identity Federation is the keyless alternative: GitHub Actions gets
-   short-lived tokens and there is no key to leak or rotate. README.md describes the switch.
-6. **The audit findings left** (below): wait for firebase-tools and workbox-build releases.
+   key, stored only as the repository secret `FIREBASE_SERVICE_ACCOUNT` (Settings > Secrets and
+   variables > Actions). Hosting gets it through `FirebaseExtended/action-hosting-deploy`; the
+   rules and functions steps write it to a temporary file on the runner, readable only by the
+   runner user, and remove it when the step ends. It is a long-lived credential: never commit it
+   (`.gitignore` covers `*-firebase-adminsdk-*.json`, `spanion-todo-*.json` and
+   `service-account*.json`, and the gitleaks scan looks for private keys), rotate it every 90 days
+   or so (and at once if it may have leaked), and delete old keys. Workload Identity Federation is
+   the keyless alternative.
+6. **Delete the legacy functions.** `testFunction` (public, returns other users' data) and
+   `testSchedule` stay live until removed: the first functions deploy from Actions deletes them
+   (`--force`), or delete them by hand at once (README.md, "Deploy & CI setup", step 3).
+7. **The audit findings left** (below): wait for firebase-tools and workbox-build releases.
 
 ## What was checked
 
 | Area | Result |
 |---|---|
 | Hard-coded credentials in tracked files | One: the reminder's notification icon was a Firebase Storage URL with an access token in `functions/src/reminders.ts`. It is now `<APP_URL>/img/icons/android-chrome-192x192.png`, with `APP_URL` a firebase-functions param (`functions/.env.example`). |
-| Other project ids, URLs and emails in code | None that belong in config. Left as they are, on purpose: the README screenshot (a public Storage URL with a download token), `.firebaserc` (the project id), the Android TWA project's host names (`packages/android`), the contact address in `PRIVACY.md`, the author link in the app menu, and `--project spanion-todo` in the deploy workflow. Test emails in `e2e/` and `src/**/*.test.ts` are fake (`example.com`, `example.info`, `user.info`). |
+| Other project ids, URLs and emails in code | None that belong in config. Left as they are, on purpose: the README screenshot (a public Storage URL with a download token), `.firebaserc` (the project id), the Android TWA project's host names (`packages/android`), the contact address in `PRIVACY.md`, the author link in the app menu, and `--project spanion-todo` in the README's manual deploy commands (the deploy workflow reads the project id from the `FIREBASE_PROJECT_ID` variable). Test emails in `e2e/` and `src/**/*.test.ts` are fake (`example.com`, `example.info`, `user.info`). |
 | Environment files | `.env.example` lists every `VITE_` variable the app reads; `.env.ci` holds only demo values (project `demo-todo`); `.env`, `.env.local`, `functions/.env` and `functions/.env.*` (except the example) are git-ignored. |
-| Secret scan | gitleaks 8.30.1 over the whole history: 6 findings before the allowlists, all reviewed (item 3 above), none after. Runs in CI on every pull request and push. |
+| Secret scan | gitleaks 8.30.1 over the whole history: 6 findings before the allowlists, all reviewed (item 3 above), none after. Runs in CI on every pull request and every push to `master`. |
 | Hosting headers | `firebase.json` sends a Content Security Policy, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy` on every path. The CSP allows no `unsafe-eval` and no inline script (the built `index.html` has none); inline styles are allowed for Vuetify. |
-| CI and deploy | Workflows run with a read-only token. Deploy runs only after CI passes on a push to `master`, on the exact commit CI tested, signed in with the deploy service account's key from an environment secret (WIF is the keyless alternative, item 5). |
+| CI and deploy | Workflows run with a read-only token (`contents: read`; the gitleaks job adds `pull-requests: read`). Every action is pinned to a full commit SHA, which Dependabot updates weekly, and checkouts don't persist the token. Deploy runs on a push to `master` and calls the CI workflow first: hosting deploys only if every CI job passes. Rules and functions deploy only from a manual run with their box ticked. A "Check deploy configuration" step names missing variables or the missing secret without printing values. |
+| Code scanning | CodeQL (`.github/workflows/codeql.yml`), `security-and-quality` queries over JavaScript/TypeScript and the workflows themselves, on pull requests, pushes to `master` and weekly. |
+| Shipped-dependency audit in CI | `npm audit --omit=dev --audit-level=moderate` in the `checks` job: the findings left (below) are all in dev-only packages, which `--omit=dev` leaves out, so a new moderate or worse advisory in a runtime dependency is what fails CI. |
 
 ## Dependency audit
 

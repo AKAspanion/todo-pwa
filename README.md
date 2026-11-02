@@ -112,19 +112,24 @@ Cloud Functions (`functions/`):
 | `npm --prefix functions run lint` | ESLint |
 | `npm --prefix functions run migrate -- --tz Asia/Kolkata [--dry-run]` | One-off migration of the old app's data (below) |
 
-CI (`.github/workflows/ci.yml`) runs on every pull request to `master` and every push to it, in
-three parallel jobs: `checks` (typecheck, lint, format check, build, unit tests, Firestore rules
-tests, and the functions' build, lint and tests), `e2e` (Playwright), and `secrets` (a gitleaks
-scan, configured in `.gitleaks.toml`). Dependabot (`.github/dependabot.yml`) opens weekly,
-grouped update PRs. Security notes and open items: [docs/SECURITY.md](docs/SECURITY.md).
+CI (`.github/workflows/ci.yml`) runs on every pull request, and on every push to `master` as the
+first job of the deploy workflow. It has four parallel jobs: `checks` (lint, typecheck, format
+check, unit tests, Firestore rules tests, the production build, and `npm audit` of the shipped
+dependencies), `functions` (the Cloud Functions' build, lint and tests), `e2e` (Playwright in
+Chromium and WebKit), and `secrets` (a gitleaks scan, configured in `.gitleaks.toml`). CodeQL
+(`.github/workflows/codeql.yml`) scans the code and the workflows on pull requests, pushes to
+`master` and weekly. Every action is pinned to a commit SHA; Dependabot
+(`.github/dependabot.yml`) opens weekly, grouped update PRs for npm packages and for those
+actions. Security notes and open items: [docs/SECURITY.md](docs/SECURITY.md).
 
 ## Deployment
 
 The live Firebase project is `spanion-todo` (`.firebaserc`). Scheduled functions need the
 **Blaze** (pay as you go) plan.
 
-Once set up (next section), every push to `master` that passes CI is deployed by
-`.github/workflows/deploy.yml`. To deploy by hand instead:
+Once set up (next section), `.github/workflows/deploy.yml` deploys hosting on every push to
+`master` that passes CI, and the rules and functions when run by hand. To deploy from your own
+machine instead:
 
 1. Put the live project's values in `.env.local`, with `VITE_USE_EMULATORS=false` and
    `VITE_FIREBASE_VAPID_KEY` set. Copy `functions/.env.example` to `functions/.env` (it sets
@@ -160,34 +165,70 @@ so the Android app opens without a URL bar.
 
 ## Deploy & CI setup
 
-`.github/workflows/deploy.yml` deploys hosting, the Firestore rules and indexes, and the functions
-after CI passes on a push to `master` (or when run by hand from the Actions tab, on `master`). It
-deploys exactly the commit CI tested, one deploy at a time. It signs in to Google Cloud as a
-deploy service account, whose JSON key is the `production` environment's secret
-`FIREBASE_SERVICE_ACCOUNT`. Set it up once:
+What runs, and when:
 
-### 1. The GitHub environment and its variables
+- **Every pull request** runs CI (`.github/workflows/ci.yml`) and CodeQL.
+- **Every push to `master`** runs the Deploy workflow (`.github/workflows/deploy.yml`): it runs the
+  same CI suite first and, only if that passes, builds the app with the live config and deploys
+  **hosting** (the `live` channel). One deploy at a time; a running deploy is never cancelled.
+- **The Firestore rules and indexes, and the Cloud Functions,** deploy only by hand: Actions >
+  Deploy > Run workflow, on `master`, with **deploy_rules** (rules + indexes) and/or
+  **deploy_functions** ticked. Both are off by default. A manual run deploys hosting too, last.
 
-Create the environment **`production`** (Settings > Environments). Add a required reviewer there
-if every deploy should wait for approval. Then add these **variables** to it (variables, not
-secrets: the Firebase web config is public and ships in every page):
+All settings are **repository-level**: Settings > Secrets and variables > Actions, not an
+environment. The deploy job runs in a GitHub environment called `production`, which GitHub
+creates on the first run; it only records the deployments and links the site. (Add a required
+reviewer there if every deploy should wait for approval. Don't add variables or secrets to it: they
+would override the repository-level ones.)
+
+### 1. Repository variables
+
+Variables, not secrets: the Firebase web config is public and ships in every page.
 
 | Variable | Value |
 |---|---|
+| `FIREBASE_PROJECT_ID` | `spanion-todo`: the project hosting, rules and functions deploy to |
+| `APP_URL` | `https://spanion-todo.web.app`: the site address, shown on the deployment and written to `functions/.env` for the functions |
 | `VITE_FIREBASE_API_KEY` | Firebase console > Project settings > Your apps > SDK config |
 | `VITE_FIREBASE_AUTH_DOMAIN` | as above (`spanion-todo.firebaseapp.com`) |
 | `VITE_FIREBASE_PROJECT_ID` | as above (`spanion-todo`) |
 | `VITE_FIREBASE_STORAGE_BUCKET` | as above |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | as above |
 | `VITE_FIREBASE_APP_ID` | as above |
-| `VITE_FIREBASE_VAPID_KEY` | Cloud Messaging > Web Push certificates > key pair |
-| `APP_URL` | `https://spanion-todo.web.app`: written to `functions/.env` for the functions |
+| `VITE_FIREBASE_VAPID_KEY` | Optional. Cloud Messaging > Web Push certificates > key pair. Without it the site deploys (with a warning) but push reminders don't work. |
 
-With the GitHub CLI, for example: `gh variable set APP_URL --env production --body https://spanion-todo.web.app`.
-Step 2 adds the one **secret**, `FIREBASE_SERVICE_ACCOUNT`. The workflow stops before building if
-any of these is missing.
+Set them all at once from a dotenv file kept outside the repository:
+
+```bash
+VARS_FILE="$(mktemp -d)/deploy-vars.env"
+cat > "$VARS_FILE" <<'VARS'
+FIREBASE_PROJECT_ID=spanion-todo
+APP_URL=https://spanion-todo.web.app
+VITE_FIREBASE_API_KEY=<from the console>
+VITE_FIREBASE_AUTH_DOMAIN=spanion-todo.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=spanion-todo
+VITE_FIREBASE_STORAGE_BUCKET=<from the console>
+VITE_FIREBASE_MESSAGING_SENDER_ID=<from the console>
+VITE_FIREBASE_APP_ID=<from the console>
+VITE_FIREBASE_VAPID_KEY=<from the console>
+VARS
+gh variable set --repo AKAspanion/todo-pwa -f "$VARS_FILE"
+```
+
+One at a time: `gh variable set APP_URL --repo AKAspanion/todo-pwa --body https://spanion-todo.web.app`.
+The workflow's "Check deploy configuration" step stops before building and names any variable
+that is missing, or the missing secret (it never prints a value).
 
 ### 2. The deploy service account and its key
+
+The one **secret**, `FIREBASE_SERVICE_ACCOUNT`, is the JSON key of a deploy service account. Give
+the account only the roles for what you deploy from Actions:
+
+| Deploys | Roles |
+|---|---|
+| Hosting (every push) | Firebase Hosting Admin (`roles/firebasehosting.admin`), API Keys Viewer (`roles/serviceusage.apiKeysViewer`) |
+| Rules and indexes (`deploy_rules`) | add Firebase Rules Admin (`roles/firebaserules.admin`), Cloud Datastore Index Admin (`roles/datastore.indexAdmin`) |
+| Functions (`deploy_functions`) | add Cloud Functions Developer (`roles/cloudfunctions.developer`), Service Account User (`roles/iam.serviceAccountUser`), Cloud Scheduler Admin (`roles/cloudscheduler.admin`, for the scheduled reminder) |
 
 Run once, as a project owner, with `gcloud` and the GitHub CLI (`gh`):
 
@@ -195,54 +236,66 @@ Run once, as a project owner, with `gcloud` and the GitHub CLI (`gh`):
 PROJECT_ID=spanion-todo
 SA="github-deploy@$PROJECT_ID.iam.gserviceaccount.com"
 
-# The deploy service account, with only the roles a deploy needs.
 gcloud iam service-accounts create github-deploy \
   --project "$PROJECT_ID" --display-name "GitHub Actions deploy"
-for role in roles/firebasehosting.admin roles/cloudfunctions.developer \
-  roles/firebaserules.admin roles/datastore.indexAdmin roles/iam.serviceAccountUser; do
+
+# Hosting only:
+roles=(roles/firebasehosting.admin roles/serviceusage.apiKeysViewer)
+# To deploy the rules and the functions from Actions as well:
+roles+=(roles/firebaserules.admin roles/datastore.indexAdmin
+  roles/cloudfunctions.developer roles/iam.serviceAccountUser roles/cloudscheduler.admin)
+
+for role in "${roles[@]}"; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" \
     --member "serviceAccount:$SA" --role "$role" --condition None
 done
 
-# Its JSON key, straight into the production environment's secret, then off this machine.
+# Its JSON key, straight into the repository secret, then off this machine.
 KEY_FILE="$(mktemp -d)/service-account.json"
 gcloud iam service-accounts keys create "$KEY_FILE" --iam-account "$SA" --project "$PROJECT_ID"
-gh secret set FIREBASE_SERVICE_ACCOUNT --env production --repo AKAspanion/todo-pwa < "$KEY_FILE"
+gh secret set FIREBASE_SERVICE_ACCOUNT --repo AKAspanion/todo-pwa < "$KEY_FILE"
 rm -P "$KEY_FILE"   # macOS; elsewhere: shred -u "$KEY_FILE"
 ```
 
-If the first functions deploy stops on a missing permission for Cloud Scheduler or Service Usage,
-grant `roles/cloudscheduler.admin` or `roles/serviceusage.serviceUsageConsumer` the same way
-(docs/SECURITY.md).
+With a key file you already have: `gh secret set FIREBASE_SERVICE_ACCOUNT --repo AKAspanion/todo-pwa < path/to/key.json`.
+
+If a functions deploy stops on a missing permission (Service Usage or Artifact Registry, for
+example), grant that one role, such as Service Usage Consumer
+(`roles/serviceusage.serviceUsageConsumer`), rather than a broad role such as Editor.
 
 The key is a long-lived credential:
 
 - **Never commit it.** `.gitignore` covers the usual key file names (`*-firebase-adminsdk-*.json`,
   `spanion-todo-*.json`, `service-account*.json`), and CI's gitleaks scan looks for private keys,
-  but keep key files out of the repository folder altogether.
+  but keep key files out of the repository folder altogether. The workflow writes it to a
+  temporary file only for the rules and functions steps, and removes it afterwards.
 - **Rotate it** every 90 days or so, and at once if it may have leaked: create a new key, update
   the secret as above, check that a deploy works, then delete the old key
   (`gcloud iam service-accounts keys list --iam-account "$SA"`, then
   `gcloud iam service-accounts keys delete <KEY_ID> --iam-account "$SA"`).
-- **The keyless alternative** is Workload Identity Federation: GitHub Actions gets short-lived
-  tokens for the service account, and no key exists to leak or rotate. To switch, create a
-  workload identity pool and an OIDC provider for `https://token.actions.githubusercontent.com`
-  restricted to `assertion.repository == 'AKAspanion/todo-pwa'`, give the principal
-  `repo:AKAspanion/todo-pwa:environment:production` the role `roles/iam.workloadIdentityUser` on
-  the service account, then pass `workload_identity_provider` and `service_account` to
-  `google-github-actions/auth` instead of `credentials_json`, add `id-token: write` to the
-  workflow's permissions, and delete the key and the secret.
 
-### 3. Before the first automatic deploy
+Workload Identity Federation is the keyless alternative (short-lived tokens, no key to leak).
 
-The workflow deploys with `--non-interactive`, so it can't answer the CLI's questions. Do these
-once, by hand:
+### 3. Once, before the first rules and functions deploy
 
-- Delete the two old functions, which the new code no longer has:
-  `npx firebase functions:delete testFunction testSchedule --project spanion-todo --force`.
-  (A non-interactive deploy stops rather than delete them.)
-- Set the container image cleanup policy the functions deploy asks about:
-  `npx firebase functions:artifacts:setpolicy --project spanion-todo`.
+1. **Move `spanion-todo` to the Blaze plan** (Firebase console > Usage and billing). Scheduled
+   functions need it.
+2. **Delete the legacy functions** `testFunction` (public, leaks data) and `testSchedule` (the old
+   hourly reminder). The first functions deploy from Actions deletes them (it runs with
+   `--force`), but `testFunction` is better gone at once:
+   `npx firebase functions:delete testFunction testSchedule --project spanion-todo --force`.
+3. **Deploy:** Actions > Deploy > Run workflow on `master`, with **deploy_rules** and
+   **deploy_functions** ticked. A run deploys the rules and indexes first, then the functions,
+   then hosting, so the new app never goes live ahead of the rules it needs.
+
+   The push that first brings this workflow to `master` deploys hosting only, against whatever
+   rules are live. To avoid that window, deploy the rules (and functions) from your machine first
+   (Deployment, step 3 above), or run this step straight after that push.
+4. **Run the data migration** once, after that deploy (Deployment, step 4 above), first with
+   `--dry-run`.
+
+If the functions deploy log warns that no container image cleanup policy is set, set one once:
+`npx firebase functions:artifacts:setpolicy --project spanion-todo`.
 
 ## Android (TWA)
 
