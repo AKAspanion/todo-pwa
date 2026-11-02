@@ -172,21 +172,70 @@ test.describe('production build', () => {
   });
 });
 
+/** The text of each job in a workflow, by its id (the jobs sit at two spaces under `jobs:`). */
+function workflowJobs(workflow: string): Record<string, string> {
+  const [, jobsText = ''] = workflow.split(/^jobs:\s*$/m);
+  const jobs: Record<string, string> = {};
+  for (const block of jobsText.split(/^(?=  [\w-]+:\s*$)/m)) {
+    const id = /^  ([\w-]+):/.exec(block)?.[1];
+    if (id) jobs[id] = block;
+  }
+  return jobs;
+}
+
+/** The workflow's `on:` block: everything up to the next top-level key. */
+function workflowTriggers(workflow: string): string {
+  return /^on:\s*\n((?:[ #].*\n|\s*\n)*)/m.exec(workflow)?.[1] ?? '';
+}
+
 test.describe('CI workflow', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'checks a file, not a browser');
 
-  test('runs every gate on pull requests to master, on Node 24 with Java 21 and the demo env', () => {
+  test('runs every gate on every pull request and, through deploy.yml, on every push to master, on Node 24 with Java 21 and the demo env', () => {
     const ci = readFileSync('.github/workflows/ci.yml', 'utf8');
+    const deploy = readFileSync('.github/workflows/deploy.yml', 'utf8');
     const nvmrc = readFileSync('.nvmrc', 'utf8').trim();
 
-    expect(ci).toMatch(/pull_request:\s*\n\s*branches:\s*\[\s*master\s*\]/);
+    // Pull requests to any base run it directly; deploy.yml calls it on each push to master.
+    const triggers = workflowTriggers(ci);
+    expect(triggers).toMatch(/^  pull_request:\s*$/m);
+    expect(triggers).not.toMatch(/^    branches:/m);
+    expect(triggers).toMatch(/^  workflow_call:\s*$/m);
+    expect(workflowTriggers(deploy)).toMatch(/^  push:\s*\n\s+branches:\s*\[\s*master\s*\]/m);
+    const callers = Object.values(workflowJobs(deploy)).filter((job) =>
+      /^    uses: \.\/\.github\/workflows\/ci\.yml\s*$/m.test(job),
+    );
+    expect(callers).toHaveLength(1);
+
+    const jobs = workflowJobs(ci);
+    expect(Object.keys(jobs).sort()).toEqual(['checks', 'e2e', 'functions', 'secrets']);
     expect(nvmrc).toBe('24');
-    expect(ci).toContain('node-version-file: .nvmrc');
-    expect(ci).toMatch(/java-version:\s*'21'/);
-    expect(ci).toContain('cat .env.ci >> "$GITHUB_ENV"');
-    for (const gate of ['typecheck', 'lint', 'format:check', 'test', 'e2e']) {
-      expect(ci, gate).toContain(`npm run ${gate}\n`);
+    for (const id of ['checks', 'functions', 'e2e']) {
+      const job = jobs[id] ?? '';
+      expect(job, id).toContain('node-version-file: .nvmrc');
+      expect(job, id).toMatch(/java-version:\s*'21'/);
+      expect(job, id).toContain(`grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"`);
     }
+
+    const gates: [job: string, command: string][] = [
+      ['checks', 'npm run lint'],
+      ['checks', 'npm run typecheck'],
+      ['checks', 'npm run format:check'],
+      ['checks', 'npm run test -- src'],
+      ['checks', 'npm run test:rules'],
+      ['checks', 'npm run build'],
+      ['checks', 'npm audit --omit=dev'],
+      ['functions', 'npm --prefix functions run build'],
+      ['functions', 'npm --prefix functions run lint'],
+      ['functions', 'npm --prefix functions run test'],
+      ['e2e', 'npm run e2e'],
+    ];
+    for (const [job, command] of gates) {
+      expect(jobs[job], `${job}: ${command}`).toMatch(
+        new RegExp(`run: ${command.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`),
+      );
+    }
+    expect(jobs.secrets).toMatch(/uses: gitleaks\/gitleaks-action@/);
   });
 });
 
