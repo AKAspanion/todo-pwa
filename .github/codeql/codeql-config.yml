@@ -1,0 +1,7 @@
+name: todo-pwa CodeQL config
+
+# End-to-end tests, their emulator helpers and the local screenshot viewer never ship:
+# they run on a developer's machine or in CI against the Firebase emulators.
+paths-ignore:
+  - e2e/**
+  - design/**

@@ -1,0 +1,23 @@
+# Build and test output
+dist/
+sourcemaps/
+coverage/
+playwright-report/
+test-results/
+design/**/compare/
+design/**/app/
+
+# Generated or third-party
+package-lock.json
+functions/package-lock.json
+functions/lib/
+packages/
+public/
+.firebase/
+
+# Kept as written: the planning documents and local tooling
+docs/
+.ga/
+.claude/
+src/assets/style.css
+*.md

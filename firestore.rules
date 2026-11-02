@@ -1,0 +1,125 @@
+rules_version = '2';
+
+// Owner-only access with field validation (spec S2, S4). Cloud Functions write through the Admin SDK,
+// which these rules do not govern. Anything not matched below is denied.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isUser(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // The keys a write must check: every key on create, only the changed ones on update, so a
+    // legacy document's untouched fields never block an edit.
+    function createdKeys() {
+      return request.resource.data.keys();
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // ---- tasks ------------------------------------------------------------------------------
+
+    function taskFields() {
+      return ['uid', 'title', 'description', 'status', 'indefinite', 'date', 'time', 'timeZone',
+              'remindAt', 'reminded', 'labelIds'];
+    }
+
+    // Fields only the old app wrote (`type`: label references, `id`: a copy of the doc id). An
+    // update may remove them while moving a task to the new shape, but never set them.
+    function legacyTaskFields() {
+      return ['type', 'id'];
+    }
+
+    // Each key in `keys` holds a valid value in `d`; a removed key fails unless it is legacy.
+    function validTaskFields(d, keys) {
+      return (!('title' in keys) || ('title' in d && d.title is string
+                                     && d.title.size() >= 1 && d.title.size() <= 200))
+        && (!('description' in keys) || ('description' in d && d.description is string
+                                          && d.description.size() <= 5000))
+        && (!('status' in keys) || ('status' in d && d.status in ['todo', 'done']))
+        && (!('indefinite' in keys) || ('indefinite' in d && d.indefinite is bool))
+        && (!('date' in keys) || ('date' in d && (d.date == null
+              || (d.date is string && d.date.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')))))
+        && (!('time' in keys) || ('time' in d && (d.time == null
+              || (d.time is string && d.time.matches('[0-9]{2}:[0-9]{2}')))))
+        && (!('timeZone' in keys) || ('timeZone' in d && d.timeZone is string
+                                       && d.timeZone.size() >= 1 && d.timeZone.size() <= 64))
+        && (!('remindAt' in keys) || ('remindAt' in d && (d.remindAt == null
+                                                          || d.remindAt is timestamp)))
+        && (!('reminded' in keys) || ('reminded' in d && d.reminded is bool))
+        && (!('labelIds' in keys) || ('labelIds' in d && d.labelIds is list
+                                       && d.labelIds.size() <= 100))
+        && (!('type' in keys) || !('type' in d))
+        && (!('id' in keys) || !('id' in d));
+    }
+
+    match /tasks/{taskId} {
+      allow read, delete: if isUser(resource.data.uid);
+
+      allow create: if isUser(request.resource.data.uid)
+        && createdKeys().hasAll(taskFields())
+        && createdKeys().hasOnly(taskFields())
+        && validTaskFields(request.resource.data, createdKeys());
+
+      allow update: if isUser(resource.data.uid)
+        && request.resource.data.uid == resource.data.uid
+        && changedKeys().hasOnly(taskFields().concat(legacyTaskFields()))
+        && validTaskFields(request.resource.data, changedKeys());
+    }
+
+    // ---- labels (the `types` collection; `label` is the name) ---------------------------------
+
+    function labelFields() {
+      return ['uid', 'label', 'color'];
+    }
+
+    function validLabelFields(d, keys) {
+      return (!('label' in keys) || ('label' in d && d.label is string
+                                     && d.label.size() <= 30 && d.label.trim().size() >= 1))
+        && (!('color' in keys) || ('color' in d && d.color is string
+                                   && d.color.size() >= 1 && d.color.size() <= 32));
+    }
+
+    match /types/{labelId} {
+      allow read, delete: if isUser(resource.data.uid);
+
+      allow create: if isUser(request.resource.data.uid)
+        && createdKeys().hasAll(labelFields())
+        && createdKeys().hasOnly(labelFields())
+        && validLabelFields(request.resource.data, createdKeys());
+
+      allow update: if isUser(resource.data.uid)
+        && request.resource.data.uid == resource.data.uid
+        && changedKeys().hasOnly(labelFields())
+        && validLabelFields(request.resource.data, changedKeys());
+    }
+
+    // ---- notifications: written by Cloud Functions only ----------------------------------------
+
+    match /notifications/{notificationId} {
+      allow read, delete: if isUser(resource.data.uid);
+    }
+
+    // ---- push devices: one document per FCM token, under its owner's own path (P3) -------------
+
+    match /users/{uid}/devices/{token} {
+      function deviceFields() {
+        return ['uid', 'token', 'userAgent', 'updatedAt'];
+      }
+
+      function validDevice(d) {
+        return d.keys().hasAll(deviceFields())
+          && d.keys().hasOnly(deviceFields())
+          && d.uid == uid
+          && d.token == token
+          && d.userAgent is string && d.userAgent.size() <= 1024
+          && d.updatedAt is timestamp;
+      }
+
+      allow read, delete: if isUser(uid);
+      allow create, update: if isUser(uid) && validDevice(request.resource.data);
+    }
+  }
+}

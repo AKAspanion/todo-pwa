@@ -1,0 +1,21 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_FIREBASE_API_KEY: string;
+  readonly VITE_FIREBASE_AUTH_DOMAIN: string;
+  /** Comma-separated Hosting domains that serve the auth handler themselves (src/lib/authDomain.ts). */
+  readonly VITE_FIREBASE_AUTH_DOMAINS?: string;
+  readonly VITE_FIREBASE_PROJECT_ID: string;
+  readonly VITE_FIREBASE_STORAGE_BUCKET: string;
+  readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string;
+  readonly VITE_FIREBASE_APP_ID: string;
+  readonly VITE_FIREBASE_VAPID_KEY: string;
+  readonly VITE_USE_EMULATORS: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
+/** The emulator hosts (`host:port`), read from firebase.json at build time by vite.config.ts. */
+declare const __FIREBASE_EMULATOR_HOSTS__: { auth: string; firestore: string };

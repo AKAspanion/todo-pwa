@@ -1,0 +1,72 @@
+{
+  "count": "no tasks | {n} task | {n} tasks",
+  "header": {
+    "relative": "{tasks} {day}",
+    "onDate": "{tasks} on {day}",
+    "all": "{tasks} to do"
+  },
+  "columns": {
+    "todo": "To do",
+    "done": "Done"
+  },
+  "empty": {
+    "todo": {
+      "title": "No task to do",
+      "caption": "Create a task and it will appear here"
+    },
+    "done": {
+      "title": "No task done",
+      "caption": "Complete a task, or drag one here, and it will appear here"
+    },
+    "create": "Create"
+  },
+  "loadingTasks": "Loading tasks",
+  "noDue": "No due date",
+  "search": {
+    "label": "Search tasks"
+  },
+  "filter": {
+    "label": "Filter by label"
+  },
+  "dateBar": {
+    "label": "Show tasks for a day",
+    "pickDate": "Pick a date"
+  },
+  "card": {
+    "check": "Mark as done",
+    "uncheck": "Mark as not done",
+    "edit": "Edit task",
+    "delete": "Delete task",
+    "confirmDelete": "Delete this task?",
+    "keep": "Keep task",
+    "confirm": "Delete",
+    "labels": "Labels",
+    "pending": "Saving…",
+    "when": "{day}, {time}"
+  },
+  "form": {
+    "label": "Edit task",
+    "title": "Title",
+    "description": "Description",
+    "labels": "Labels",
+    "noLabels": "No labels yet. Create one on your profile.",
+    "indefinite": "No due date",
+    "date": "Date",
+    "time": "Time",
+    "save": "Save",
+    "cancel": "Cancel",
+    "titleRequired": "Enter the task's title",
+    "dateRequired": "Pick a date"
+  },
+  "errors": {
+    "load": "Couldn't load your data. Try again.",
+    "save": "Couldn't save. Try again.",
+    "slowSave": "Still saving. Check your connection.",
+    "delete": "Couldn't delete the task. Try again.",
+    "retry": "Retry"
+  },
+  "toast": {
+    "saved": "Task updated",
+    "deleted": "Task deleted"
+  }
+}

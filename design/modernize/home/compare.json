@@ -1,0 +1,43 @@
+{
+  "appBase": "http://visual.test/design/modernize/",
+  "clock": "2026-11-02T09:00:00Z",
+  "setup": "../../../e2e/support/visual-setup.mjs",
+  "pairs": [
+    {
+      "name": "home-empty",
+      "design": "../reference.html?screen=home&side=refs&state=home-empty",
+      "app": "reference.html?screen=home&side=app&state=home-empty",
+      "fullPage": true
+    },
+    {
+      "name": "home-loading",
+      "design": "../reference.html?screen=home&side=refs&state=home-loading",
+      "app": "reference.html?screen=home&side=app&state=home-loading",
+      "fullPage": true
+    },
+    {
+      "name": "home-tasks",
+      "design": "../reference.html?screen=home&side=refs&state=home-tasks",
+      "app": "reference.html?screen=home&side=app&state=home-tasks",
+      "fullPage": true
+    },
+    {
+      "name": "home-editing",
+      "design": "../reference.html?screen=home&side=refs&state=home-editing",
+      "app": "reference.html?screen=home&side=app&state=home-editing",
+      "fullPage": true
+    },
+    {
+      "name": "home-load-error",
+      "design": "../reference.html?screen=home&side=refs&state=home-load-error",
+      "app": "reference.html?screen=home&side=app&state=home-load-error",
+      "fullPage": true
+    },
+    {
+      "name": "home-hi",
+      "design": "../reference.html?screen=home&side=refs&state=home-hi",
+      "app": "reference.html?screen=home&side=app&state=home-hi",
+      "fullPage": true
+    }
+  ]
+}

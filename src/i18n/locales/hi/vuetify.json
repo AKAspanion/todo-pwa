@@ -1,0 +1,213 @@
+{
+  "badge": "बैज",
+  "open": "खोलें",
+  "close": "बंद करें",
+  "dismiss": "हटाएँ",
+  "confirmEdit": {
+    "ok": "ठीक है",
+    "cancel": "रद्द करें"
+  },
+  "dataIterator": {
+    "noResultsText": "कोई मिलता-जुलता रिकॉर्ड नहीं मिला",
+    "loadingText": "आइटम लोड हो रहे हैं..."
+  },
+  "dataTable": {
+    "itemsPerPageText": "प्रति पेज पंक्तियाँ:",
+    "ariaLabel": {
+      "sortDescending": "घटते क्रम में छाँटा गया।",
+      "sortAscending": "बढ़ते क्रम में छाँटा गया।",
+      "sortNone": "छाँटा नहीं गया।",
+      "activateNone": "छँटाई हटाने के लिए चुनें।",
+      "activateDescending": "घटते क्रम में छाँटने के लिए चुनें।",
+      "activateAscending": "बढ़ते क्रम में छाँटने के लिए चुनें।",
+      "selectRow": "पंक्ति चुनें",
+      "selectAll": "सभी चुनें",
+      "selectGroup": "समूह चुनें"
+    },
+    "sortBy": "इसके अनुसार छाँटें"
+  },
+  "dataFooter": {
+    "itemsPerPageText": "प्रति पेज आइटम:",
+    "itemsPerPageAll": "सभी",
+    "nextPage": "अगला पेज",
+    "prevPage": "पिछला पेज",
+    "firstPage": "पहला पेज",
+    "lastPage": "आख़िरी पेज",
+    "pageText": "{2} में से {0}-{1}"
+  },
+  "dateRangeInput": {
+    "divider": "से"
+  },
+  "monthPicker": {
+    "title": "महीना चुनें",
+    "itemsSelected": "{0} चुने गए",
+    "header": "महीना दर्ज करें",
+    "range": {
+      "title": "महीने दर्ज करें"
+    },
+    "ariaLabel": {
+      "previousYear": "पिछला वर्ष",
+      "nextYear": "अगला वर्ष",
+      "selectYear": "वर्ष चुनें",
+      "currentMonth": "मौजूदा महीना, {0}"
+    }
+  },
+  "datePicker": {
+    "itemsSelected": "{0} चुने गए",
+    "range": {
+      "title": "तारीखें चुनें",
+      "header": "तारीखें दर्ज करें"
+    },
+    "title": "तारीख चुनें",
+    "header": "तारीख दर्ज करें",
+    "input": {
+      "placeholder": "तारीख दर्ज करें"
+    },
+    "ariaLabel": {
+      "previousMonth": "पिछला महीना",
+      "nextMonth": "अगला महीना",
+      "selectYear": "वर्ष चुनें",
+      "previousYear": "पिछला वर्ष",
+      "nextYear": "अगला वर्ष",
+      "selectMonth": "महीना चुनें",
+      "selectDate": "{0}",
+      "currentDate": "आज, {0}"
+    }
+  },
+  "noDataText": "कोई डेटा उपलब्ध नहीं है",
+  "carousel": {
+    "prev": "पिछला दृश्य",
+    "next": "अगला दृश्य",
+    "ariaLabel": {
+      "delimiter": "{1} में से स्लाइड {0}"
+    }
+  },
+  "calendar": {
+    "moreEvents": "{0} और",
+    "today": "आज"
+  },
+  "heatmap": {
+    "less": "कम",
+    "more": "ज़्यादा"
+  },
+  "input": {
+    "clear": "{0} साफ़ करें",
+    "prependAction": "{0} से पहले की क्रिया",
+    "appendAction": "{0} के बाद की क्रिया",
+    "otp": "सत्यापन कोड दर्ज करें"
+  },
+  "fileInput": {
+    "counter": "{0} फ़ाइलें",
+    "counterSize": "{0} फ़ाइलें (कुल {1})"
+  },
+  "fileUpload": {
+    "title": "फ़ाइलें यहाँ खींचकर छोड़ें",
+    "divider": "या",
+    "browse": "फ़ाइलें चुनें"
+  },
+  "timePicker": {
+    "am": "पूर्वाह्न",
+    "pm": "अपराह्न",
+    "title": "समय चुनें",
+    "hour": "घंटा",
+    "minute": "मिनट",
+    "second": "सेकंड",
+    "notAllowed": "यह मान स्वीकार्य नहीं है"
+  },
+  "pagination": {
+    "ariaLabel": {
+      "root": "पेज नेविगेशन",
+      "next": "अगला पेज",
+      "previous": "पिछला पेज",
+      "page": "पेज {0} पर जाएँ",
+      "currentPage": "पेज {0}, मौजूदा पेज",
+      "first": "पहला पेज",
+      "last": "आख़िरी पेज"
+    }
+  },
+  "stepper": {
+    "next": "अगला",
+    "prev": "पिछला"
+  },
+  "rating": {
+    "ariaLabel": {
+      "item": "{1} में से {0} रेटिंग"
+    }
+  },
+  "rangeSlider": {
+    "ariaLabel": {
+      "start": "न्यूनतम",
+      "end": "अधिकतम"
+    }
+  },
+  "splitBtn": {
+    "menu": "और विकल्प"
+  },
+  "loading": "लोड हो रहा है...",
+  "infiniteScroll": {
+    "loadMore": "और लोड करें",
+    "empty": "और कुछ नहीं"
+  },
+  "rules": {
+    "required": "यह फ़ील्ड ज़रूरी है",
+    "email": "कृपया मान्य ईमेल दर्ज करें",
+    "number": "इस फ़ील्ड में केवल संख्याएँ हो सकती हैं",
+    "integer": "इस फ़ील्ड में केवल पूर्णांक हो सकते हैं",
+    "capital": "इस फ़ील्ड में केवल बड़े अक्षर हो सकते हैं",
+    "maxLength": "आप अधिकतम {0} अक्षर दर्ज कर सकते हैं",
+    "minLength": "आपको कम से कम {0} अक्षर दर्ज करने होंगे",
+    "strictLength": "दर्ज किए गए मान की लंबाई मान्य नहीं है",
+    "exclude": "{0} अक्षर की अनुमति नहीं है",
+    "notEmpty": "कृपया कम से कम एक मान चुनें",
+    "pattern": "प्रारूप मान्य नहीं है"
+  },
+  "command": {
+    "search": "कोई कमांड लिखें या खोजें..."
+  },
+  "hotkey": {
+    "then": "फिर",
+    "ctrl": "Ctrl",
+    "command": "Command",
+    "space": "Space",
+    "shift": "Shift",
+    "alt": "Alt",
+    "enter": "Enter",
+    "escape": "Escape",
+    "upArrow": "ऊपर तीर",
+    "downArrow": "नीचे तीर",
+    "leftArrow": "बायाँ तीर",
+    "rightArrow": "दायाँ तीर",
+    "backspace": "Backspace",
+    "option": "Option",
+    "plus": "प्लस",
+    "shortcut": "कीबोर्ड शॉर्टकट: {0}",
+    "or": "या"
+  },
+  "media": {
+    "play": "चलाएँ",
+    "pause": "रोकें",
+    "seek": "आगे-पीछे करें",
+    "volume": "आवाज़",
+    "mute": "म्यूट करें",
+    "unmute": "अनम्यूट करें",
+    "enterFullscreen": "फ़ुल स्क्रीन",
+    "exitFullscreen": "फ़ुल स्क्रीन से बाहर निकलें"
+  },
+  "colorPicker": {
+    "ariaLabel": {
+      "eyedropper": "आईड्रॉपर से रंग चुनें",
+      "hueSlider": "ह्यू",
+      "alphaSlider": "पारदर्शिता",
+      "redInput": "लाल मान",
+      "greenInput": "हरा मान",
+      "blueInput": "नीला मान",
+      "alphaInput": "पारदर्शिता मान",
+      "hueInput": "ह्यू मान",
+      "saturationInput": "संतृप्ति मान",
+      "lightnessInput": "चमक मान",
+      "hexInput": "HEX मान",
+      "hexaInput": "पारदर्शिता सहित HEX मान",
+      "changeFormat": "रंग का प्रारूप बदलें"
+    }
+  }
+}

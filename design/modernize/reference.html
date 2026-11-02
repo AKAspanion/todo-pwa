@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visual reference</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #fff;
+      }
+      img {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Shows one capture of a screen state at the window's width, for e2e/support/visual.ts:
+      reference.html?screen=<screen>&side=refs|app&state=<state> loads <screen>/<side>/<state>-<width>.png.
+    -->
+    <img id="capture" alt="" />
+    <script>
+      const query = new URLSearchParams(location.search);
+      const name = /^[A-Za-z0-9][\w.-]*$/;
+      const screen = query.get('screen') ?? '';
+      const side = query.get('side') ?? '';
+      const state = query.get('state') ?? '';
+      if (name.test(screen) && name.test(state) && (side === 'refs' || side === 'app')) {
+        document.getElementById('capture').src = `${screen}/${side}/${state}-${innerWidth}.png`;
+      } else {
+        document.body.textContent = 'Expected ?screen=<name>&side=refs|app&state=<name>';
+      }
+    </script>
+  </body>
+</html>

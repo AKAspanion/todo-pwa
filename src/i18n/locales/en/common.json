@@ -1,0 +1,23 @@
+{
+  "appName": "Task Manager",
+  "close": "Close",
+  "loading": "Loading…",
+  "comingSoon": "This screen is being rebuilt.",
+  "nav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "calendar": "Calendar",
+    "add": "Add task",
+    "notification": "Notifications",
+    "profile": "Profile"
+  },
+  "screens": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "home": "Tasks",
+    "add": "Add task",
+    "calendar": "Calendar",
+    "notification": "Notifications",
+    "profile": "Profile"
+  }
+}

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1976D2" />
+    <meta
+      name="description"
+      content="Plan your tasks, label them and get reminded before they are due."
+    />
+    <link rel="canonical" href="https://todo.spanion.in/" />
+    <meta property="og:url" content="https://todo.spanion.in/" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon-180x180.png" />
+    <title>Task Manager</title>
+    <style>
+      #loading {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
+      }
+      #loading > div {
+        width: 64px;
+        height: 64px;
+        border: 2px solid #e3e3e3;
+        border-top-color: #1976d2;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      #app:not(:empty) + #loading {
+        display: none;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>Task Manager needs JavaScript. Please enable it to continue.</noscript>
+    <div id="app"></div>
+    <div id="loading" aria-hidden="true"><div></div></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

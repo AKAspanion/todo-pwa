@@ -1,0 +1,37 @@
+{
+  "appBase": "http://visual.test/design/modernize/",
+  "clock": "2026-11-02T09:00:00Z",
+  "setup": "../../../e2e/support/visual-setup.mjs",
+  "pairs": [
+    {
+      "name": "calendar-month",
+      "design": "../reference.html?screen=calendar&side=refs&state=calendar-month",
+      "app": "reference.html?screen=calendar&side=app&state=calendar-month",
+      "fullPage": true
+    },
+    {
+      "name": "calendar-week",
+      "design": "../reference.html?screen=calendar&side=refs&state=calendar-week",
+      "app": "reference.html?screen=calendar&side=app&state=calendar-week",
+      "fullPage": true
+    },
+    {
+      "name": "calendar-day",
+      "design": "../reference.html?screen=calendar&side=refs&state=calendar-day",
+      "app": "reference.html?screen=calendar&side=app&state=calendar-day",
+      "fullPage": true
+    },
+    {
+      "name": "calendar-details",
+      "design": "../reference.html?screen=calendar&side=refs&state=calendar-details",
+      "app": "reference.html?screen=calendar&side=app&state=calendar-details",
+      "fullPage": true
+    },
+    {
+      "name": "calendar-hi",
+      "design": "../reference.html?screen=calendar&side=refs&state=calendar-hi",
+      "app": "reference.html?screen=calendar&side=app&state=calendar-hi",
+      "fullPage": true
+    }
+  ]
+}

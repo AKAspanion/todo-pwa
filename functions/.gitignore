@@ -1,1 +1,3 @@
 node_modules/
+# TypeScript build output (`npm run build`), deployed from here but never committed.
+lib/

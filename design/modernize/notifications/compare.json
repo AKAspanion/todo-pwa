@@ -1,0 +1,31 @@
+{
+  "appBase": "http://visual.test/design/modernize/",
+  "clock": "2026-11-02T09:00:00Z",
+  "setup": "../../../e2e/support/visual-setup.mjs",
+  "pairs": [
+    {
+      "name": "notifications-empty",
+      "design": "../reference.html?screen=notifications&side=refs&state=notifications-empty",
+      "app": "reference.html?screen=notifications&side=app&state=notifications-empty",
+      "fullPage": true
+    },
+    {
+      "name": "notifications-list",
+      "design": "../reference.html?screen=notifications&side=refs&state=notifications-list",
+      "app": "reference.html?screen=notifications&side=app&state=notifications-list",
+      "fullPage": true
+    },
+    {
+      "name": "notifications-unsupported",
+      "design": "../reference.html?screen=notifications&side=refs&state=notifications-unsupported",
+      "app": "reference.html?screen=notifications&side=app&state=notifications-unsupported",
+      "fullPage": true
+    },
+    {
+      "name": "notifications-hi",
+      "design": "../reference.html?screen=notifications&side=refs&state=notifications-hi",
+      "app": "reference.html?screen=notifications&side=app&state=notifications-hi",
+      "fullPage": true
+    }
+  ]
+}

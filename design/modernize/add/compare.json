@@ -1,0 +1,31 @@
+{
+  "appBase": "http://visual.test/design/modernize/",
+  "clock": "2026-11-02T09:00:00Z",
+  "setup": "../../../e2e/support/visual-setup.mjs",
+  "pairs": [
+    {
+      "name": "add-empty",
+      "design": "../reference.html?screen=add&side=refs&state=add-empty",
+      "app": "reference.html?screen=add&side=app&state=add-empty",
+      "fullPage": true
+    },
+    {
+      "name": "add-filled",
+      "design": "../reference.html?screen=add&side=refs&state=add-filled",
+      "app": "reference.html?screen=add&side=app&state=add-filled",
+      "fullPage": true
+    },
+    {
+      "name": "add-error",
+      "design": "../reference.html?screen=add&side=refs&state=add-error",
+      "app": "reference.html?screen=add&side=app&state=add-error",
+      "fullPage": true
+    },
+    {
+      "name": "add-hi",
+      "design": "../reference.html?screen=add&side=refs&state=add-hi",
+      "app": "reference.html?screen=add&side=app&state=add-hi",
+      "fullPage": true
+    }
+  ]
+}

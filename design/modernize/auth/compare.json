@@ -1,0 +1,55 @@
+{
+  "appBase": "http://visual.test/design/modernize/",
+  "clock": "2026-11-02T09:00:00Z",
+  "setup": "../../../e2e/support/visual-setup.mjs",
+  "pairs": [
+    {
+      "name": "signin-en",
+      "design": "../reference.html?screen=auth&side=refs&state=signin-en",
+      "app": "reference.html?screen=auth&side=app&state=signin-en",
+      "fullPage": true
+    },
+    {
+      "name": "signin-email-open-en",
+      "design": "../reference.html?screen=auth&side=refs&state=signin-email-open-en",
+      "app": "reference.html?screen=auth&side=app&state=signin-email-open-en",
+      "fullPage": true
+    },
+    {
+      "name": "signin-error-en",
+      "design": "../reference.html?screen=auth&side=refs&state=signin-error-en",
+      "app": "reference.html?screen=auth&side=app&state=signin-error-en",
+      "fullPage": true
+    },
+    {
+      "name": "signup-en",
+      "design": "../reference.html?screen=auth&side=refs&state=signup-en",
+      "app": "reference.html?screen=auth&side=app&state=signup-en",
+      "fullPage": true
+    },
+    {
+      "name": "signin-hi",
+      "design": "../reference.html?screen=auth&side=refs&state=signin-hi",
+      "app": "reference.html?screen=auth&side=app&state=signin-hi",
+      "fullPage": true
+    },
+    {
+      "name": "signin-email-open-hi",
+      "design": "../reference.html?screen=auth&side=refs&state=signin-email-open-hi",
+      "app": "reference.html?screen=auth&side=app&state=signin-email-open-hi",
+      "fullPage": true
+    },
+    {
+      "name": "signin-error-hi",
+      "design": "../reference.html?screen=auth&side=refs&state=signin-error-hi",
+      "app": "reference.html?screen=auth&side=app&state=signin-error-hi",
+      "fullPage": true
+    },
+    {
+      "name": "signup-hi",
+      "design": "../reference.html?screen=auth&side=refs&state=signup-hi",
+      "app": "reference.html?screen=auth&side=app&state=signup-hi",
+      "fullPage": true
+    }
+  ]
+}
