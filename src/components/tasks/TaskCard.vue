@@ -31,7 +31,8 @@ import { useI18n } from 'vue-i18n';
 import MarkdownView from '@/components/MarkdownView.vue';
 import { formatTime12, parseLocalDate, relativeDayLabel, type DateLocale } from '@/lib/dates';
 import type { Label, Task, TaskInput } from '@/types/models';
-import LabelChips, { resolveLabels, safeColor } from './LabelChips.vue';
+import LabelChips from './LabelChips.vue';
+import { resolveLabels, safeColor } from './labels';
 import TaskEditForm from './TaskEditForm.vue';
 
 const props = defineProps<{ task: Task; labels: Label[] }>();

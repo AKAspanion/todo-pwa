@@ -33,7 +33,7 @@ jobs:
           java-version: '21'
       # Demo Firebase settings: every test runs against the emulators (project demo-todo).
       - name: Use the demo environment
-        run: cat .env.ci >> "$GITHUB_ENV"
+        run: grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"
       - run: npm ci
       - name: Cache the Firebase emulators
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -74,7 +74,7 @@ jobs:
           distribution: temurin
           java-version: '21'
       - name: Use the demo environment
-        run: cat .env.ci >> "$GITHUB_ENV"
+        run: grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"
       # The root install provides firebase-tools, which the functions' tests start the emulator with.
       - run: npm ci
       - run: npm --prefix functions ci
@@ -105,7 +105,7 @@ jobs:
           distribution: temurin
           java-version: '21'
       - name: Use the demo environment
-        run: cat .env.ci >> "$GITHUB_ENV"
+        run: grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"
       - run: npm ci
       - name: Cache the Firebase emulators
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

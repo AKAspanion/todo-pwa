@@ -9,7 +9,20 @@ import { unregisterLegacyWorkers } from './legacyWorkers';
 
 const ORIGIN = 'https://todo.spanion.in';
 
-function fakeRegistration(scope: string, script: string | null) {
+interface FakeWorker {
+  scriptURL: string;
+}
+
+/** The parts of a ServiceWorkerRegistration that unregisterLegacyWorkers reads. */
+interface FakeRegistration {
+  scope: string;
+  active: FakeWorker | null;
+  waiting: FakeWorker | null;
+  installing: FakeWorker | null;
+  unregister: ReturnType<typeof vi.fn<() => Promise<boolean>>>;
+}
+
+function fakeRegistration(scope: string, script: string | null): FakeRegistration {
   const worker = script === null ? null : { scriptURL: `${ORIGIN}${script}` };
   return {
     scope: `${ORIGIN}${scope}`,
@@ -20,7 +33,7 @@ function fakeRegistration(scope: string, script: string | null) {
   };
 }
 
-function stubRegistrations(registrations: ReturnType<typeof fakeRegistration>[]) {
+function stubRegistrations(registrations: FakeRegistration[]) {
   vi.stubGlobal('navigator', {
     serviceWorker: { getRegistrations: vi.fn(async () => registrations) },
   });
@@ -33,7 +46,10 @@ afterEach(() => {
 describe('unregisterLegacyWorkers', () => {
   it('unregisters the old Workbox worker, the old FCM worker and anything at the FCM scope', async () => {
     const workbox = fakeRegistration('/', '/service-worker.js');
-    const fcm = fakeRegistration('/firebase-cloud-messaging-push-scope', '/firebase-messaging-sw.js');
+    const fcm = fakeRegistration(
+      '/firebase-cloud-messaging-push-scope',
+      '/firebase-messaging-sw.js',
+    );
     const atFcmScope = fakeRegistration('/firebase-cloud-messaging-push-scope', null);
     const fcmAtRoot = fakeRegistration('/', '/firebase-messaging-sw.js');
     stubRegistrations([workbox, fcm, atFcmScope, fcmAtRoot]);
@@ -46,13 +62,16 @@ describe('unregisterLegacyWorkers', () => {
     expect(fcmAtRoot.unregister).toHaveBeenCalledTimes(1);
   });
 
-  it("finds a legacy script on a waiting or installing worker", async () => {
-    const waiting = { ...fakeRegistration('/', null), waiting: { scriptURL: `${ORIGIN}/service-worker.js` } };
+  it('finds a legacy script on a waiting or installing worker', async () => {
+    const waiting = {
+      ...fakeRegistration('/', null),
+      waiting: { scriptURL: `${ORIGIN}/service-worker.js` },
+    };
     const installing = {
       ...fakeRegistration('/', null),
       installing: { scriptURL: `${ORIGIN}/firebase-messaging-sw.js` },
     };
-    stubRegistrations([waiting, installing] as ReturnType<typeof fakeRegistration>[]);
+    stubRegistrations([waiting, installing]);
 
     await unregisterLegacyWorkers();
 
@@ -80,7 +99,10 @@ describe('unregisterLegacyWorkers', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const failing = fakeRegistration('/', '/service-worker.js');
     failing.unregister.mockRejectedValueOnce(new Error('boom'));
-    const fcm = fakeRegistration('/firebase-cloud-messaging-push-scope', '/firebase-messaging-sw.js');
+    const fcm = fakeRegistration(
+      '/firebase-cloud-messaging-push-scope',
+      '/firebase-messaging-sw.js',
+    );
     stubRegistrations([failing, fcm]);
 
     await expect(unregisterLegacyWorkers()).resolves.toBeUndefined();

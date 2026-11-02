@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n';
 import { vFocusOnMount } from '@/directives/focusOnMount';
 import { todayYmd } from '@/lib/dates';
 import type { Label, Task, TaskInput } from '@/types/models';
-import { safeColor } from './LabelChips.vue';
+import { safeColor } from './labels';
 
 const props = defineProps<{ task: Task; labels: Label[]; saving: boolean; error: string | null }>();
 const emit = defineEmits<{ submit: [patch: Partial<TaskInput>]; cancel: [] }>();

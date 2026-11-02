@@ -40,6 +40,7 @@ registerRoute(
 
 // A new version waits until the user accepts the "new version available" prompt.
 self.addEventListener('message', (event) => {
+  if (event.origin && event.origin !== self.location.origin) return;
   if ((event.data as { type?: string } | null)?.type === 'SKIP_WAITING') void self.skipWaiting();
 });
 

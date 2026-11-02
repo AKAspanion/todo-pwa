@@ -25,14 +25,24 @@ describe('renderMarkdown (S3)', () => {
     expect(html).toContain('<strong>b</strong>');
   });
 
-  it('never links a javascript: URL', () => {
-    const html = renderMarkdown('[x](javascript:alert(1))');
+  it.each([
+    '[x](javascript:alert(1))',
+    '[x](JavaScript:alert(1))',
+    '[x](vbscript:msgbox(1))',
+    '[x](data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==)',
+  ])('never links a script-capable URL: %s', (source) => {
+    const html = renderMarkdown(source);
 
-    expect(html).not.toMatch(/href\s*=\s*["']?\s*javascript:/i);
-    const hrefs = [...asDom(html).querySelectorAll('a')].map((a) => a.getAttribute('href'));
-    expect(hrefs.filter((href) => href?.trim().toLowerCase().startsWith('javascript:'))).toEqual(
-      [],
-    );
+    // Browsers ignore case, surrounding spaces and embedded tabs/newlines in a scheme.
+    const schemeOf = (href: string) =>
+      href
+        .replace(/[\s\u0000-\u001f]/g, '')
+        .toLowerCase()
+        .split(':')[0];
+    const hrefs = [...asDom(html).querySelectorAll('a')].map((a) => a.getAttribute('href') ?? '');
+    expect(
+      hrefs.filter((href) => ['javascript', 'vbscript', 'data'].includes(schemeOf(href))),
+    ).toEqual([]);
   });
 
   it('opens links in a new tab with rel="noopener noreferrer"', () => {
