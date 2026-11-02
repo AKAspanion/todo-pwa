@@ -1,6 +1,6 @@
 /**
- * Sign-in, sign-up and the signed-in user. Email and password, and Google. Facebook sign-in was
- * removed (§11.1). Errors reach the caller as Firebase errors, whose `code` the screens translate.
+ * Sign-in, sign-up and the signed-in user. Email and password, and Google: the only providers
+ * (§11.1). Errors reach the caller as Firebase errors, whose `code` the screens translate.
  */
 import {
   GoogleAuthProvider,

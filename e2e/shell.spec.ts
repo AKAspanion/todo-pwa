@@ -13,31 +13,37 @@ import {
   readDoc,
   resetEmulators,
   seedDoc,
+  signInAs,
 } from './support/emulator';
 
 const MAX_PRECACHE_BYTES = 2 * 1024 * 1024;
 
 /**
- * Where a signed-out visit to a redirecting path ends up: /home itself, or, once the auth guard
- * is built (Task 4), the sign-in screen with /home as the place to return to.
+ * Where a signed-out visit to a redirecting path ends up: the auth guard (Task 4) sends it to the
+ * sign-in screen, with /home as the place to return to.
  */
 async function expectRedirectToHome(page: Page): Promise<void> {
   await expect(page).toHaveURL(
-    (url) =>
-      url.pathname === '/home' ||
-      (url.pathname === '/signin' && url.searchParams.get('redirect') === '/home'),
+    (url) => url.pathname === '/signin' && url.searchParams.get('redirect') === '/home',
   );
 }
 
+/** Signs in as a fresh user, so the guarded app screens open. */
+async function signInFreshUser(page: Page): Promise<void> {
+  await resetEmulators();
+  const user = await createUser('shell@example.info', 'abc-def_9', 'Shell');
+  await signInAs(page, user.email, user.password);
+}
+
 test.describe('app shell routes', () => {
-  test('a signed-out visit to / ends on /home', async ({ page }) => {
+  test('a signed-out visit to / goes to sign in, returning to /home', async ({ page }) => {
     await page.goto('/');
 
     await expectRedirectToHome(page);
   });
 
   for (const path of ['/index', '/nope', '/a/b/c']) {
-    test(`a visit to ${path} ends on /home`, async ({ page }) => {
+    test(`a signed-out visit to ${path} goes to sign in, returning to /home`, async ({ page }) => {
       await page.goto(path);
 
       await expectRedirectToHome(page);
@@ -45,7 +51,8 @@ test.describe('app shell routes', () => {
   }
 
   test('the bottom nav marks the Home tab active on /home', async ({ page }) => {
-    // Task 4's guard sends signed-out visitors to /signin: sign in first (signInAs) from then on.
+    // The guard sends signed-out visitors to /signin: sign in first.
+    await signInFreshUser(page);
     await page.goto('/home');
 
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
@@ -58,6 +65,7 @@ test.describe('app shell routes', () => {
   });
 
   test('a redirect from / lands with the Home tab active', async ({ page }) => {
+    await signInFreshUser(page);
     await page.goto('/');
 
     await expect(page).toHaveURL(/\/home$/);
@@ -75,6 +83,7 @@ test.describe('app shell routes', () => {
 
   test('the saved language is used on load', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('lang', 'hi'));
+    await signInFreshUser(page);
 
     await page.goto('/home');
 
