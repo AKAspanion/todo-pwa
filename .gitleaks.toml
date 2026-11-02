@@ -1,0 +1,33 @@
+# Secret scan settings for gitleaks (CI: .github/workflows/ci.yml). Every default rule stays on;
+# the allowlists below only cover known, reviewed findings in old history. See docs/SECURITY.md.
+title = "todo-pwa"
+
+[extend]
+useDefault = true
+
+# The Firebase web config (apiKey and friends) committed in 2019. A Firebase web API key is a
+# public identifier that ships in every page of the app, not a secret; it is restricted in Google
+# Cloud instead. Allowlisted only in these commits and these files, so a new key anywhere is still
+# reported.
+[[allowlists]]
+description = "Public Firebase web config committed in 2019"
+condition = "AND"
+commits = [
+  "327d48b0ddac1fabfb43c5644cbc4a78d7c83683", # push notification initialized: .env
+  "7c0b8ed1e3ba0bd4fac9080aeb2f2a2536651500", # authentication setup complete: src/firebase/index.ts
+  "b0407b9fade8bcd7a4b4edc8b56424acc49352b1", # mockup header created: src/firebase/index.ts
+]
+paths = [
+  '''^\.env$''',
+  '''^src/firebase/index\.ts$''',
+]
+
+# Firebase Storage download URLs (`...?alt=media&token=<uuid>`) for public images: the README
+# screenshot and the old notification icon. The token only grants read access to that one public
+# file.
+[[allowlists]]
+description = "Firebase Storage download-token URLs of public images"
+regexTarget = "line"
+regexes = [
+  '''https://firebasestorage\.googleapis\.com/v0/b/[A-Za-z0-9._-]+/o/[A-Za-z0-9%._-]+\?alt=media&token=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}''',
+]
