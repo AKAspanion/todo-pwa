@@ -1,5 +1,6 @@
 /// <reference types="vitest/config" />
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseEnv } from 'node:util';
@@ -72,6 +73,21 @@ function moveSourceMapsOutOfDist(): Plugin {
   };
 }
 
+/**
+ * Every component entry Vuetify exports (`vuetify/components/VBtn`, …). vite-plugin-vuetify adds
+ * these imports while it transforms each view, which Vite's start-up scan never sees. So the dev
+ * server discovered them only when a lazily loaded view first opened, re-bundled, and reloaded the
+ * page: on a cold server (as on CI) that reload wiped a form an e2e test had just filled in.
+ * Pre-bundling them all up front means the dev server never reloads for them.
+ */
+function vuetifyComponentEntries(): string[] {
+  const require = createRequire(import.meta.url);
+  const components = join(dirname(require.resolve('vuetify/package.json')), 'lib', 'components');
+  return readdirSync(components, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && existsSync(join(components, entry.name, 'index.js')))
+    .map((entry) => `vuetify/components/${entry.name}`);
+}
+
 /** Vendor chunks, each well under the precache limit: Firebase, Vuetify, Vue and its libraries, and the rest. */
 function vendorChunk(test: RegExp, name: string, priority: number) {
   return { name, test, priority };
@@ -128,6 +144,9 @@ export default defineConfig({
   ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
+  optimizeDeps: {
+    include: vuetifyComponentEntries(),
   },
   build: {
     sourcemap: 'hidden',
