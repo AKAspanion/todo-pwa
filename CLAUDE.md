@@ -1,5 +1,5 @@
 <!-- GA-WORKFLOW:START -->
-<!-- ga:rules 187e9d918e1f -->
+<!-- ga:rules 28f0ef342197 -->
 
 ## How work flows here
 
@@ -10,7 +10,7 @@ Use these skills without being asked; the developer shouldn't have to name them.
 - **While building:** `ga:debug` when something fails and the cause isn't obvious.
 - **Where a plan run stands:** `ga.mjs run status` reads each run's ledger: tasks done out of the plan's total, the task in hand and its fix round, the checkpoints, rulings and provisional rulings so far. Run it when the developer asks how far the work has got, rather than piecing it together.
 - **Before saying it's done:** `ga:verify-work`. `ga:review-code` when the developer asks for a review.
-- **Commands:** typecheck `npm run typecheck`, lint `npm run lint`, format-check `npm run format:check`, test `npm test`, e2e `npm run e2e`. Run these as written. An app's `AGENTS.md` may list its own under Commands.
+- **Commands:** typecheck `npm run typecheck`, lint `npm run lint`, format-check `npm run format:check`, test `npm test`, e2e `npm run e2e`. Fix lint with `npm run lint -- --fix` before fixing it by hand. Run these as written. An app's `AGENTS.md` may list its own under Commands.
 - **Anything the client hands over** (documents, an API collection, a design or a Figma link, their code): `ga:learn` files it, asks the one question it needs and runs the skill that learns it. For what's already in place, use those directly: `ga:learn-docs` for `intake/`, and `ga:learn-codebase` for an existing codebase with little knowledge, or the client's code copied into this project, keeping their structure and updating the knowledge base that's there. Drafts are reviewed by a person: suggest `/ga:review-knowledge`.
 - **Estimating a new build for a proposal:** suggest `/ga:estimate`, which the developer starts. It grills out every gap in the client's documents and prototype, freezes the workflows, and writes the GeekyAnts estimate, plus the client's own format when they gave one. Never estimate from a template of your own.
 - **Knowledge:** `ga:ask` before searching the code, `ga:remember` for every feature, decision or changed requirement, and `ga:check-knowledge` at the end. The knowledge section below has the rules.
@@ -45,10 +45,10 @@ Set in `.ga/config.json` under `workflow`. `/ga:workflow` asks the developer and
 - Commit at the end of each step: each spec, each approved design, each task. In a plan run the implementer commits its task, and the task is complete then. Stage the step's files by name, never `git add -A`, with the knowledge that describes them in the same commit.
 - Commit messages are Conventional Commits: `type(scope): summary`.
 - Build on a branch named `feat/<topic>`.
-- Branch from, and merge back into, `main`. Until ga's own setup is on `main` (`git cat-file -e main:.ga/config.json` fails), branch from the branch that holds it, and say so: a branch cut from `main` then has no `knowledge/` and no `.ga/`.
+- Branch from, and merge back into, `master`. Until ga's own setup is on `master` (`git cat-file -e master:.ga/config.json` fails), branch from the branch that holds it, and say so: a branch cut from `master` then has no `knowledge/` and no `.ga/`.
 - Ask before pushing.
 - Ask before opening a merge request.
-- Keep the branch's commits as they are when it's finished; don't squash.
+- Squash the branch into one commit when it's finished.
 - No task edits the knowledge base: each task's report lists the concepts it changed. Once the merge request is open, `ga:finish-branch` starts one background agent that writes them, runs the knowledge gates and the run's record in its own worktree of the branch, and pushes them there (its after-finish.md). Nothing waits for it, and the developer can start the next thing.
 - The after-finish job runs `knowledge stale` over the branch and rereads and fixes each concept it lists, or records it as still true.
 - Suggest `/ga:review-knowledge` for knowledge drafted in the work.
@@ -101,6 +101,34 @@ Never configurable, whatever the project sets:
 
 ## Knowledge map
 
-_No concepts yet. Add the first one under `knowledge/`._
+_Generated from `knowledge/`. Do not edit by hand._
+
+_45 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
+
+- [data/](knowledge/data/) — 2 concepts
+- [decisions/](knowledge/decisions/) — 6 concepts
+- [design-system/](knowledge/design-system/) — 2 concepts
+- [domain/](knowledge/domain/) — 3 concepts
+- [features/](knowledge/features/) — 8 concepts
+- [findings/](knowledge/findings/) — 1 concept
+- [integrations/](knowledge/integrations/) — 3 concepts
+- [operations/](knowledge/operations/) — 3 concepts
+- [quality/](knowledge/quality/) — 2 concepts
+- [questions/](knowledge/questions/) — 4 concepts
+- [risks/](knowledge/risks/) — 1 concept
+- [security/](knowledge/security/) — 3 concepts
+
+### apps
+
+- [Android app (TWA)](knowledge/apps/android-twa.md) _(Application)_ — The Play Store app app.web.spanion_todo.twa, a Trusted Web Activity that opens the live site full-screen.
+- [Cloud Functions](knowledge/apps/functions.md) _(Application)_ — The functions/ package — the five-minute reminder run and the budget kill-switch, on Node 22 with firebase-functions v2; nothing answers HTTP.
+- [iOS wrapper](knowledge/apps/ios-webview.md) _(Application)_ — An Xcode project, "Task Manager", that shows the live site in a WKWebView; whether it is still shipped is open.
+- [Web app](knowledge/apps/web.md) _(Application)_ — The Vue 3 single-page app at the repository root, built by Vite and served by Firebase Hosting as an installable PWA.
+
+### project
+
+- [Architecture](knowledge/project/architecture.md) _(Architecture)_ — A Vue SPA that talks straight to Firebase Auth and Firestore, guarded by security rules, plus two Cloud Functions and one service worker.
+- [Conventions](knowledge/project/conventions.md) _(Conventions)_ — How code is written in todo-pwa — where each kind of file goes, how errors travel, where tests live, and which tools and policy keys enforce the rest.
+- [Task Manager (todo-pwa)](knowledge/project/overview.md) _(Project Overview)_ — A personal task manager that installs as a PWA and on Android, with labels, a calendar and a push reminder an hour before a task is due.
 
 <!-- OKF-KNOWLEDGE-MAP:END -->

@@ -1,3 +1,22 @@
 {
-  "consent": null
+  "consent": null,
+  "workflow": {
+    "git": {
+      "message": "conventional",
+      "ticket": "none",
+      "base": "master",
+      "branch": "feat/<topic>",
+      "squash": true
+    },
+    "checks": {
+      "commands": {
+        "typecheck": "npm run typecheck",
+        "lint": "npm run lint",
+        "lint-fix": "npm run lint -- --fix",
+        "format-check": "npm run format:check",
+        "test": "npm test",
+        "e2e": "npm run e2e"
+      }
+    }
+  }
 }

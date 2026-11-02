@@ -1,0 +1,35 @@
+---
+type: Runbook
+status: draft
+title: Run locally
+description: Node from .nvmrc, Java for the emulators, then the emulators and the Vite dev server against the demo project.
+generated:
+  by: claude-code/claude-opus-5-5
+  at: 2026-11-02T19:14:37Z
+---
+
+# Run locally
+
+## Prerequisites
+
+- Node at the version in `.nvmrc` (the functions run on Node 22 in production, but their tests and build run
+  on the local Node).
+- Java 21 or later, for the Firebase emulators.
+- The Firebase CLI comes with the dev dependencies (`npx firebase`).
+
+## Steps
+
+1. Install: `npm install`, `npm --prefix functions install`, and once `npx playwright install chromium webkit`.
+2. `cp .env.example .env.local`, keeping `VITE_USE_EMULATORS=true`; the Firebase values can stay empty.
+3. Start the emulators for the demo project: `npx firebase emulators:start --project demo-todo`. Their ports
+   are in `firebase.json` (`emulators`); they start empty, so sign up in the app first.
+4. Start the app: `npm run dev`. The app's other scripts are in `package.json` and explained in `README.md`
+   ("Scripts"); `test`, `test:rules` and `e2e` start and stop the emulators themselves.
+
+## Sources
+
+- `.nvmrc`
+- `.env.example`
+- `firebase.json`
+- `package.json`
+- `README.md`
