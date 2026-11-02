@@ -526,8 +526,10 @@ function authStates(): VisualState[] {
   return (['en', 'hi'] as const).flatMap((locale): VisualState[] => {
     const s = STRINGS[locale];
     const openEmail = (page: Page) => openEmailForm(page, s);
+    const heading = (title: string) => (page: Page) =>
+      expect(page.getByRole('heading', { name: title })).toBeVisible();
     return [
-      { name: `signin-${locale}`, path: '/signin', locale },
+      { name: `signin-${locale}`, path: '/signin', locale, act: heading(s.signIn.title) },
       { name: `signin-email-open-${locale}`, path: '/signin', locale, act: openEmail },
       {
         name: `signin-error-${locale}`,
@@ -542,7 +544,7 @@ function authStates(): VisualState[] {
           await expect(page.getByTestId('auth-error')).toBeVisible();
         },
       },
-      { name: `signup-${locale}`, path: '/signup', locale },
+      { name: `signup-${locale}`, path: '/signup', locale, act: heading(s.signUp.title) },
     ];
   });
 }

@@ -44,7 +44,11 @@ export interface VisualState {
   theme?: 'light' | 'dark';
   /** Runs before the page opens: sign in, seed data, mock a request with page.route. */
   before?: (page: Page) => Promise<void>;
-  /** Runs once the page has loaded: open a dialog, type, submit. */
+  /**
+   * Runs once the page has loaded, and waits on the state's own locator: what shows the state is
+   * ready (a heading, the loaded list), plus anything that sets it up (open a dialog, type, submit).
+   * captureScreen requires it; it is optional here for screens that capture with their own loop.
+   */
   act?: (page: Page) => Promise<void>;
   /** Capture the whole scrolling page rather than the window. */
   fullPage?: boolean;
@@ -102,6 +106,8 @@ export async function captureScreen(
   const newReferences: string[] = [];
   for (const state of states) {
     checkName('state', state.name);
+    const { act } = state;
+    if (!act) throw new Error(`state "${state.name}" needs an act that waits on its own locator`);
     for (const width of VISUAL_WIDTHS) {
       const context = await browser.newContext(visualContextOptions(width, baseURL));
       try {
@@ -114,8 +120,10 @@ export async function captureScreen(
         }, saved);
         await state.before?.(page);
         await page.goto(state.path, { waitUntil: 'load' });
-        await page.waitForLoadState('networkidle');
-        await state.act?.(page);
+        // Never network idle: a signed-in page keeps Firestore's listen stream open, so the
+        // network never idles and the capture hung until the test timed out. Each state's `act`
+        // waits on its own locator instead (the visual-capture ruling).
+        await act(page);
         await page.evaluate(() => document.fonts.ready.then(() => undefined));
         const file = `${state.name}-${width}.png`;
         await page.screenshot({
