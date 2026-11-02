@@ -1,0 +1,31 @@
+{
+  "views": {
+    "label": "Calendar view",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month"
+  },
+  "today": "Today",
+  "previous": {
+    "day": "Previous day",
+    "week": "Previous week",
+    "month": "Previous month"
+  },
+  "next": {
+    "day": "Next day",
+    "week": "Next week",
+    "month": "Next month"
+  },
+  "range": "{start} – {end}",
+  "loading": "Loading tasks",
+  "errors": {
+    "load": "Couldn't load your data. Try again.",
+    "retry": "Retry"
+  },
+  "details": {
+    "when": "{day}, {time}",
+    "noDescription": "No description",
+    "done": "Done",
+    "close": "Close"
+  }
+}
