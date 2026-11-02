@@ -278,12 +278,18 @@ Workload Identity Federation is the keyless alternative (short-lived tokens, no 
 
 ### 3. Once, before the first rules and functions deploy
 
-1. **Move `spanion-todo` to the Blaze plan** (Firebase console > Usage and billing). Scheduled
+1. **Delete the legacy functions first, before merging or deploying anything:** `testFunction`
+   is public and returns every user's push token and task titles, and `testSchedule` is the old
+   hourly reminder. Nothing deploys the functions on a push to `master`, so they stay live until
+   this runs (with the Firebase CLI signed in as a project owner; `npx firebase` works too):
+
+   ```bash
+   firebase functions:delete testFunction testSchedule --project spanion-todo --force
+   ```
+
+   (The first functions deploy from Actions would also delete them, as it runs with `--force`.)
+2. **Move `spanion-todo` to the Blaze plan** (Firebase console > Usage and billing). Scheduled
    functions need it.
-2. **Delete the legacy functions** `testFunction` (public, leaks data) and `testSchedule` (the old
-   hourly reminder). The first functions deploy from Actions deletes them (it runs with
-   `--force`), but `testFunction` is better gone at once:
-   `npx firebase functions:delete testFunction testSchedule --project spanion-todo --force`.
 3. **Deploy:** Actions > Deploy > Run workflow on `master`, with **deploy_rules** and
    **deploy_functions** ticked. A run deploys the rules and indexes first, then the functions,
    then hosting, so the new app never goes live ahead of the rules it needs.
