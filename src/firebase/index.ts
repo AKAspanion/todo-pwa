@@ -1,4 +1,7 @@
-import * as firebase from 'firebase';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import 'firebase/compat/messaging';
 import store from '../store/store';
 
 // @ts-ignore
@@ -78,10 +81,25 @@ class FirebaseWeb {
     }
 
     public authChangeListener(callback: any) {
-        firebase.auth().onAuthStateChanged(callback);
+        return firebase.auth().onAuthStateChanged(callback);
+    }
+
+    // Resolves once Firebase has restored the persisted session (or found none),
+    // so route guards don't decide on a not-yet-known auth state.
+    public waitForAuthReady = (): Promise<any> => {
+        return new Promise((resolve) => {
+            const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+                unsubscribe();
+                resolve(user);
+            });
+        });
     }
 
     public initializeFirebase = () => {
+        if (!this.firebaseConfig.apiKey) {
+            // tslint:disable-next-line:no-console
+            console.error('Firebase config missing: create .env.local from .env.example (VUE_APP_* values).');
+        }
         firebase.initializeApp(this.firebaseConfig);
     }
 
@@ -99,9 +117,8 @@ class FirebaseWeb {
 
     public getMessagingToken = () => {
         const messaging = firebase.messaging();
-        messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
         messaging
-            .getToken()
+            .getToken({ vapidKey: process.env.VUE_APP_VAPID_KEY })
             .then((currentToken) => {
                 if (currentToken) {
                     store.dispatch('SET_NOTIFICATION_GRANT', true);
@@ -130,8 +147,7 @@ class FirebaseWeb {
 
     public tokenRefreshListener() {
         const messaging = firebase.messaging();
-        messaging.usePublicVapidKey(process.env.VUE_APP_VAPID_KEY);
-        messaging.getToken().then((refreshedToken) => {
+        messaging.getToken({ vapidKey: process.env.VUE_APP_VAPID_KEY }).then((refreshedToken) => {
             this.sendFCMTokenToServer(refreshedToken);
         }).catch(() => {
             // ERROR
@@ -182,14 +198,21 @@ class FirebaseWeb {
     }
 
     public signInWithFacebook = () => {
-        let provider: any = null;
-        provider = new firebase.auth.FacebookAuthProvider();
-        firebase.auth().signInWithRedirect(provider);
+        return this.signInWithProvider(new firebase.auth.FacebookAuthProvider());
     }
     public signInWithGoogle = () => {
-        let provider: any = null;
-        provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider);
+        return this.signInWithProvider(new firebase.auth.GoogleAuthProvider());
+    }
+    // Redirect sign-in breaks when the app is not served from authDomain (browsers
+    // partition the storage it relies on), so use a popup and only fall back to
+    // redirect when the popup can't open.
+    public signInWithProvider = (provider: any) => {
+        return firebase.auth().signInWithPopup(provider).catch((err: any) => {
+            if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment')) {
+                return firebase.auth().signInWithRedirect(provider);
+            }
+            throw err;
+        });
     }
     public signInResult() {
         return firebase.auth().getRedirectResult();

@@ -154,10 +154,31 @@ export default Vue.extend({
             }
         },
         onGoolgeSignin() {
-            firebase.signInWithGoogle();
+            this.handleSocialSignin(firebase.signInWithGoogle());
         },
         onFacebookSignin() {
-            firebase.signInWithFacebook();
+            this.handleSocialSignin(firebase.signInWithFacebook());
+        },
+        handleSocialSignin(signin: Promise<any>) {
+            signin
+                .then((response: any) => {
+                    // a redirect fallback resolves without a user; the page reloads instead
+                    if (response && response.user) {
+                        this.onSigninSuccess();
+                    }
+                })
+                .catch((err: any) => {
+                    if (err && err.code === 'auth/popup-closed-by-user') return;
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        (err && err.message) || this.$t("toast.error.sign-in")
+                    );
+                });
+        },
+        onSigninSuccess() {
+            this.$store.dispatch("SHOW_SNACK", this.$t("toast.success.sign-in"));
+            const redirect: any = this.$route.query.redirect;
+            this.$router.replace(redirect || "/home");
         },
         onSignIn() {
             if (
@@ -169,20 +190,13 @@ export default Vue.extend({
                 this.signingIn = true;
                 firebase
                     .signInWithEmail(this.user)
-                    .then((response: any) => {
-                        this.$store.dispatch(
-                            "SHOW_SNACK",
-                            this.$t("toast.success.sign-in")
-                        );
-                        this.navigateToHome();
+                    .then(() => {
+                        this.onSigninSuccess();
                     })
                     .catch((err: any) => {
-                        this.$store.dispatch("SHOW_SNACK", err.message);
-                    })
-                    .catch(() => {
                         this.$store.dispatch(
                             "SHOW_SNACK",
-                            this.$t("toast.error.sign-in")
+                            (err && err.message) || this.$t("toast.error.sign-in")
                         );
                     })
                     .finally(() => {
@@ -202,6 +216,10 @@ export default Vue.extend({
         if (firebase.getUser()) {
             this.navigateToHome();
         }
+        // surfaces errors from the redirect sign-in fallback
+        firebase.signInResult().catch((err: any) => {
+            this.$store.dispatch("SHOW_SNACK", err.message);
+        });
     }
 });
 </script>

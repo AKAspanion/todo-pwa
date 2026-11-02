@@ -168,10 +168,30 @@ export default Vue.extend({
     },
     methods: {
         onGoogleSignUp() {
-            firebase.signUpWithGoogle();
+            this.handleSocialSignUp(firebase.signUpWithGoogle());
         },
         onFacebookSignUp() {
-            firebase.signUpWithFacebook();
+            this.handleSocialSignUp(firebase.signUpWithFacebook());
+        },
+        handleSocialSignUp(signup: Promise<any>) {
+            signup
+                .then((response: any) => {
+                    // a redirect fallback resolves without a user; the page reloads instead
+                    if (response && response.user) {
+                        this.$store.dispatch(
+                            "SHOW_SNACK",
+                            this.$t("toast.success.sign-up")
+                        );
+                        this.navigateToHome();
+                    }
+                })
+                .catch((err: any) => {
+                    if (err && err.code === 'auth/popup-closed-by-user') return;
+                    this.$store.dispatch(
+                        "SHOW_SNACK",
+                        (err && err.message) || this.$t("toast.error.sign-up")
+                    );
+                });
         },
         onEmailSignUp() {
             let signUpValidator: any = this.$refs.formSignUp;
@@ -196,10 +216,10 @@ export default Vue.extend({
                     .catch((err: any) => {
                         this.$store.dispatch(
                             "SHOW_SNACK",
-                            this.$t("toast.error.sign-up")
+                            (err && err.message) || this.$t("toast.error.sign-up")
                         );
                     })
-                    .then(() => {
+                    .finally(() => {
                         this.signingUp = false;
                     });
             }
@@ -220,7 +240,7 @@ export default Vue.extend({
         this.$nextTick(() => {
             setTimeout(() => {
                 let firstName: any = this.$refs.userEmail;
-                firstName.focus();
+                if (firstName) firstName.focus();
             }, 300);
         });
     }
