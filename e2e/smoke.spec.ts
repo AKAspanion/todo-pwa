@@ -111,11 +111,12 @@ async function drag(page: Page, source: Locator, target: Locator): Promise<void>
 async function pickDate(page: Page, ymd: string): Promise<void> {
   await page.getByLabel(ADD.date.label, { exact: true }).click();
   await expect(page.locator('.v-date-picker')).toBeVisible();
-  const day = page.locator(`[data-v-date="${ymd}"]`);
+  // Vuetify puts data-v-date on each day's button itself.
+  const day = page.locator(`.v-date-picker button[data-v-date="${ymd}"]`);
   if ((await day.count()) === 0) {
     await page.getByRole('button', { name: 'Next month' }).click();
   }
-  await day.getByRole('button').click();
+  await day.click();
   await expect(page.locator('.v-date-picker')).toBeHidden();
 }
 
@@ -132,7 +133,7 @@ async function pickTime(page: Page, hour: string, minute: string): Promise<void>
 
 async function signOut(page: Page): Promise<void> {
   await page.getByRole('button', { name: AUTH.menu.open }).click();
-  await page.getByRole('link', { name: AUTH.menu.signOut }).click();
+  await page.getByRole('button', { name: AUTH.menu.signOut }).click();
   await expect(page).toHaveURL(/\/signin$/);
   await expect(page.getByRole('heading', { name: AUTH.signIn.title })).toBeVisible();
 }
