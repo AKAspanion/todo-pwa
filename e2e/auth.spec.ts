@@ -70,9 +70,21 @@ async function abortAuthRequests(page: Page): Promise<void> {
   await page.route('**/identitytoolkit**', (route) => route.abort('internetdisconnected'));
 }
 
+/**
+ * The page's markup, lower-cased, without the text of its stylesheets: the icon font's CSS
+ * (`@mdi/font`, which the spec names) lists every icon, `mdi-facebook` among them.
+ */
+async function markupWithoutStyles(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const copy = document.documentElement.cloneNode(true) as HTMLElement;
+    copy.querySelectorAll('style').forEach((style) => style.remove());
+    return copy.outerHTML.toLowerCase();
+  });
+}
+
 async function openMenu(page: Page, s: AuthStrings = EN): Promise<void> {
   await page.getByRole('button', { name: s.menu.open }).click();
-  await expect(page.getByRole('link', { name: s.menu.signOut })).toBeVisible();
+  await expect(page.getByRole('button', { name: s.menu.signOut })).toBeVisible();
 }
 
 interface PerUserState {
@@ -138,12 +150,12 @@ test.describe('sign-in and sign-up', () => {
     await expect(page.getByRole('heading', { name: EN.signIn.title })).toBeVisible();
     await expect(page.getByRole('button', { name: EN.signIn.google })).toBeVisible();
     await expect(page.getByText(/facebook/i)).toHaveCount(0);
-    expect((await page.content()).toLowerCase()).not.toContain('facebook');
+    expect(await markupWithoutStyles(page)).not.toContain('facebook');
 
     await page.goto('/signup');
     await expect(page.getByRole('heading', { name: EN.signUp.title })).toBeVisible();
     await expect(page.getByText(/facebook/i)).toHaveCount(0);
-    expect((await page.content()).toLowerCase()).not.toContain('facebook');
+    expect(await markupWithoutStyles(page)).not.toContain('facebook');
   });
 
   test('no file under src mentions Facebook (§11.1)', ({ browserName }) => {
@@ -320,7 +332,7 @@ test.describe('app menu', () => {
 
     await openMenu(page);
     await expect(page.getByText('User A')).toBeVisible();
-    await page.getByRole('link', { name: EN.menu.signOut }).click();
+    await page.getByRole('button', { name: EN.menu.signOut }).click();
 
     await expect(page).toHaveURL(/\/signin$/);
     expect(await perUserState(page, false)).toEqual({ tasks: [], labels: [], notifications: [] });
@@ -347,7 +359,7 @@ test.describe('app menu', () => {
       .click();
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'hi');
-    await expect(page.getByRole('link', { name: STRINGS.hi.menu.signOut })).toBeVisible();
+    await expect(page.getByRole('button', { name: STRINGS.hi.menu.signOut })).toBeVisible();
 
     await page.reload();
 
@@ -413,7 +425,7 @@ test.describe('app menu', () => {
     );
     // The app reads the photo when it signs in, so sign in again.
     await openMenu(page);
-    await page.getByRole('link', { name: EN.menu.signOut }).click();
+    await page.getByRole('button', { name: EN.menu.signOut }).click();
     await expect(page).toHaveURL(/\/signin$/);
     await signInWithForm(page, 'ada@user.info', PASSWORD);
     await expect(page).toHaveURL(/\/home$/);

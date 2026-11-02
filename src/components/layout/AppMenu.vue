@@ -134,7 +134,9 @@ watch(
 
           <v-divider class="my-1" />
 
+          <!-- An action, not a place: a button to assistive tech (Vuetify gives it role listitem). -->
           <v-list-item
+            role="button"
             prepend-icon="mdi-logout-variant"
             :title="t('auth.menu.signOut')"
             :disabled="signingOut"
