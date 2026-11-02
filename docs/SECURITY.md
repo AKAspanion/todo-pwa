@@ -25,12 +25,17 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
    download-token URLs of public images, so the secret scan still catches anything new.
 4. **Give the deploy service account only these roles** (README.md, "Deploy & CI setup"):
    Firebase Hosting Admin, Cloud Functions Developer, Firebase Rules Admin, Cloud Datastore Index
-   Admin, and Service Account User. No key is ever created for it: GitHub Actions gets
-   short-lived tokens through Workload Identity Federation, and only jobs in the `production`
-   environment of `AKAspanion/todo-pwa` can use it. If the first functions deploy stops on a
-   missing permission for Cloud Scheduler (the scheduled reminder) or Service Usage, add Cloud
-   Scheduler Admin or Service Usage Consumer rather than a broad role such as Editor.
-5. **The audit findings left** (below): wait for firebase-tools and workbox-build releases.
+   Admin, and Service Account User. If the first functions deploy stops on a missing permission
+   for Cloud Scheduler (the scheduled reminder) or Service Usage, add Cloud Scheduler Admin or
+   Service Usage Consumer rather than a broad role such as Editor.
+5. **Look after the deploy key.** The deploy workflow signs in with the service account's JSON
+   key, stored only as the `production` environment secret `FIREBASE_SERVICE_ACCOUNT`. It is a
+   long-lived credential: never commit it (`.gitignore` covers `*-firebase-adminsdk-*.json`,
+   `spanion-todo-*.json` and `service-account*.json`, and the gitleaks scan looks for private
+   keys), rotate it periodically (every 90 days or so, and at once if it may have leaked), and
+   delete old keys. Workload Identity Federation is the keyless alternative: GitHub Actions gets
+   short-lived tokens and there is no key to leak or rotate. README.md describes the switch.
+6. **The audit findings left** (below): wait for firebase-tools and workbox-build releases.
 
 ## What was checked
 
@@ -41,7 +46,7 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
 | Environment files | `.env.example` lists every `VITE_` variable the app reads; `.env.ci` holds only demo values (project `demo-todo`); `.env`, `.env.local`, `functions/.env` and `functions/.env.*` (except the example) are git-ignored. |
 | Secret scan | gitleaks 8.30.1 over the whole history: 6 findings before the allowlists, all reviewed (item 3 above), none after. Runs in CI on every pull request and push. |
 | Hosting headers | `firebase.json` sends a Content Security Policy, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy` on every path. The CSP allows no `unsafe-eval` and no inline script (the built `index.html` has none); inline styles are allowed for Vuetify. |
-| CI and deploy | Workflows run with a read-only token. Deploy runs only after CI passes on a push to `master`, on the exact commit CI tested, with Workload Identity Federation instead of a stored key. |
+| CI and deploy | Workflows run with a read-only token. Deploy runs only after CI passes on a push to `master`, on the exact commit CI tested, signed in with the deploy service account's key from an environment secret (WIF is the keyless alternative, item 5). |
 
 ## Dependency audit
 

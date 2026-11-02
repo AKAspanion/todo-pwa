@@ -12,6 +12,10 @@ node_modules
 functions/.env
 functions/.env.*
 !functions/.env.example
+# Service account keys: never committed (the deploy key lives in a GitHub environment secret)
+*-firebase-adminsdk-*.json
+spanion-todo-*.json
+service-account*.json
 
 # Log files
 npm-debug.log*

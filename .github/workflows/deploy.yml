@@ -1,7 +1,7 @@
 name: Deploy
 
 # Deploys what CI tested on master: hosting, Firestore rules and indexes, and the functions, to the
-# live project. Setup (environment, variables, Workload Identity Federation): README.md.
+# live project. Setup (environment, variables, the service account secret): README.md.
 on:
   workflow_run:
     workflows: [CI]
@@ -16,7 +16,6 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   deploy:
@@ -49,20 +48,24 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-      - name: Check the deploy variables
+      - name: Check the deploy settings
         env:
-          GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          # Only whether the secret is set, never its value.
+          HAS_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
         run: |
           missing=0
           for name in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID \
             VITE_FIREBASE_STORAGE_BUCKET VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID \
-            VITE_FIREBASE_VAPID_KEY APP_URL GCP_WORKLOAD_IDENTITY_PROVIDER GCP_SERVICE_ACCOUNT; do
+            VITE_FIREBASE_VAPID_KEY APP_URL; do
             if [ -z "${!name}" ]; then
               echo "::error::The production environment has no variable $name (see README.md)."
               missing=1
             fi
           done
+          if [ "$HAS_SERVICE_ACCOUNT" != 'true' ]; then
+            echo "::error::The production environment has no secret FIREBASE_SERVICE_ACCOUNT (see README.md)."
+            missing=1
+          fi
           exit "$missing"
 
       - uses: actions/setup-node@v4
@@ -87,12 +90,12 @@ jobs:
       - name: Write functions/.env
         run: printf 'APP_URL=%s\n' "$APP_URL" > functions/.env
 
-      # Short-lived credentials through Workload Identity Federation: no service account key.
+      # The deploy service account's JSON key, an environment secret (README.md: rotate it; Workload
+      # Identity Federation is the keyless alternative).
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
       # The project's own firebase-tools (devDependencies), with the credentials above.
       - name: Deploy

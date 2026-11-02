@@ -162,8 +162,9 @@ so the Android app opens without a URL bar.
 
 `.github/workflows/deploy.yml` deploys hosting, the Firestore rules and indexes, and the functions
 after CI passes on a push to `master` (or when run by hand from the Actions tab, on `master`). It
-deploys exactly the commit CI tested, one deploy at a time. It signs in to Google Cloud through
-Workload Identity Federation, so no service account key is stored anywhere. Set it up once:
+deploys exactly the commit CI tested, one deploy at a time. It signs in to Google Cloud as a
+deploy service account, whose JSON key is the `production` environment's secret
+`FIREBASE_SERVICE_ACCOUNT`. Set it up once:
 
 ### 1. The GitHub environment and its variables
 
@@ -181,33 +182,18 @@ secrets: the Firebase web config is public and ships in every page):
 | `VITE_FIREBASE_APP_ID` | as above |
 | `VITE_FIREBASE_VAPID_KEY` | Cloud Messaging > Web Push certificates > key pair |
 | `APP_URL` | `https://spanion-todo.web.app`: written to `functions/.env` for the functions |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | printed by step 2: `projects/<number>/locations/global/workloadIdentityPools/github/providers/todo-pwa` |
-| `GCP_SERVICE_ACCOUNT` | `github-deploy@spanion-todo.iam.gserviceaccount.com` |
 
 With the GitHub CLI, for example: `gh variable set APP_URL --env production --body https://spanion-todo.web.app`.
-The workflow stops before building if any of them is missing.
+Step 2 adds the one **secret**, `FIREBASE_SERVICE_ACCOUNT`. The workflow stops before building if
+any of these is missing.
 
-### 2. Workload Identity Federation and the deploy service account
+### 2. The deploy service account and its key
 
-Run once, as a project owner, with `gcloud`:
+Run once, as a project owner, with `gcloud` and the GitHub CLI (`gh`):
 
 ```bash
 PROJECT_ID=spanion-todo
-PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
-REPO=AKAspanion/todo-pwa
 SA="github-deploy@$PROJECT_ID.iam.gserviceaccount.com"
-
-gcloud services enable iamcredentials.googleapis.com sts.googleapis.com --project "$PROJECT_ID"
-
-# A pool for GitHub Actions, and an OIDC provider that only accepts tokens from this repository.
-gcloud iam workload-identity-pools create github \
-  --project "$PROJECT_ID" --location global --display-name "GitHub Actions"
-gcloud iam workload-identity-pools providers create-oidc todo-pwa \
-  --project "$PROJECT_ID" --location global --workload-identity-pool github \
-  --display-name "todo-pwa" \
-  --issuer-uri "https://token.actions.githubusercontent.com" \
-  --attribute-mapping "google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.environment=assertion.environment" \
-  --attribute-condition "assertion.repository == '$REPO'"
 
 # The deploy service account, with only the roles a deploy needs.
 gcloud iam service-accounts create github-deploy \
@@ -218,18 +204,34 @@ for role in roles/firebasehosting.admin roles/cloudfunctions.developer \
     --member "serviceAccount:$SA" --role "$role" --condition None
 done
 
-# Only jobs in this repository's production environment may act as it.
-gcloud iam service-accounts add-iam-policy-binding "$SA" --project "$PROJECT_ID" \
-  --role roles/iam.workloadIdentityUser \
-  --member "principal://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/subject/repo:$REPO:environment:production"
-
-# The value for GCP_WORKLOAD_IDENTITY_PROVIDER:
-echo "projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/providers/todo-pwa"
+# Its JSON key, straight into the production environment's secret, then off this machine.
+KEY_FILE="$(mktemp -d)/service-account.json"
+gcloud iam service-accounts keys create "$KEY_FILE" --iam-account "$SA" --project "$PROJECT_ID"
+gh secret set FIREBASE_SERVICE_ACCOUNT --env production --repo AKAspanion/todo-pwa < "$KEY_FILE"
+rm -P "$KEY_FILE"   # macOS; elsewhere: shred -u "$KEY_FILE"
 ```
 
 If the first functions deploy stops on a missing permission for Cloud Scheduler or Service Usage,
 grant `roles/cloudscheduler.admin` or `roles/serviceusage.serviceUsageConsumer` the same way
 (docs/SECURITY.md).
+
+The key is a long-lived credential:
+
+- **Never commit it.** `.gitignore` covers the usual key file names (`*-firebase-adminsdk-*.json`,
+  `spanion-todo-*.json`, `service-account*.json`), and CI's gitleaks scan looks for private keys,
+  but keep key files out of the repository folder altogether.
+- **Rotate it** every 90 days or so, and at once if it may have leaked: create a new key, update
+  the secret as above, check that a deploy works, then delete the old key
+  (`gcloud iam service-accounts keys list --iam-account "$SA"`, then
+  `gcloud iam service-accounts keys delete <KEY_ID> --iam-account "$SA"`).
+- **The keyless alternative** is Workload Identity Federation: GitHub Actions gets short-lived
+  tokens for the service account, and no key exists to leak or rotate. To switch, create a
+  workload identity pool and an OIDC provider for `https://token.actions.githubusercontent.com`
+  restricted to `assertion.repository == 'AKAspanion/todo-pwa'`, give the principal
+  `repo:AKAspanion/todo-pwa:environment:production` the role `roles/iam.workloadIdentityUser` on
+  the service account, then pass `workload_identity_provider` and `service_account` to
+  `google-github-actions/auth` instead of `credentials_json`, add `id-token: write` to the
+  workflow's permissions, and delete the key and the secret.
 
 ### 3. Before the first automatic deploy
 
