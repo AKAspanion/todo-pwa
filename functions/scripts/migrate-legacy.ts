@@ -8,10 +8,14 @@
  * - Tasks lacking `timeZone`, `remindAt` or `reminded` get the missing ones: `timeZone` is `--tz`,
  *   `remindAt` is the task's due instant, its date and time in its zone as UTC (null for done,
  *   indefinite or undated tasks), `reminded` is false. Fields a task already has are left alone.
- * - Each `fcm/{uid}` token is copied to `users/{uid}/devices/{token}`; null or malformed tokens are
- *   skipped. The `fcm` documents themselves stay.
  * - Notifications without `createdAt` get one from their legacy `timestamp` text, read as wall time
- *   in `--tz`; unreadable ones get epoch 0, so lists ordered by `createdAt` still show them.
+ *   in `--tz`; unreadable ones get the document's own creation time, so lists ordered by
+ *   `createdAt` still show them.
+ *
+ * Legacy push tokens (`fcm/{uid}`) are not copied to `users/{uid}/devices` (review I1, I2): each
+ * belongs to the old app's FCM worker, which public/firebase-messaging-sw.js unregisters, one
+ * browser's token can sit under several accounts, and the new app could never remove a copied
+ * one. Users who had push on switch it on again once in the new app. The `fcm` documents stay.
  *
  * `--dry-run` reads and counts, and writes nothing. Running it again changes nothing, and a run
  * that stops halfway can simply be run again.
@@ -20,7 +24,6 @@ import { basename } from 'node:path';
 import { initializeApp } from 'firebase-admin/app';
 import {
   FieldPath,
-  FieldValue,
   Timestamp,
   getFirestore,
   type DocumentData,
@@ -38,7 +41,6 @@ export interface MigrationOptions {
 export interface MigrationReport {
   dryRun: boolean;
   tasks: { updated: number; unchanged: number };
-  devices: { created: number; existing: number; skipped: number };
   notifications: { updated: number; unchanged: number; unparseable: number };
 }
 
@@ -48,10 +50,6 @@ const USAGE = 'Usage: npm --prefix functions run migrate -- --tz <IANA time zone
 const PAGE_SIZE = 300;
 /** Writes per batch, under Firestore's limit of 500. */
 const BATCH_SIZE = 400;
-/** The `userAgent` of a device copied from `fcm/{uid}`, which never recorded one. */
-const LEGACY_USER_AGENT = 'unknown (migrated from fcm)';
-/** FCM registration tokens use only these characters, which also keeps them valid document ids. */
-const FCM_TOKEN = /^[\w:-]{1,1024}$/;
 /** The longest legacy timestamp text read; `11/22/2026, 11:30:00 PM` is 23 characters. */
 const MAX_TIMESTAMP_LENGTH = 64;
 /** `toLocaleString('en-US')` as the old function wrote it, e.g. `11/2/2026, 3:30:00 PM`. */
@@ -202,10 +200,6 @@ export function parseLegacyTimestamp(value: unknown, timeZone: string): Date | n
   );
 }
 
-function isFcmToken(value: unknown): value is string {
-  return typeof value === 'string' && FCM_TOKEN.test(value) && !/^__.*__$/.test(value);
-}
-
 /** The fields a task is missing, or null when it has them all. */
 function taskPatch(data: DocumentData, fallbackZone: string): DocumentData | null {
   const patch: DocumentData = {};
@@ -252,7 +246,6 @@ export async function migrateLegacy(
   const report: MigrationReport = {
     dryRun: options.dryRun,
     tasks: { updated: 0, unchanged: 0 },
-    devices: { created: 0, existing: 0, skipped: 0 },
     notifications: { updated: 0, unchanged: 0, unparseable: 0 },
   };
   const writes: Write[] = [];
@@ -267,30 +260,6 @@ export async function migrateLegacy(
     }
   }
 
-  for await (const fcm of allDocs(db, 'fcm')) {
-    const token: unknown = fcm.get('token');
-    if (!isFcmToken(token)) {
-      report.devices.skipped += 1;
-      continue;
-    }
-    const uid = fcm.id;
-    const device = db.collection('users').doc(uid).collection('devices').doc(token);
-    if ((await device.get()).exists) {
-      report.devices.existing += 1;
-      continue;
-    }
-    // The device shape the Firestore rules require: { uid, token, userAgent, updatedAt }.
-    writes.push((batch) =>
-      batch.create(device, {
-        uid,
-        token,
-        userAgent: LEGACY_USER_AGENT,
-        updatedAt: FieldValue.serverTimestamp(),
-      }),
-    );
-    report.devices.created += 1;
-  }
-
   for await (const notification of allDocs(db, 'notifications')) {
     if (notification.get('createdAt') !== undefined) {
       report.notifications.unchanged += 1;
@@ -298,7 +267,7 @@ export async function migrateLegacy(
     }
     const at = parseLegacyTimestamp(notification.get('timestamp'), options.timeZone);
     if (!at) report.notifications.unparseable += 1;
-    const createdAt = at ? Timestamp.fromDate(at) : Timestamp.fromMillis(0);
+    const createdAt = at ? Timestamp.fromDate(at) : notification.createTime;
     writes.push((batch) => batch.update(notification.ref, { createdAt }));
     report.notifications.updated += 1;
   }

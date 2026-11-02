@@ -68,7 +68,7 @@ Status for every row: **fixed in code, tests written, not yet run.**
 |---|---|---|---|
 | P1 | Permission asked from a watcher; no `isSupported()` guard | Task 9 | Asked only from the toggle (a user gesture), only where supported; otherwise the toggle is disabled with an explanation |
 | P2 | A new foreground handler per sign-in | Task 9 | One `onMessage` handler per app session |
-| P3 | One `fcm/{uid}` token per user, kept after sign-out | Tasks 3, 9, 10 | One document per device at `users/{uid}/devices/{token}`; deleted on sign-out (and `deleteToken` is called) and when permission is turned off; deleted server-side when FCM reports it invalid; the migration copies old tokens |
+| P3 | One `fcm/{uid}` token per user, kept after sign-out | Tasks 3, 9, 10 | One document per device at `users/{uid}/devices/{token}`; deleted on sign-out (and `deleteToken` is called) and when permission is turned off; deleted server-side when FCM reports it invalid. Old `fcm/{uid}` tokens are not migrated (review I1, I2): the old messaging worker that holds them is unregistered by a kill switch, so users who had push on switch it on again once |
 | P4 | Background service worker on Firebase 3.9.0 | Task 9 | Same SDK major as the app, inside the one vite-plugin-pwa service worker |
 | P5 | Reminder function broken in ten ways, on Node 8 | Task 10 | v2 `onSchedule('every 5 minutes')` on Node 22: queries `remindAt` in (now, now + 60 min] with `reminded == false`, sends over FCM HTTP v1 to each device, writes a notification with a server `Timestamp`, sets `reminded`; one failure doesn't stop the others |
 | P6 | No UTC reminder instant | Tasks 2, 6, 10 | `remindAt` (UTC `Timestamp`) and `timeZone` (IANA) saved with each task; cleared for indefinite and done tasks; recomputed on edit, which resets `reminded` |
@@ -160,7 +160,9 @@ These were ruled during the run; each differs from, or adds to, what the plan or
 5. **Deploy hosting, rules and functions** (see the README's Deployment section). Scheduled
    functions need the **Blaze** plan. When the functions deploy asks to delete `testFunction` and
    `testSchedule`, answer yes.
-6. **Run the data migration once**, after the deploy, first as a dry run:
+6. **Run the data migration once**, after the deploy, first as a dry run. It fills in the
+   tasks' reminder fields and the notifications' `createdAt`; it does not copy the old push
+   tokens, so users who had reminders on switch them on again once in the new app:
 
    ```bash
    npm --prefix functions run migrate -- --tz Asia/Kolkata --dry-run

@@ -147,8 +147,10 @@ machine instead:
    delete the two old functions, `testFunction` (public, leaks data) and `testSchedule` (the old
    hourly reminder): answer yes. `sendReminders` replaces them.
 4. Once, after the first deploy, migrate the old data. It fills in each task's reminder fields
-   (`remindAt`, `timeZone`, `reminded`), copies each `fcm/{uid}` token to
-   `users/{uid}/devices/{token}`, and gives old notifications a `createdAt`. It needs admin
+   (`remindAt`, `timeZone`, `reminded`) and gives old notifications a `createdAt`. It does not
+   copy the old push tokens (`fcm/{uid}`): they belong to the old app's messaging worker, which
+   the site now unregisters, so users who had reminders on switch them on again once in the new
+   app. It needs admin
    credentials for the live project (`GOOGLE_APPLICATION_CREDENTIALS`, or
    `gcloud auth application-default login` with `GOOGLE_CLOUD_PROJECT=spanion-todo`). Try it with
    `--dry-run` first, which writes nothing:

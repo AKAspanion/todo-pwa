@@ -57,14 +57,13 @@ async function seedLegacy(): Promise<void> {
 
 const SEEDED = ['tasks/alice-task', 'fcm/alice', 'fcm/bob', 'notifications/n1'];
 
-/** Every document path in the emulator's database with its last update time. */
+/** Every seeded document's last update time, and how many device documents exist. */
 async function snapshotAll(): Promise<Record<string, number | undefined>> {
-  const paths = [...SEEDED, 'users/alice/devices/t1'];
-  const snaps: DocumentSnapshot[] = await db.getAll(...paths.map((path) => db.doc(path)));
+  const snaps: DocumentSnapshot[] = await db.getAll(...SEEDED.map((path) => db.doc(path)));
   const devices = await db.collectionGroup('devices').get();
   const result: Record<string, number | undefined> = {};
   snaps.forEach((snap, i) => {
-    result[paths[i] ?? ''] = snap.exists ? snap.updateTime?.toMillis() : undefined;
+    result[SEEDED[i] ?? ''] = snap.exists ? snap.updateTime?.toMillis() : undefined;
   });
   result['devices'] = devices.size;
   return result;
@@ -84,7 +83,6 @@ describe('migrateLegacy on the seeded legacy data', () => {
     expect(report).toEqual<MigrationReport>({
       dryRun: true,
       tasks: { updated: 1, unchanged: 0 },
-      devices: { created: 1, existing: 0, skipped: 1 },
       notifications: { updated: 1, unchanged: 0, unparseable: 0 },
     });
     expect(await snapshotAll()).toEqual(before);
@@ -92,7 +90,7 @@ describe('migrateLegacy on the seeded legacy data', () => {
     expect((await db.doc('notifications/n1').get()).get('createdAt')).toBeUndefined();
   });
 
-  it('a real run fills the task, copies the token and dates the notification', async () => {
+  it('a real run fills the task and dates the notification', async () => {
     await seedLegacy();
 
     const report = await migrateLegacy(db, { timeZone: IST, dryRun: false });
@@ -100,7 +98,6 @@ describe('migrateLegacy on the seeded legacy data', () => {
     expect(report).toEqual<MigrationReport>({
       dryRun: false,
       tasks: { updated: 1, unchanged: 0 },
-      devices: { created: 1, existing: 0, skipped: 1 },
       notifications: { updated: 1, unchanged: 0, unparseable: 0 },
     });
 
@@ -114,18 +111,8 @@ describe('migrateLegacy on the seeded legacy data', () => {
     expect(taskDoc.get('date')).toBe('2026-11-03');
     expect(taskDoc.get('time')).toBe('09:00');
 
-    const device = await db.doc('users/alice/devices/t1').get();
-    expect(device.exists).toBe(true);
-    expect(Object.keys(device.data() ?? {}).sort()).toEqual([
-      'token',
-      'uid',
-      'updatedAt',
-      'userAgent',
-    ]);
-    expect(device.data()).toMatchObject({ uid: 'alice', token: 't1' });
-    expect(typeof device.get('userAgent')).toBe('string');
-    expect(device.get('updatedAt')).toBeInstanceOf(Timestamp);
-    expect((await db.collection('users/bob/devices').get()).empty).toBe(true);
+    // Legacy push tokens are not migrated (review I1, I2): users switch push on again.
+    expect((await db.collectionGroup('devices').get()).empty).toBe(true);
 
     const notification = await db.doc('notifications/n1').get();
     // 3:30 PM in Asia/Kolkata (UTC+05:30) is 10:00 UTC.
@@ -144,7 +131,6 @@ describe('migrateLegacy on the seeded legacy data', () => {
     expect(report).toEqual<MigrationReport>({
       dryRun: false,
       tasks: { updated: 0, unchanged: 1 },
-      devices: { created: 0, existing: 1, skipped: 1 },
       notifications: { updated: 0, unchanged: 1, unparseable: 0 },
     });
     expect(await snapshotAll()).toEqual(before);
@@ -196,31 +182,35 @@ describe('migrateLegacy on other legacy shapes', () => {
     );
   });
 
-  it('skips tokens that are missing, empty, not strings or not valid document ids', async () => {
-    await db.doc('fcm/u1').set({ token: '' });
-    await db.doc('fcm/u2').set({ token: 'a/b' });
-    await db.doc('fcm/u3').set({ token: 42 });
-    await db.doc('fcm/u4').set({});
-    await db.doc('fcm/u5').set({ token: '__reserved__' });
+  it('copies no legacy fcm token to devices, even one token shared by two accounts', async () => {
+    await db.doc('fcm/alice').set({ id: 'alice', token: 'shared-tablet-token' });
+    await db.doc('fcm/bob').set({ id: 'bob', token: 'shared-tablet-token' });
+    const before = await db.getAll(db.doc('fcm/alice'), db.doc('fcm/bob'));
 
-    const report = await migrateLegacy(db, { timeZone: IST, dryRun: false });
+    await migrateLegacy(db, { timeZone: IST, dryRun: false });
 
-    expect(report.devices).toEqual({ created: 0, existing: 0, skipped: 5 });
     expect((await db.collectionGroup('devices').get()).empty).toBe(true);
+    // The fcm documents stay as they were.
+    const after = await db.getAll(db.doc('fcm/alice'), db.doc('fcm/bob'));
+    expect(after.map((snap) => snap.updateTime?.toMillis())).toEqual(
+      before.map((snap) => snap.updateTime?.toMillis()),
+    );
   });
 
-  it('dates an unreadable or missing notification timestamp at epoch 0, so lists still show it', async () => {
+  it("dates an unreadable or missing notification timestamp at the document's creation, so lists still show it", async () => {
     await db.doc('notifications/garbage').set({ uid: 'alice', timestamp: 'yesterday-ish' });
     await db.doc('notifications/missing').set({ uid: 'alice' });
+    const created = await db.getAll(db.doc('notifications/garbage'), db.doc('notifications/missing'));
     const createdAt = Timestamp.fromDate(new Date('2026-11-02T10:00:00Z'));
     await db.doc('notifications/new').set({ uid: 'alice', createdAt });
 
     const report = await migrateLegacy(db, { timeZone: IST, dryRun: false });
 
     expect(report.notifications).toEqual({ updated: 2, unchanged: 1, unparseable: 2 });
-    for (const id of ['garbage', 'missing']) {
+    for (const [i, id] of ['garbage', 'missing'].entries()) {
       const value = (await db.doc(`notifications/${id}`).get()).get('createdAt') as Timestamp;
-      expect(value.toMillis()).toBe(0);
+      expect(value.toMillis()).toBeGreaterThan(0);
+      expect(value.isEqual(created[i]?.createTime ?? Timestamp.fromMillis(0))).toBe(true);
     }
     const kept = (await db.doc('notifications/new').get()).get('createdAt') as Timestamp;
     expect(kept.isEqual(createdAt)).toBe(true);
