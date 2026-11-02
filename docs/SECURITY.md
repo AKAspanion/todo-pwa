@@ -46,8 +46,9 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
    or so (and at once if it may have leaked), and delete old keys. Workload Identity Federation is
    the keyless alternative.
 6. **Delete the legacy functions.** `testFunction` (public, returns other users' data) and
-   `testSchedule` stay live until removed: the first functions deploy from Actions deletes them
-   (`--force`), or delete them by hand at once (README.md, "Deploy & CI setup", step 3).
+   `testSchedule` stay live until removed, as no push deploys the functions. Delete them first,
+   before merging: `firebase functions:delete testFunction testSchedule --project spanion-todo --force`
+   (README.md, "Deploy & CI setup", section 3, step 1).
 7. **The audit findings left** (below): wait for firebase-tools and workbox-build releases.
 
 ## What was checked
