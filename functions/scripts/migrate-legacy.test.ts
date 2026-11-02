@@ -200,7 +200,10 @@ describe('migrateLegacy on other legacy shapes', () => {
   it("dates an unreadable or missing notification timestamp at the document's creation, so lists still show it", async () => {
     await db.doc('notifications/garbage').set({ uid: 'alice', timestamp: 'yesterday-ish' });
     await db.doc('notifications/missing').set({ uid: 'alice' });
-    const created = await db.getAll(db.doc('notifications/garbage'), db.doc('notifications/missing'));
+    const created = await db.getAll(
+      db.doc('notifications/garbage'),
+      db.doc('notifications/missing'),
+    );
     const createdAt = Timestamp.fromDate(new Date('2026-11-02T10:00:00Z'));
     await db.doc('notifications/new').set({ uid: 'alice', createdAt });
 

@@ -8,7 +8,7 @@ import type { Message, Messaging, TokenMessage } from 'firebase-admin/messaging'
 import * as logger from 'firebase-functions/logger';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { reminderBody } from './dueTasks';
-import { runReminders } from './reminders';
+import { DEFAULT_REMINDER_LIMITS, runReminders } from './reminders';
 
 vi.mock('firebase-functions/logger', () => ({
   debug: vi.fn(),
@@ -363,6 +363,101 @@ describe('runReminders: failures', () => {
     expect(logger.warn).toHaveBeenCalledWith('reminders: task has no valid owner', {
       taskId: 'no-owner',
     });
+  });
+});
+
+/** `2026-11-02T03:MM:SSZ`: inside NOW's due window for any minute from 01 to 59. */
+function at(minute: number, second = 0): string {
+  const mm = String(minute).padStart(2, '0');
+  const ss = String(second).padStart(2, '0');
+  return `2026-11-02T03:${mm}:${ss}Z`;
+}
+
+describe('runReminders: limits (review I7)', () => {
+  it('runs with 500 tasks a run, 20 per owner and 10 at a time by default', () => {
+    expect(DEFAULT_REMINDER_LIMITS).toEqual({ perRun: 500, perOwner: 20, concurrency: 10 });
+  });
+
+  it('reads only the run limit of due tasks, earliest first; the rest wait for the next run', async () => {
+    for (const [i, owner] of ['ann', 'ben', 'cat', 'dan'].entries()) {
+      await addDevice(owner, `tok-${owner}`);
+      // Written latest first, so only the query's order puts them earliest first.
+      await addTask(`task-${owner}`, task(owner, at(40 - i * 10)));
+    }
+    const limits = { perRun: 3, perOwner: 20, concurrency: 2 };
+    const fcm = fakeMessaging();
+
+    const result = await runReminders(db, fcm.messaging, NOW, limits);
+
+    expect(result).toEqual({ sent: 3, failed: 0, removedTokens: 0 });
+    expect(fcm.sentTaskIds().sort()).toEqual(['task-ben', 'task-cat', 'task-dan']);
+    expect(await isReminded('task-ann')).toBe(false);
+    expect(logger.warn).toHaveBeenCalledWith(
+      'reminders: run reached its task limit; the rest wait',
+      {
+        limit: 3,
+      },
+    );
+
+    const next = await runReminders(db, fcm.messaging, new Date(at(5)), limits);
+    expect(next).toEqual({ sent: 1, failed: 0, removedTokens: 0 });
+    expect(await isReminded('task-ann')).toBe(true);
+  });
+
+  it("holds an owner's 21st due task for the next run, and still sends another owner's task", async () => {
+    await addDevice('alice', 'tok-alice');
+    await addDevice('bob', 'tok-bob');
+    for (let i = 1; i <= 21; i += 1) {
+      await addTask(`alice-${i}`, task('alice', at(i)));
+    }
+    // Later than all of Alice's, so a cap that stopped the run would miss it.
+    await addTask('bob-1', task('bob', at(50)));
+    const fcm = fakeMessaging();
+
+    const result = await runReminders(db, fcm.messaging, NOW);
+
+    expect(result).toEqual({ sent: 21, failed: 0, removedTokens: 0 });
+    expect(fcm.sentTaskIds()).toContain('bob-1');
+    expect(fcm.sentTaskIds()).not.toContain('alice-21');
+    expect(fcm.sentTaskIds().filter((id) => id?.startsWith('alice-'))).toHaveLength(20);
+    expect(await isReminded('alice-20')).toBe(true);
+    expect(await isReminded('alice-21')).toBe(false);
+    expect(await isReminded('bob-1')).toBe(true);
+    expect(logger.info).toHaveBeenCalledWith(
+      'reminders: owners over their limit wait for the next run',
+      { deferred: 1 },
+    );
+
+    // The next run, 5 minutes later, sends it while it is still due.
+    const next = await runReminders(db, fcm.messaging, new Date(at(5)));
+    expect(next).toEqual({ sent: 1, failed: 0, removedTokens: 0 });
+    expect(await isReminded('alice-21')).toBe(true);
+  });
+
+  it("doesn't let one owner's failing tasks hold up another owner's, with few slots", async () => {
+    await addDevice('alice', 'tok-alice');
+    await addDevice('bob', 'tok-bob');
+    for (let i = 1; i <= 5; i += 1) {
+      await addTask(`alice-${i}`, task('alice', at(i)));
+    }
+    await addTask('bob-1', task('bob', at(30)));
+    const fcm = fakeMessaging(async (message) => {
+      if (message.token === 'tok-alice') throw fcmError('messaging/internal-error');
+      return 'ok';
+    });
+
+    const result = await runReminders(db, fcm.messaging, NOW, {
+      perRun: 500,
+      perOwner: 20,
+      concurrency: 2,
+    });
+
+    expect(result).toEqual({ sent: 1, failed: 5, removedTokens: 0 });
+    expect(await isReminded('bob-1')).toBe(true);
+    expect(await notificationsFor('bob-1')).toHaveLength(1);
+    for (let i = 1; i <= 5; i += 1) {
+      expect(await isReminded(`alice-${i}`)).toBe(false);
+    }
   });
 });
 

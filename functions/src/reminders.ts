@@ -3,6 +3,10 @@
  * (`remindAt`, the due instant, in `(now, now + 60 min]`), send one FCM HTTP v1 message to each of
  * the owner's devices, leave a notification document and mark the task reminded. One task's or one
  * device's failure never stops the others.
+ *
+ * Each run is bounded (review I7): it reads the 500 earliest due tasks, sends at most 20 per owner
+ * (the rest wait for the next run) and handles 10 tasks at a time, so one account flooding
+ * `remindAt` can't stall everyone's reminders.
  */
 import {
   FieldValue,
@@ -16,7 +20,17 @@ import { getMessaging, type Messaging, type TokenMessage } from 'firebase-admin/
 import * as logger from 'firebase-functions/logger';
 import { defineString } from 'firebase-functions/params';
 import { onSchedule, type ScheduleFunction } from 'firebase-functions/v2/scheduler';
-import { REMINDER_TITLE, clipTitle, dueWindow, reminderBody } from './dueTasks';
+import {
+  MAX_REMINDERS_PER_OWNER,
+  MAX_REMINDERS_PER_RUN,
+  REMINDER_CONCURRENCY,
+  REMINDER_TITLE,
+  capPerOwner,
+  clipTitle,
+  dueWindow,
+  reminderBody,
+  settleWithConcurrency,
+} from './dueTasks';
 
 export interface ReminderRunResult {
   /** Messages FCM accepted. */
@@ -26,6 +40,22 @@ export interface ReminderRunResult {
   /** Device documents deleted because FCM reported their token dead. */
   removedTokens: number;
 }
+
+/** How much one run does (review I7). */
+export interface ReminderLimits {
+  /** Due tasks read, earliest `remindAt` first. */
+  perRun: number;
+  /** Reminders sent per owner; the owner's later tasks wait for the next run. */
+  perOwner: number;
+  /** Tasks handled at once. */
+  concurrency: number;
+}
+
+export const DEFAULT_REMINDER_LIMITS: Readonly<ReminderLimits> = {
+  perRun: MAX_REMINDERS_PER_RUN,
+  perOwner: MAX_REMINDERS_PER_OWNER,
+  concurrency: REMINDER_CONCURRENCY,
+};
 
 /** The live site's primary address, used when `APP_URL` isn't set. */
 const DEFAULT_APP_URL = 'https://todo.spanion.in';
@@ -164,13 +194,16 @@ async function remindTask(
 }
 
 /**
- * Sends the reminders due in {@link dueWindow}`(now)`. Each task is handled on its own: a failure
- * is logged, counted in `failed`, and the task keeps `reminded: false` so the next run tries again.
+ * Sends the reminders due in {@link dueWindow}`(now)`, within `limits`. Each task is handled on its
+ * own: a failure is logged, counted in `failed`, and the task keeps `reminded: false` so the next
+ * run tries again. Tasks past the run's or their owner's limit also keep `reminded: false`, and
+ * the next run, 5 minutes later, takes them first while they are still due.
  */
 export async function runReminders(
   db: Firestore,
   messaging: Messaging,
   now: Date,
+  limits: Readonly<ReminderLimits> = DEFAULT_REMINDER_LIMITS,
 ): Promise<ReminderRunResult> {
   const { from, to } = dueWindow(now);
   // Served by the `tasks(reminded ASC, remindAt ASC)` index. Done and indefinite tasks have
@@ -180,16 +213,31 @@ export async function runReminders(
     .where('reminded', '==', false)
     .where('remindAt', '>', Timestamp.fromDate(from))
     .where('remindAt', '<=', Timestamp.fromDate(to))
+    .orderBy('remindAt')
+    .limit(limits.perRun)
     .get();
+  if (due.size >= limits.perRun) {
+    logger.warn('reminders: run reached its task limit; the rest wait', { limit: limits.perRun });
+  }
 
-  const outcomes = await Promise.all(
-    due.docs.map((task) =>
-      remindTask(db, messaging, task).catch((err: unknown) => {
-        logger.error('reminders: task failed', { taskId: task.id, code: errorCode(err) });
-        return FAILED_TASK;
-      }),
-    ),
+  const tasks = capPerOwner(due.docs, (task) => task.get('uid'), limits.perOwner);
+  if (tasks.length < due.size) {
+    logger.info('reminders: owners over their limit wait for the next run', {
+      deferred: due.size - tasks.length,
+    });
+  }
+
+  const settled = await settleWithConcurrency(tasks, limits.concurrency, (task) =>
+    remindTask(db, messaging, task),
   );
+  const outcomes = settled.map((result, i) => {
+    if (result.status === 'fulfilled') return result.value;
+    logger.error('reminders: task failed', {
+      taskId: tasks[i]?.id,
+      code: errorCode(result.reason),
+    });
+    return FAILED_TASK;
+  });
 
   return outcomes.reduce<ReminderRunResult>(
     (total, outcome) => ({
