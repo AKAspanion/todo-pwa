@@ -1,5 +1,48 @@
 # Security
 
+What was checked on 2026-11-02 while hardening the release pipeline, and what is left for the
+project owner. The earlier security fixes in the app itself (Firestore rules, sanitised Markdown,
+the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), section S.
+
+## Left for the owner
+
+1. **Restrict the Firebase browser API key** (Google Cloud console > APIs & Services >
+   Credentials, the "Browser key" of `spanion-todo`):
+   - Application restrictions: HTTP referrers `https://spanion-todo.web.app/*`,
+     `https://spanion-todo.firebaseapp.com/*`, `http://localhost/*` and `http://localhost:*/*`
+     (the dev server and the e2e server).
+   - API restrictions: only the APIs the app calls: Identity Toolkit API, Token Service API,
+     Cloud Firestore API, Firebase Installations API and FCM Registration API (add others only if
+     the console reports a blocked call).
+2. **Consider App Check** (reCAPTCHA Enterprise for the web app; Play Integrity for the Android
+   app), first in monitoring mode, then enforced for Firestore. It stops other sites and scripts
+   from using the public web config against the project. The CSP in `firebase.json` would then
+   need `https://www.google.com` and `https://www.recaptcha.net` in `script-src` and `frame-src`.
+3. **The web config in the 2019 git history** (commits `327d48b`, `7c0b8ed`, `b0407b9`: `.env`
+   and `src/firebase/index.ts`) is public by design: the same values ship in every page the app
+   serves. It is not a secret and is not worth rewriting history for; restricting the key (1) is
+   the fix. `.gitleaks.toml` allowlists exactly those commits and files, plus Firebase Storage
+   download-token URLs of public images, so the secret scan still catches anything new.
+4. **Give the deploy service account only these roles** (README.md, "Deploy & CI setup"):
+   Firebase Hosting Admin, Cloud Functions Developer, Firebase Rules Admin, Cloud Datastore Index
+   Admin, and Service Account User. No key is ever created for it: GitHub Actions gets
+   short-lived tokens through Workload Identity Federation, and only jobs in the `production`
+   environment of `AKAspanion/todo-pwa` can use it. If the first functions deploy stops on a
+   missing permission for Cloud Scheduler (the scheduled reminder) or Service Usage, add Cloud
+   Scheduler Admin or Service Usage Consumer rather than a broad role such as Editor.
+5. **The audit findings left** (below): wait for firebase-tools and workbox-build releases.
+
+## What was checked
+
+| Area | Result |
+|---|---|
+| Hard-coded credentials in tracked files | One: the reminder's notification icon was a Firebase Storage URL with an access token in `functions/src/reminders.ts`. It is now `<APP_URL>/img/icons/android-chrome-192x192.png`, with `APP_URL` a firebase-functions param (`functions/.env.example`). |
+| Other project ids, URLs and emails in code | None that belong in config. Left as they are, on purpose: the README screenshot (a public Storage URL with a download token), `.firebaserc` (the project id), the Android TWA project's host names (`packages/android`), the contact address in `PRIVACY.md`, the author link in the app menu, and `--project spanion-todo` in the deploy workflow. Test emails in `e2e/` and `src/**/*.test.ts` are fake (`example.com`, `example.info`, `user.info`). |
+| Environment files | `.env.example` lists every `VITE_` variable the app reads; `.env.ci` holds only demo values (project `demo-todo`); `.env`, `.env.local`, `functions/.env` and `functions/.env.*` (except the example) are git-ignored. |
+| Secret scan | gitleaks 8.30.1 over the whole history: 6 findings before the allowlists, all reviewed (item 3 above), none after. Runs in CI on every pull request and push. |
+| Hosting headers | `firebase.json` sends a Content Security Policy, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy` on every path. The CSP allows no `unsafe-eval` and no inline script (the built `index.html` has none); inline styles are allowed for Vuetify. |
+| CI and deploy | Workflows run with a read-only token. Deploy runs only after CI passes on a push to `master`, on the exact commit CI tested, with Workload Identity Federation instead of a stored key. |
+
 ## Dependency audit
 
 _Checked 2026-11-02 with `npm audit` (root) and `npm --prefix functions audit`._
