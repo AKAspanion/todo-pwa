@@ -16,6 +16,7 @@ import {
   setFirestoreRules,
   todayUtc,
 } from './fixtures/home';
+import { dragCard } from './support/drag';
 import { readDoc, signInAs, type TestUser } from './support/emulator';
 import {
   VISUAL_CLOCK,
@@ -58,29 +59,6 @@ function titlesIn(page: Page, status: 'todo' | 'done'): Locator {
   return page.getByTestId(`task-list-${status}`).getByTestId('task-title');
 }
 
-/**
- * Drags with the mouse, in steps, as a person would: the board's lists use SortableJS's pointer
- * fallback, which follows pointer moves rather than native drag events.
- */
-async function drag(
-  page: Page,
-  source: Locator,
-  target: Locator,
-  at: 'center' | 'top' = 'center',
-): Promise<void> {
-  const from = await source.getByTestId('task-title').boundingBox();
-  const to = await target.boundingBox();
-  if (!from || !to) throw new Error('drag: source or target is not on screen');
-  const startX = from.x + Math.min(24, from.width / 2);
-  const startY = from.y + from.height / 2;
-  await page.mouse.move(startX, startY);
-  await page.mouse.down();
-  await page.mouse.move(startX + 8, startY + 8, { steps: 4 });
-  const endY = at === 'top' ? to.y + 4 : to.y + to.height / 2;
-  await page.mouse.move(to.x + to.width / 2, endY, { steps: 20 });
-  await page.mouse.up();
-}
-
 test.describe('home board', () => {
   let user: TestUser;
   let today: string;
@@ -103,7 +81,7 @@ test.describe('home board', () => {
     const done = page.getByTestId('task-list-done');
     await expect(page.getByTestId('task-empty-done')).toBeVisible();
 
-    await drag(page, cardByTitle(page, 'Water the plants'), done);
+    await dragCard(page, cardByTitle(page, 'Water the plants'), done);
 
     await expect(titlesIn(page, 'done')).toHaveText(['Water the plants']);
     await expect(titlesIn(page, 'todo')).toHaveText(['Stay in todo']);
@@ -125,12 +103,10 @@ test.describe('home board', () => {
     const order = ['First at eight', 'Second at ten', 'Third at noon'];
     await expect(titlesIn(page, 'todo')).toHaveText(order);
 
-    await drag(
-      page,
-      cardByTitle(page, 'Third at noon'),
-      cardByTitle(page, 'First at eight'),
-      'top',
-    );
+    await dragCard(page, cardByTitle(page, 'Third at noon'), cardByTitle(page, 'First at eight'), {
+      at: 'top',
+      into: page.getByTestId('task-list-todo'),
+    });
 
     await expect(titlesIn(page, 'todo')).toHaveText(order);
     await expect(titlesIn(page, 'done')).toHaveCount(0);

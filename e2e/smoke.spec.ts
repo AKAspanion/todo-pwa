@@ -14,6 +14,7 @@ import {
   createUser,
   resetEmulators,
 } from './support/emulator';
+import { dragCard } from './support/drag';
 
 /** A zone east of UTC, so a date parsed as UTC midnight (D1) would land on the wrong day. */
 const TIME_ZONE = 'Asia/Kolkata';
@@ -91,23 +92,6 @@ async function storedStatuses(): Promise<string[]> {
 /** The card whose title is `title`, within `scope`. */
 function card(scope: Page | Locator, title: string): Locator {
   return scope.getByTestId('task-card').filter({ hasText: title });
-}
-
-/**
- * Drags with the mouse, in steps, as a person would: the board's lists use SortableJS's pointer
- * fallback, which follows pointer moves rather than native drag events (as in home.spec.ts).
- */
-async function drag(page: Page, source: Locator, target: Locator): Promise<void> {
-  const from = await source.getByTestId('task-title').boundingBox();
-  const to = await target.boundingBox();
-  if (!from || !to) throw new Error('drag: source or target is not on screen');
-  const startX = from.x + Math.min(24, from.width / 2);
-  const startY = from.y + from.height / 2;
-  await page.mouse.move(startX, startY);
-  await page.mouse.down();
-  await page.mouse.move(startX + 8, startY + 8, { steps: 4 });
-  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 20 });
-  await page.mouse.up();
 }
 
 /** Picks a day in the add form's date picker, moving to the next month when the day is in it. */
@@ -190,7 +174,7 @@ test.describe('smoke', () => {
     });
 
     await test.step('mark it done by dragging it to Done', async () => {
-      await drag(page, card(page, TITLE), page.getByTestId('task-list-done'));
+      await dragCard(page, card(page, TITLE), page.getByTestId('task-list-done'));
       await expect(card(page.getByTestId('task-list-done'), TITLE)).toBeVisible();
       await expect(card(page.getByTestId('task-list-todo'), TITLE)).toHaveCount(0);
       await expect.poll(storedStatuses).toEqual(['done']);
