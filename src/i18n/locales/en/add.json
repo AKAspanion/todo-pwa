@@ -1,0 +1,33 @@
+{
+  "title": {
+    "label": "Title",
+    "placeholder": "Name your task",
+    "required": "Title is required",
+    "tooLong": "Keep the title under 200 characters"
+  },
+  "description": {
+    "label": "Description",
+    "placeholder": "Details, in Markdown",
+    "tooLong": "Keep the description under 5000 characters"
+  },
+  "date": {
+    "label": "Select date"
+  },
+  "time": {
+    "label": "Select time",
+    "done": "Done"
+  },
+  "indefinite": "Indefinite task?",
+  "labels": {
+    "label": "Labels",
+    "loading": "Loading labels",
+    "loadFailed": "Couldn't load your labels.",
+    "retry": "Retry",
+    "none": "No labels yet.",
+    "create": "Create a label"
+  },
+  "submit": "Add task",
+  "added": "Task added",
+  "saveFailed": "Couldn't save. Try again.",
+  "stillSaving": "Still saving. Check your connection."
+}
