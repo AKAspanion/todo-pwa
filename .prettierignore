@@ -1,0 +1,25 @@
+# Build and test output
+dist/
+sourcemaps/
+coverage/
+playwright-report/
+test-results/
+design/**/compare/
+design/**/app/
+
+# Generated or third-party
+package-lock.json
+functions/package-lock.json
+functions/lib/
+packages/
+public/
+.firebase/
+
+# Kept as written: the legacy function (Task 10 replaces it), the planning documents and local tooling
+functions/index.js
+docs/
+.ga/
+.claude/
+functions/.eslintrc.json
+src/assets/style.css
+*.md

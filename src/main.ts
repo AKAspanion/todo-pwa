@@ -1,19 +1,10 @@
-import Vue from 'vue';
+import { createPinia } from 'pinia';
+import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router/router';
-import store from './store/store';
-import vuetify from './vuetify/vuetify';
-import i18n from './i18n/i18n';
-import './registerServiceWorker';
+import { i18n } from './plugins/i18n';
+import { vuetify } from './plugins/vuetify';
+import { router } from './router';
 
-import './assets/style.css';
+document.documentElement.lang = i18n.global.locale.value;
 
-Vue.config.productionTip = false;
-
-new Vue({
-    vuetify,
-    router,
-    store,
-    i18n,
-    render: (h) => h(App),
-}).$mount('#app');
+createApp(App).use(createPinia()).use(router).use(i18n).use(vuetify).mount('#app');
