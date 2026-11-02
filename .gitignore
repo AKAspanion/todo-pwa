@@ -58,3 +58,9 @@ packages/android/source/local.properties
 # Local tooling: Claude Code worktrees and the ga run workspace
 .claude/worktrees/
 .ga/runs/
+
+# Visual test output: per-run screenshot diffs (refs/ are committed baselines)
+design/modernize/*/compare/
+
+# Local Claude Code preview config
+.claude/launch.json
