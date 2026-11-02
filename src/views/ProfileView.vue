@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch, type ComponentPublicInstance } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { vFocusOnMount } from '@/directives/focusOnMount';
 import { updateDisplayName } from '@/services/auth';
 import { LABEL_NAME_MAX } from '@/services/labels';
 import { useLabelsStore } from '@/stores/labels';
@@ -203,9 +204,9 @@ watch(
         >
           <v-text-field
             v-model="nameDraft"
+            v-focus-on-mount
             :label="t('profile.name.field')"
             :readonly="nameSaving"
-            autofocus
             variant="solo"
             density="compact"
             bg-color="surface"

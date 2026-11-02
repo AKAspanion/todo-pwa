@@ -3,6 +3,7 @@ import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { VForm } from 'vuetify/components';
+import { vFocusOnMount } from '@/directives/focusOnMount';
 import { authErrorCode, authErrorKey } from '@/lib/authForm';
 import { safeRedirect } from '@/router/guard';
 import { consumeRedirectResult, signInEmail, signInWithGoogle } from '@/services/auth';
@@ -140,10 +141,10 @@ onMounted(async () => {
       <v-form v-else ref="form" validate-on="submit" @submit.prevent="submitEmail">
         <v-text-field
           v-model="email"
+          v-focus-on-mount
           type="email"
           name="email"
           autocomplete="email"
-          autofocus
           maxlength="254"
           variant="outlined"
           class="mb-2"

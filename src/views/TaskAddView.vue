@@ -13,6 +13,7 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { VForm } from 'vuetify/components';
+import { vFocusOnMount } from '@/directives/focusOnMount';
 import {
   formatLongDate,
   formatTime12,
@@ -167,17 +168,17 @@ onBeforeUnmount(() => {
   <v-container class="add-task">
     <h1 class="text-h6 mb-4">{{ t('common.screens.add') }}</h1>
     <v-form ref="formRef" :readonly="saving" @submit.prevent="submit">
-      <v-row dense>
+      <v-row density="compact">
         <v-col cols="12">
           <v-text-field
             v-model="form.title"
+            v-focus-on-mount
             :label="t('add.title.label')"
             :placeholder="t('add.title.placeholder')"
             :rules="titleRules"
             :counter="TITLE_MAX"
             prepend-inner-icon="mdi-format-title"
             variant="outlined"
-            autofocus
           />
         </v-col>
 

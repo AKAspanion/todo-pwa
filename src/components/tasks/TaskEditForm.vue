@@ -6,6 +6,7 @@
  */
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { vFocusOnMount } from '@/directives/focusOnMount';
 import { todayYmd } from '@/lib/dates';
 import type { Label, Task, TaskInput } from '@/types/models';
 import { safeColor } from './LabelChips.vue';
@@ -64,13 +65,13 @@ function onSubmit(): void {
   >
     <v-text-field
       v-model="title"
+      v-focus-on-mount
       name="title"
       :label="t('tasks.form.title')"
       :readonly="saving"
       :error-messages="titleError"
       density="compact"
       variant="outlined"
-      autofocus
     />
     <v-textarea
       v-model="description"

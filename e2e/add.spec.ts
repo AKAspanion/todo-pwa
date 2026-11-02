@@ -126,11 +126,12 @@ const submitButton = (page: Page) => page.getByRole('button', { name: 'Add task'
 async function pickDate(page: Page, ymd: string): Promise<void> {
   await page.getByLabel('Select date', { exact: true }).click();
   await expect(page.locator('.v-date-picker')).toBeVisible();
-  const day = page.locator(`[data-v-date="${ymd}"]`);
+  // Vuetify puts data-v-date on each day's button itself.
+  const day = page.locator(`.v-date-picker button[data-v-date="${ymd}"]`);
   if ((await day.count()) === 0) {
     await page.getByRole('button', { name: 'Next month' }).click();
   }
-  await day.getByRole('button').click();
+  await day.click();
   await expect(page.locator('.v-date-picker')).toBeHidden();
 }
 
