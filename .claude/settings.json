@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "ask": [
+      "Bash(*knowledge confirm*)"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(!**/.env.example)",
+      "Read(**/*.pem)",
+      "Read(**/*.p12)",
+      "Read(**/*.key)",
+      "Read(**/*.keystore)",
+      "Read(**/id_rsa*)",
+      "Read(**/credentials*.json)",
+      "Read(**/.npmrc)",
+      "Read(**/google-services.json)",
+      "Read(**/GoogleService-Info.plist)"
+    ]
+  },
+  "enabledPlugins": {
+    "ga-stack@geekyants": true
+  }
+}

@@ -1,0 +1,4 @@
+learn/scan.json
+learn/runs/*/plan.json
+learn/runs/*/staging/
+intake/

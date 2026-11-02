@@ -1,0 +1,3 @@
+# The Playwright MCP's snapshots and screenshots stay out of git.
+*
+!.gitignore
