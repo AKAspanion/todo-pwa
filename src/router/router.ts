@@ -97,39 +97,40 @@ const router = new Router({
         },
     ],
 });
+if (!firebase.isAppInitialized()) {
+    firebase.initializeFirebase();
+}
+
+// Single app-wide listener: keeps the store in sync and sends the user to sign-in
+// when the session ends (sign-out, token revoked) while on a protected page.
+firebase.authChangeListener((user: any) => {
+    if (user) {
+        store.dispatch('SET_USER', user);
+        store.dispatch('LOGIN');
+    } else {
+        store.dispatch('UNSET_USER');
+        store.dispatch('LOGOUT');
+        if (router.currentRoute.matched.some((record: any) => record.meta.requireAuth)) {
+            router.replace('/signin').catch(() => {
+                // already navigating
+            });
+        }
+    }
+});
+
 router.beforeEach((to, from, next) => {
-    if (!firebase.isAppInitialized()) {
-        firebase.initializeFirebase();
-    }
     store.dispatch('LOADING', true);
-    if (to.name === 'signin' || to.name === 'signup') {
-        store.dispatch('SHOW_NAVBAR', false);
-    }
-    firebase.authChangeListener((user: any) => {
+    const requireAuth = to.matched.some((record: any) => record.meta.requireAuth);
+    firebase.waitForAuthReady().then((user: any) => {
         store.dispatch('LOADING', false);
-        if (to.matched.some((record: any) => record.meta.requireAuth)) {
-            store.dispatch('SHOW_NAVBAR', true);
-            if (!user) {
-                store.dispatch('UNSET_USER');
-                store.dispatch('LOGOUT');
-                const nextObject: any = {
-                    path: '/signin',
-                    redirect: from.fullPath,
-                };
-                next(nextObject);
-            } else {
-                store.dispatch('SET_USER', user);
-                store.dispatch('LOGIN');
-                next();
-            }
+        if (requireAuth && !user) {
+            next({ path: '/signin', query: { redirect: to.fullPath } });
+        } else if (!requireAuth && user) {
+            next({ path: '/home' });
         } else {
-            if (localStorage.getItem('isLoggedIn') === 'true') {
-                next({
-                    path: '/home',
-                });
-            } else {
-                next();
-            }
+            // the nav bar also triggers the push-permission prompt, so only show it signed in
+            store.dispatch('SHOW_NAVBAR', requireAuth);
+            next();
         }
     });
 });

@@ -21,7 +21,7 @@ const firebase = new FirebaseWeb();
 })
 export default class App extends Vue {
     mounted() {
-        if (!firebase.isAppInitialized) {
+        if (!firebase.isAppInitialized()) {
             firebase.initializeFirebase();
         }
     }
