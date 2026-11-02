@@ -79,6 +79,17 @@ describe('TimeField', () => {
     wrapper.unmount();
   });
 
+  it("titles the picker in the app's words, with no missing-message warning, whatever its label", async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = mountField({ label: 'Custom' });
+
+    await pressEnter(wrapper);
+
+    expect(wrapper.findComponent(VTimePicker).exists()).toBe(true);
+    expect(warn).not.toHaveBeenCalled();
+    wrapper.unmount();
+  });
+
   it('opens the time picker from the keyboard with Enter, and its Done button closes it', async () => {
     const wrapper = mountField();
 

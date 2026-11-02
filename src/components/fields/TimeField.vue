@@ -63,9 +63,10 @@ function openFromKeyboard(): void {
         @keydown.space.prevent="openFromKeyboard"
       />
     </template>
+    <!-- Vuetify translates the picker's title itself, as a message key: give it the app's key. -->
     <v-time-picker
       :model-value="model || null"
-      :title="label ?? t('fields.time.label')"
+      title="fields.time.label"
       format="24hr"
       color="primary"
       @update:model-value="onPick"

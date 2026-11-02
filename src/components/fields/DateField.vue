@@ -67,9 +67,10 @@ function openFromKeyboard(): void {
         @keydown.space.prevent="openFromKeyboard"
       />
     </template>
+    <!-- Vuetify translates the picker's title itself, as a message key: give it the app's key. -->
     <v-date-picker
       :model-value="pickerDate"
-      :title="label ?? t('fields.date.label')"
+      title="fields.date.label"
       color="primary"
       hide-header
       @update:model-value="onPick"

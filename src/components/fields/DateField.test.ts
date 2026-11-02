@@ -79,6 +79,17 @@ describe('DateField', () => {
     wrapper.unmount();
   });
 
+  it("titles the picker in the app's words, with no missing-message warning, whatever its label", async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = mountField({ label: 'Custom' });
+
+    await pressEnter(wrapper);
+
+    expect(wrapper.findComponent(VDatePicker).exists()).toBe(true);
+    expect(warn).not.toHaveBeenCalled();
+    wrapper.unmount();
+  });
+
   it('opens the date picker from the keyboard with Enter', async () => {
     const wrapper = mountField();
 
