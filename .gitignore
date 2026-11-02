@@ -8,6 +8,10 @@ node_modules
 .env
 .env.local
 .env.*.local
+# Cloud Functions params: functions/.env.example documents them; the deploy workflow writes .env
+functions/.env
+functions/.env.*
+!functions/.env.example
 
 # Log files
 npm-debug.log*

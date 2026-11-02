@@ -240,6 +240,28 @@ describe('runReminders: sending', () => {
     const message = fcm.send.mock.calls[0]?.[0] as TokenMessage;
     expect(message.notification?.body).toBe(reminderBody(`${'x'.repeat(199)}…`, '09:00'));
   });
+
+  it.each([
+    ['https://todo.example', 'https://todo.example/img/icons/android-chrome-192x192.png'],
+    ['https://todo.example/', 'https://todo.example/img/icons/android-chrome-192x192.png'],
+    ['', 'https://spanion-todo.web.app/img/icons/android-chrome-192x192.png'],
+  ])('with APP_URL=%j, the web push icon is %s', async (appUrl, icon) => {
+    vi.stubEnv('APP_URL', appUrl);
+    try {
+      await addDevice('alice', 'tok-alice');
+      await addTask('milk', task('alice', '2026-11-02T03:30:00Z'));
+      const fcm = fakeMessaging();
+
+      await runReminders(db, fcm.messaging, NOW);
+
+      const message = fcm.send.mock.calls[0]?.[0] as TokenMessage;
+      expect(message.webpush?.notification?.icon).toBe(icon);
+      // The service worker routes a click itself (src/sw.ts), so the message carries no link.
+      expect(message.webpush?.fcmOptions?.link).toBeUndefined();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
 });
 
 describe('runReminders: failures', () => {

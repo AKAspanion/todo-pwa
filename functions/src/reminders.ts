@@ -14,6 +14,7 @@ import {
 } from 'firebase-admin/firestore';
 import { getMessaging, type Messaging, type TokenMessage } from 'firebase-admin/messaging';
 import * as logger from 'firebase-functions/logger';
+import { defineString } from 'firebase-functions/params';
 import { onSchedule, type ScheduleFunction } from 'firebase-functions/v2/scheduler';
 import { REMINDER_TITLE, clipTitle, dueWindow, reminderBody } from './dueTasks';
 
@@ -26,9 +27,23 @@ export interface ReminderRunResult {
   removedTokens: number;
 }
 
-/** The icon the old function sent, kept for the web push. */
-const ICON_URL =
-  'https://firebasestorage.googleapis.com/v0/b/spanion-todo.appspot.com/o/FCMImages%2Fcheck-all.png?alt=media&token=acf1bf37-6d10-401c-bd7a-ae67991135cf';
+/** The live site, used when `APP_URL` isn't set. */
+const DEFAULT_APP_URL = 'https://spanion-todo.web.app';
+
+/**
+ * The web app's address (`functions/.env`, see `functions/.env.example`). The CLI resolves it at
+ * deploy time; read it with `.value()` only while a function runs.
+ */
+const APP_URL = defineString('APP_URL', {
+  default: DEFAULT_APP_URL,
+  description: "The web app's address. Reminder notifications show its icon.",
+});
+
+/** The web push icon: the app's own icon, which the site serves from public/. */
+function notificationIconUrl(): string {
+  const appUrl = (APP_URL.value() || DEFAULT_APP_URL).replace(/\/+$/, '');
+  return `${appUrl}/img/icons/android-chrome-192x192.png`;
+}
 
 /** FCM codes meaning a token will never work again, so its device document is deleted (P3). */
 const DEAD_TOKEN_CODES: ReadonlySet<string> = new Set([
@@ -60,7 +75,7 @@ function reminderMessage(token: string, taskId: string, body: string): TokenMess
     token,
     notification: { title: REMINDER_TITLE, body },
     data: { taskId },
-    webpush: { notification: { icon: ICON_URL } },
+    webpush: { notification: { icon: notificationIconUrl() } },
   };
 }
 
