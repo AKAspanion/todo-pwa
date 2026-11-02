@@ -25,19 +25,21 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
    download-token URLs of public images, so the secret scan still catches anything new.
 4. **Give the deploy service account only the roles for what Actions deploys** (README.md,
    "Deploy & CI setup"):
-   - Hosting only (every push to `master`): Firebase Hosting Admin and API Keys Viewer.
-   - Rules and indexes (`deploy_rules`): add Firebase Rules Admin and Cloud Datastore Index Admin.
+   - Rules, indexes and hosting (every push to `master`): Firebase Rules Admin, Cloud Datastore
+     Index Admin, Firebase Hosting Admin and API Keys Viewer.
    - Functions (`deploy_functions`): add Cloud Functions Developer, Service Account User and Cloud
      Scheduler Admin (the scheduled reminder).
 
-   If you never deploy rules or functions from Actions, leave those roles off. If a functions
+   If you never deploy functions from Actions, leave those roles off. If a functions
    deploy stops on a missing permission (Service Usage, Artifact Registry), add that one role,
    such as Service Usage Consumer, rather than a broad role such as Editor.
 5. **Look after the deploy key.** The deploy workflow signs in with the service account's JSON
    key, stored only as the repository secret `FIREBASE_SERVICE_ACCOUNT` (Settings > Secrets and
    variables > Actions). Hosting gets it through `FirebaseExtended/action-hosting-deploy`; the
    rules and functions steps write it to a temporary file on the runner, readable only by the
-   runner user, and remove it when the step ends. It is a long-lived credential: never commit it
+   runner user, and remove it when the step ends. Every `npm ci` runs earlier, without the key and
+   with `--ignore-scripts` (as does the action's own `npx firebase-tools`), so no dependency's
+   install script runs while the key is on the runner. It is a long-lived credential: never commit it
    (`.gitignore` covers `*-firebase-adminsdk-*.json`, `spanion-todo-*.json` and
    `service-account*.json`, and the gitleaks scan looks for private keys), rotate it every 90 days
    or so (and at once if it may have leaked), and delete old keys. Workload Identity Federation is
@@ -56,7 +58,7 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
 | Environment files | `.env.example` lists every `VITE_` variable the app reads; `.env.ci` holds only demo values (project `demo-todo`); `.env`, `.env.local`, `functions/.env` and `functions/.env.*` (except the example) are git-ignored. |
 | Secret scan | gitleaks 8.30.1 over the whole history: 6 findings before the allowlists, all reviewed (item 3 above), none after. Runs in CI on every pull request and every push to `master`. |
 | Hosting headers | `firebase.json` sends a Content Security Policy, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy` on every path. The CSP allows no `unsafe-eval` and no inline script (the built `index.html` has none); inline styles are allowed for Vuetify. |
-| CI and deploy | Workflows run with a read-only token (`contents: read`; the gitleaks job adds `pull-requests: read`). Every action is pinned to a full commit SHA, which Dependabot updates weekly, and checkouts don't persist the token. Deploy runs on a push to `master` and calls the CI workflow first: hosting deploys only if every CI job passes. Rules and functions deploy only from a manual run with their box ticked. A "Check deploy configuration" step names missing variables or the missing secret without printing values. |
+| CI and deploy | Workflows run with a read-only token (`contents: read`; the gitleaks job adds `pull-requests: read`). Every action is pinned to a full commit SHA, which Dependabot updates weekly, and checkouts don't persist the token. Deploy runs on a push to `master` and calls the CI workflow first: the rules, indexes and hosting deploy only if every CI job passes, the rules and indexes before hosting. Functions deploy only from a manual run with their box ticked. The deploy key is never in an install step's environment, and installs run with `--ignore-scripts`. A "Check deploy configuration" step names missing variables or the missing secret without printing values. |
 | Code scanning | CodeQL (`.github/workflows/codeql.yml`), `security-and-quality` queries over JavaScript/TypeScript and the workflows themselves, on pull requests, pushes to `master` and weekly. |
 | Shipped-dependency audit in CI | `npm audit --omit=dev --audit-level=moderate` in the `checks` job: the findings left (below) are all in dev-only packages, which `--omit=dev` leaves out, so a new moderate or worse advisory in a runtime dependency is what fails CI. |
 

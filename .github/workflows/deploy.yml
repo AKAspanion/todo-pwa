@@ -1,18 +1,15 @@
 name: Deploy
 
-# Every push to master runs the full CI suite, then deploys hosting.
-# Firestore rules + indexes, and the Cloud Functions, deploy only when started by hand
-# (Actions > Deploy > Run workflow) with "deploy_rules" or "deploy_functions" ticked.
+# Every push to master runs the full CI suite, then deploys the Firestore rules and indexes, then
+# hosting: the app always goes live with the rules it was built and tested against.
+# The Cloud Functions deploy only when started by hand (Actions > Deploy > Run workflow) with
+# "deploy_functions" ticked.
 # Setup (repository variables, the FIREBASE_SERVICE_ACCOUNT secret): README.md > Deploy & CI setup.
 on:
   push:
     branches: [master]
   workflow_dispatch:
     inputs:
-      deploy_rules:
-        description: Also deploy firestore.rules and firestore.indexes.json
-        type: boolean
-        default: false
       deploy_functions:
         description: Also deploy the Cloud Functions (Blaze plan)
         type: boolean
@@ -87,12 +84,19 @@ jobs:
           if [ -z "$VITE_FIREBASE_VAPID_KEY" ]; then
             echo "::warning::VITE_FIREBASE_VAPID_KEY is not set: the site deploys, but push reminders won't work."
           fi
-      - run: npm ci
+      # Installs run before any step that holds the deploy key, and without dependency install
+      # scripts, so no third-party package code runs while the key is on the runner. None of these
+      # packages needs its install script to build or deploy.
+      - run: npm ci --ignore-scripts
+      - name: Install the Cloud Functions' dependencies
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_functions }}
+        run: npm --prefix functions ci --ignore-scripts
       - run: npm run build
       # The rules and functions steps use the project's own firebase-tools (npm ci above), signed
       # in with the service account key written to a temporary file that is removed afterwards.
+      # The key is in these deploy steps' environment only, never in an install step's.
+      # On every run, before hosting: the new app needs the new rules (review I4).
       - name: Deploy Firestore rules and indexes
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_rules }}
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
@@ -114,8 +118,8 @@ jobs:
         run: |
           # The functions read APP_URL as a firebase-functions param (functions/.env.example).
           printf 'APP_URL=%s\n' "$APP_URL" > functions/.env
-          # firebase.json's predeploy step builds the functions with these.
-          npm --prefix functions ci
+          # firebase.json's predeploy step builds the functions with the dependencies installed
+          # above, before this step had the key.
           creds="$RUNNER_TEMP/sa.json"
           trap 'rm -f "$creds"' EXIT
           (umask 077; printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$creds")
@@ -124,6 +128,9 @@ jobs:
       # Last, so new rules, indexes and functions are live before the app that needs them.
       - name: Deploy hosting
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
+        env:
+          # The action installs firebase-tools with npx while it holds the key: no install scripts.
+          npm_config_ignore_scripts: 'true'
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ vars.FIREBASE_PROJECT_ID }}
