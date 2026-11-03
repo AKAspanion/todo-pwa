@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Install, offline and updates
 description: The app installs as a PWA, opens offline once loaded online, offers each new release instead of forcing it, and removes the old app's service workers.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Install, offline and updates

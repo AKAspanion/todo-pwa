@@ -1,11 +1,11 @@
 ---
 type: Security
-status: draft
 title: Data protection
 description: What is sensitive here — tasks, push tokens, the deploy key — and the protections in the rules, the rendering, the hosting headers, the build and the logs.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Data protection
@@ -34,12 +34,16 @@ generated:
   path (`checkedToken` in `src/services/devices.ts`).
 - **Logs** name an error by its code only, never its message ([project/conventions](../project/conventions.md)).
 - **No HTTP functions:** the old public `testFunction` returned every user's tokens and task titles; it is
-  gone, and a test fails on any new HTTP export ([apps/functions](../apps/functions.md)). It must still be
-  deleted from the live project ([risks/debt](../risks/debt.md)).
+  gone from the code and, per the developer on 2026-11-03, deleted from the live project; a test fails on any
+  new HTTP export ([apps/functions](../apps/functions.md)).
 - **Secrets in git:** `.gitignore` covers env files and the usual key file names, and CI's gitleaks scan
   (`.gitleaks.toml`) runs on every pull request and push. The scan for this knowledge base still flagged
   lines to look at: [findings/committed-secret-candidates](../findings/committed-secret-candidates.md).
 - What was checked, and what is left for the owner: `docs/SECURITY.md`.
+
+## History
+
+- 2026-11-03: the old `testFunction` was still to be deleted from the live project; now deleted, per the developer.
 
 ## Sources
 

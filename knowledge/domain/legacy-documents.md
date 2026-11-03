@@ -1,11 +1,11 @@
 ---
 type: Business Rule
-status: draft
 title: Old documents stay readable
 description: Documents the 2019 app wrote are read defensively and moved to the new shape on edit; a one-off migration fills in the reminder fields.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Old documents stay readable

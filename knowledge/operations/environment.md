@@ -1,11 +1,11 @@
 ---
 type: Runbook
-status: draft
 title: Environment variables
 description: Where each setting is declared and read — the VITE_FIREBASE_* web config, the emulator switch, the functions' APP_URL, and the test-only variables.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Environment variables

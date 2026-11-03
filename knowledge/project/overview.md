@@ -1,11 +1,11 @@
 ---
 type: Project Overview
-status: draft
 title: Task Manager (todo-pwa)
 description: A personal task manager that installs as a PWA and on Android, with labels, a calendar and a push reminder an hour before a task is due.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Task Manager (todo-pwa)
@@ -30,12 +30,14 @@ named in `.firebaserc`). The current code is a 2026-11-02 rebuild of a 2019 Vue 
   budget kill-switch.
 - [apps/android-twa](../apps/android-twa.md): the Play Store app, a Trusted Web Activity around the site
   (`packages/android/source`).
-- [apps/ios-webview](../apps/ios-webview.md): an Xcode WebView wrapper around the site (`packages/ios/src`).
+- [apps/ios-webview](../apps/ios-webview.md): an Xcode WebView wrapper around the site (`packages/ios/src`), kept
+  in the repository but not shipped.
 
 ## Open
 
-- [questions/ios-wrapper-status](../questions/ios-wrapper-status.md): whether the iOS wrapper is still shipped.
-- [questions/label-edit-delete](../questions/label-edit-delete.md): labels can be created but not renamed or deleted.
+Nothing about the product's shape is open. Decided on 2026-11-03: the iOS wrapper isn't shipped
+([decisions/ios-wrapper-unmaintained](../decisions/ios-wrapper-unmaintained.md)), and labels stay create-only
+([decisions/labels-create-only](../decisions/labels-create-only.md)).
 
 ## Sources
 

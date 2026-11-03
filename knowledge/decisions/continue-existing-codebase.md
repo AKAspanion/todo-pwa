@@ -1,11 +1,11 @@
 ---
 type: Decision
-status: draft
 title: Continue the existing todo-pwa codebase
 description: The code in this repository is built on where it is; it isn't rewritten, migrated or treated as reference only.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:11:18Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Continue the existing todo-pwa codebase

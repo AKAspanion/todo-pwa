@@ -1,11 +1,11 @@
 ---
 type: Component Inventory
-status: draft
 title: Components
 description: The app's own components under src/components, grouped by area, on top of Vuetify's.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Components

@@ -1,11 +1,11 @@
 ---
 type: Decision
-status: draft
 title: Old tasks are taken to be in Asia/Kolkata
 description: Tasks the old app saved, which carry no time zone, are read and migrated as India time, the zone the old app and its reminder assumed.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Old tasks are taken to be in Asia/Kolkata

@@ -1,11 +1,11 @@
 ---
 type: Application
-status: draft
 title: Android app (TWA)
 description: The Play Store app app.web.spanion_todo.twa, a Trusted Web Activity that opens the live site full-screen.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Android app (TWA)
