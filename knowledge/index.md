@@ -19,6 +19,7 @@ Start with [Task Manager (todo-pwa)](project/overview.md): what the product is, 
 - [Design system](design-system/index.md) - tokens and the app's own components.
 - [Operations](operations/index.md) - environment, running locally and deploying.
 - [Quality](quality/index.md) - tests and CI.
+- [Requirements](requirements/index.md) - what later work must do, set by work already agreed.
 - [Decisions](decisions/index.md) - choices made about this project, and why.
 - [Findings](findings/index.md) - problems found in the code or repository.
 - [Risks](risks/index.md) - technical debt and open owner tasks.
