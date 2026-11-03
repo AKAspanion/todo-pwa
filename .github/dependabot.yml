@@ -37,6 +37,9 @@ updates:
       # vue-tsc doesn't support TS 7 yet
       - dependency-name: typescript
         versions: ['>=7.0.0']
+      # Node's types follow the Node that runs the tooling (.nvmrc): raise this with .nvmrc
+      - dependency-name: '@types/node'
+        versions: ['>=25.0.0']
 
   - package-ecosystem: npm
     directory: /functions
@@ -64,6 +67,9 @@ updates:
       # vue-tsc doesn't support TS 7 yet (the functions stay on the app's TypeScript)
       - dependency-name: typescript
         versions: ['>=7.0.0']
+      # Node's types follow the functions' runtime (firebase.json, nodejs22): raise this with the runtime
+      - dependency-name: '@types/node'
+        versions: ['>=23.0.0']
 
   - package-ecosystem: github-actions
     directory: /

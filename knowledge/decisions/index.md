@@ -12,5 +12,6 @@
 - [Push reminders are kept, on the Blaze plan](push-reminders-on-blaze.md) - Reminders stay, which needs scheduled functions and so the pay-as-you-go Blaze plan, capped by the budget kill-switch.
 - [Saves never time out or retry](saves-never-time-out.md) - A save waits for Firestore's answer however long it takes, because a timeout or a retry risks writing twice; the form says it is still saving after 15 s.
 - [New Pinia stores use the setup style](setup-style-stores.md) - A new store is written as a setup store, like the session store; the four options stores stay as they are until they are changed for another reason.
+- [@types/node follows the Node each package runs on](types-node-follows-runtime.md) - The app's @types/node stays on the major of its tooling's Node (.nvmrc) and the functions' on their runtime's (nodejs22); Dependabot ignores majors past them.
 
 <!-- GA-GENERATED:END -->
