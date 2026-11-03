@@ -1,11 +1,11 @@
 ---
 type: Decision
-status: draft
 title: Push reminders are kept, on the Blaze plan
 description: Reminders stay, which needs scheduled functions and so the pay-as-you-go Blaze plan, capped by the budget kill-switch.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Push reminders are kept, on the Blaze plan

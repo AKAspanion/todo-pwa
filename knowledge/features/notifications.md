@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Notifications and push reminders
 description: The notifications screen — a per-device push toggle and the list of reminders received, newest first.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Notifications and push reminders

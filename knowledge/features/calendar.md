@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Calendar
 description: The user's dated tasks by day, week or month; clicking one opens its details.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Calendar

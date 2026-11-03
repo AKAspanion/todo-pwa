@@ -1,11 +1,11 @@
 ---
 type: Decision
-status: draft
 title: Saves never time out or retry
 description: A save waits for Firestore's answer however long it takes, because a timeout or a retry risks writing twice; the form says it is still saving after 15 s.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Saves never time out or retry

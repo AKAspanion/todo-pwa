@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Add a task
 description: The add screen — a title, a Markdown description, a local date and time or indefinite, and any of the user's labels.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Add a task

@@ -1,11 +1,11 @@
 ---
 type: Integration
-status: draft
 title: Cloud Billing budget kill-switch
 description: A budget publishes to billing-budget-alerts; once the month's actual cost reaches the budget, stopBillingOnBudget unlinks the project's billing account.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Cloud Billing budget kill-switch

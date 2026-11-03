@@ -1,11 +1,11 @@
 ---
 type: Decision
-status: draft
 title: The emulators run on their own ports
 description: Auth, Firestore and Functions emulators use ports other than Firebase's defaults, set once in firebase.json, because another local project uses the defaults.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # The emulators run on their own ports

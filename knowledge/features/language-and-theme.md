@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Language and theme
 description: English or Hindi, light or dark, each remembered on the device under the old app's storage keys.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Language and theme

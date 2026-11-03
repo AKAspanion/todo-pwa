@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Sign in and sign up
 description: Email and password or Google; signed-out visitors are sent to sign in and come back to the page they asked for.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Sign in and sign up

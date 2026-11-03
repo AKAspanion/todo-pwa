@@ -1,11 +1,11 @@
 ---
 type: Application
-status: draft
 title: Cloud Functions
 description: The functions/ package — the five-minute reminder run and the budget kill-switch, on Node 22 with firebase-functions v2; nothing answers HTTP.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Cloud Functions

@@ -1,11 +1,11 @@
 ---
 type: Finding
-status: draft
 title: Secret-shaped values committed to git
 description: The inventory scan flagged two whole files and five lines as possible secrets; the docs say they are demo or public values, but nobody has confirmed each one.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Secret-shaped values committed to git

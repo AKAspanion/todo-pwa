@@ -1,11 +1,11 @@
 ---
 type: Application
-status: draft
 title: iOS wrapper
-description: An Xcode project, "Task Manager", that shows the live site in a WKWebView; whether it is still shipped is open.
+description: An Xcode project, "Task Manager", that shows the live site in a WKWebView; kept in the repository, not shipped or maintained.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # iOS wrapper
@@ -13,8 +13,8 @@ generated:
 ## Role
 
 Shows the web app inside a native iOS shell (a WKWebView), with the site's origin as its only allowed origin.
-The README doesn't mention it, and its last change is the commit that added it:
-[questions/ios-wrapper-status](../questions/ios-wrapper-status.md).
+It isn't shipped or maintained, and site changes needn't keep it working
+([decisions/ios-wrapper-unmaintained](../decisions/ios-wrapper-unmaintained.md)).
 
 ## Stack
 

@@ -1,11 +1,11 @@
 ---
 type: Integration
-status: draft
 title: Firebase (Auth, Firestore, Hosting, emulators)
 description: The whole backend — Auth for sign-in, Firestore for data, Hosting for the site — with the Emulator Suite on the project's own ports for development and tests.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Firebase (Auth, Firestore, Hosting, emulators)

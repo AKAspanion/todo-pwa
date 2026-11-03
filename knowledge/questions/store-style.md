@@ -1,11 +1,11 @@
 ---
 type: Open Question
-status: draft
 title: Which Pinia store style does new code use?
 description: Four stores use the options style and the session store the setup style.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Which Pinia store style does new code use?
@@ -22,7 +22,7 @@ until this is decided.
 
 ## Status
 
-Open
+Answered: new stores use the setup style. See [setup-style-stores](../decisions/setup-style-stores.md).
 
 ## Sources
 
