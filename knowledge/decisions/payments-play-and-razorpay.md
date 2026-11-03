@@ -39,4 +39,4 @@ The developer decided on 2026-11-03 that:
 ## Sources
 
 - `packages/android/source/app/src/main/AndroidManifest.xml`
-- `functions/scripts/grant-pro.ts`
+- `docs/specs/2026-11-03-payments.md`

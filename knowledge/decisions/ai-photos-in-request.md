@@ -38,3 +38,4 @@ Storage was turned down as one more service, rule set and clean-up job for an im
 
 - `firebase.json`
 - `firestore.rules`
+- `docs/specs/2026-11-03-ai-capture.md`
