@@ -1,11 +1,11 @@
 ---
 type: Runbook
-status: draft
 title: CI
 description: Four parallel CI jobs on every pull request and before every deploy — checks, functions, e2e and a gitleaks scan — plus CodeQL and Dependabot.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # CI

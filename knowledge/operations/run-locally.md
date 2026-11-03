@@ -1,11 +1,11 @@
 ---
 type: Runbook
-status: draft
 title: Run locally
 description: Node from .nvmrc, Java for the emulators, then the emulators and the Vite dev server against the demo project.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Run locally

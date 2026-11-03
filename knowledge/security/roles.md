@@ -1,11 +1,11 @@
 ---
 type: Security
-status: draft
 title: Who may do what
 description: One role, the owner — every document is readable and writable only by the user whose uid it carries; notifications are written only by the functions.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Who may do what
@@ -24,7 +24,7 @@ documents.
 | Collection | Read, delete | Create | Update |
 |---|---|---|---|
 | `tasks/{taskId}` | owner | owner, with every task field and nothing else, each valid | owner; `uid` can't change; only task fields, each valid; old `type`/`id` may be removed |
-| `types/{labelId}` | owner | owner, with `uid`, `label`, `color`, each valid | owner; `uid` can't change |
+| `types/{labelId}` | owner | owner, with `uid`, `label`, `color`, each valid | owner; `uid` can't change; only label fields, each valid |
 | `notifications/{id}` | owner | nobody (functions only) | nobody |
 | `users/{uid}/devices/{token}` | owner of the path | owner, exactly `uid`, `token`, `userAgent`, `updatedAt`, with `uid` and `token` matching the path | same as create |
 

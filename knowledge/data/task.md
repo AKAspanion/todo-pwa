@@ -1,11 +1,11 @@
 ---
 type: Data Model
-status: draft
 title: Task
 description: A task document's fields, which of them the user enters and which are derived on every save, and the limits the rules enforce.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Task

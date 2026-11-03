@@ -1,11 +1,11 @@
 ---
 type: Security
-status: draft
 title: Authentication
 description: Firebase Auth with email and password or Google; the route guard is a convenience, and the Firestore rules are the real check.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Authentication

@@ -1,11 +1,11 @@
 ---
 type: Conventions
-status: draft
 title: Conventions
 description: How code is written in todo-pwa — where each kind of file goes, how errors travel, where tests live, and which tools and policy keys enforce the rest.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Conventions
@@ -15,16 +15,17 @@ generated:
 - A screen is `src/views/<Name>View.vue`, lazily imported by its route in `src/router/index.ts` (e.g. `src/views/HomeView.vue`).
 - A store is `src/stores/<name>.ts` exporting `use<Name>Store` (e.g. `src/stores/tasks.ts`); a service is `src/services/<collection or area>.ts` (e.g. `src/services/tasks.ts`).
 - Error codes thrown by app code are `'<area>/<code>'`, like Firebase's: `label/invalid-name`, `device/invalid-token`, `auth/not-signed-in` (`src/services/labels.ts`).
-- Comments cite the spec item they implement (`D7`, `P6`, `S2`, from `docs/specs/2026-11-02-modernize-and-fix.md`); services, `src/lib/` and `src/pwa/` modules open with a doc comment saying what the module is (`src/services/tasks.ts`). Stores and plugins don't.
+- Comments cite the spec item they implement. Today's ids (`D7`, `P6`, `S2`) are all from `docs/specs/2026-11-02-modernize-and-fix.md`; new code cites the items of its own spec in `docs/specs/`, by that spec's ids.
+- Services, `src/lib/` and `src/pwa/` modules open with a doc comment saying what the module is (`src/services/tasks.ts`). Stores and plugins don't.
 
 ## Folder layout
 
-- Only `src/services/` touches Firestore and Auth; `src/lib/firebase.ts` creates the one app. Views and components go through a store (`src/views/HomeView.vue`).
+- Only `src/services/` touches Firestore and Auth; `src/lib/firebase.ts` creates the one app. Views and components go through a store (`src/views/HomeView.vue`). Push messaging is the one other Firebase caller, and lives in `src/pwa/useMessaging.ts` and `src/sw.ts`.
 - Shared components are grouped by area under `src/components/<area>/` (`tasks`, `fields`, `layout`, `calendar`).
 - Every visible string lives in `src/i18n/locales/<lang>/<feature>.json`, with the same keys in `en` and `hi`; each file is the `<feature>` namespace (`src/plugins/i18n.ts`).
 - Imports from `src/` use the `@/` alias (`vite.config.ts`). Components use `<script setup lang="ts">`.
 - In `functions/`, rules with no Firebase in them go in their own module so they are cheap to test (`functions/src/dueTasks.ts`).
-- Stores split two ways: four use the options style (`src/stores/tasks.ts`), `src/stores/session.ts` the setup style. Which new code follows: [questions/store-style](../questions/store-style.md).
+- A new store uses the setup style, `defineStore('<name>', () => { ... })`, as `src/stores/session.ts` does ([decisions/setup-style-stores](../decisions/setup-style-stores.md)). The four options stores (`src/stores/tasks.ts`) stay as they are.
 
 ## Error handling
 
@@ -55,6 +56,10 @@ generated:
 - The root checks are policy keys: `checks.commands.typecheck`, `checks.commands.lint`, `checks.commands.lint-fix`, `checks.commands.format-check`, `checks.commands.test`, `checks.commands.e2e`. `test` and `e2e` start the emulators themselves and need Java 21+.
 - The functions have their own: `npm --prefix functions run build`, `lint` and `test` (`functions/package.json`).
 
+## History
+
+- 2026-11-03: the store style for new code was an open question; now setup style. See [Setup-style stores](../decisions/setup-style-stores.md).
+
 ## Sources
 
 - `./eslint.config.js`
@@ -75,6 +80,8 @@ generated:
 - `src/services/labels.ts`
 - `src/plugins/i18n.ts`
 - `src/lib/firebase.ts`
+- `src/pwa/useMessaging.ts`
+- `src/sw.ts`
 - `functions/src/dueTasks.ts`
 - `functions/src/reminders.ts`
 - `functions/src/reminders.test.ts`

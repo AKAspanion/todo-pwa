@@ -1,11 +1,11 @@
 ---
 type: Runbook
-status: draft
 title: Deploy
 description: Every push to master runs CI, then deploys the Firestore rules and indexes and then hosting; the functions deploy only from a manual run; one-time setup steps before the first deploy.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Deploy
@@ -29,9 +29,13 @@ generated:
 
 The one-time steps are in `README.md`, "Deploy & CI setup", section 3: delete the old public `testFunction`
 and `testSchedule` first, move the project to Blaze, authorise both domains for Google sign-in, deploy, then
-run the data migration once ([domain/legacy-documents](../domain/legacy-documents.md)). The kill-switch's own
-setup is in [integrations/cloud-billing](../integrations/cloud-billing.md). Which of these are done is not
-recorded here: [risks/debt](../risks/debt.md).
+run the data migration once ([domain/legacy-documents](../domain/legacy-documents.md)). The developer said on
+2026-11-03 that all of these are done on `spanion-todo`. The kill-switch's own setup is in
+[integrations/cloud-billing](../integrations/cloud-billing.md).
+
+## History
+
+- 2026-11-03: whether the first-deploy steps were done wasn't recorded; now done, per the developer.
 
 ## Sources
 

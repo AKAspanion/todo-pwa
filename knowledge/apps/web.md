@@ -1,11 +1,11 @@
 ---
 type: Application
-status: draft
 title: Web app
 description: The Vue 3 single-page app at the repository root, built by Vite and served by Firebase Hosting as an installable PWA.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Web app

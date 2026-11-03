@@ -1,11 +1,11 @@
 ---
 type: Design Tokens
-status: draft
 title: Design tokens
 description: Vuetify's defaults with one app colour, #1976D2, shared by the theme and the web manifest, and a light and a dark theme.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Design tokens

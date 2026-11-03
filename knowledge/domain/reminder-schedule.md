@@ -1,11 +1,11 @@
 ---
 type: Business Rule
-status: draft
 title: Reminder schedule
 description: A dated, not-done task gets one push in the hour before it is due, from a run every five minutes with per-run and per-owner limits.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Reminder schedule

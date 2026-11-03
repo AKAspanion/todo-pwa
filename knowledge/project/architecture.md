@@ -1,11 +1,11 @@
 ---
 type: Architecture
-status: draft
 title: Architecture
 description: A Vue SPA that talks straight to Firebase Auth and Firestore, guarded by security rules, plus two Cloud Functions and one service worker.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Architecture

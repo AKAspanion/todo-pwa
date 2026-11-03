@@ -1,11 +1,11 @@
 ---
 type: Integration
-status: draft
 title: Firebase Cloud Messaging
 description: Web push for reminders — tokens from the browser with the VAPID key, sends from the function over the HTTP v1 API.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Firebase Cloud Messaging

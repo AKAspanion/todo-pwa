@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Task board (home)
 description: The home screen — Todo and Done lists, narrowed by text, labels and a day, where tasks are checked, dragged, edited and deleted.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Task board (home)

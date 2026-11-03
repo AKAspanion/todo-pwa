@@ -1,11 +1,11 @@
 ---
 type: Data Model
-status: draft
 title: Data model
 description: Four Firestore collections — tasks, types (labels), notifications and users/{uid}/devices — each owned by the uid it carries.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Data model

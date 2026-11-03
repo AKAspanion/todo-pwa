@@ -1,11 +1,11 @@
 ---
 type: Feature
-status: draft
 title: Profile and labels
 description: The profile screen — the user's name and photo, editing the display name, and creating labels with a name and colour.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Profile and labels
@@ -13,8 +13,8 @@ generated:
 ## What it does
 
 Shows the signed-in user's photo (or initials), name and email; edits the display name; lists the user's
-labels and creates new ones with a name and a colour. Labels can't be renamed or deleted here:
-[questions/label-edit-delete](../questions/label-edit-delete.md).
+labels and creates new ones with a name and a colour. Labels are create-only by decision:
+[decisions/labels-create-only](../decisions/labels-create-only.md).
 
 ## Screens and routes
 

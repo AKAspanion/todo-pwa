@@ -1,11 +1,11 @@
 ---
 type: Business Rule
-status: draft
 title: Dates are local wall-clock values
 description: A task's date and time are what the user typed, in the device's time zone, and are never parsed as UTC; only remindAt is an instant.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
+verified: human:panditankit1995@gmail.com
 ---
 
 # Dates are local wall-clock values
