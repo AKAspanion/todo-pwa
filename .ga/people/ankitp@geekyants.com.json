@@ -1,0 +1,10 @@
+{
+  "workflow": {
+    "steps": {
+      "spec": "always",
+      "plan": "always",
+      "tdd": "encouraged"
+    }
+  },
+  "habitsOffered": "2026-11-03"
+}
