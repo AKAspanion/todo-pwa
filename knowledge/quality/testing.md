@@ -23,7 +23,12 @@ verified: human:panditankit1995@gmail.com
   WebKit (`playwright.config.ts`). They share one set of emulators and reset them, so they run one at a time,
   against their own Vite server. `e2e/auth.spec.ts` also checks accessibility with `@axe-core/playwright`.
 - **Visual:** each screen's spec has one visual test (Chromium) that captures its states at 390 and 1280 px into
-  `design/modernize/<screen>/` and compares them with the references in `refs/`. It runs only where
+  `design/modernize/<screen>/` and compares them with the references in `refs/`. The references are captures
+  of the old app (`b8af93e^`), taken by `e2e/old-app-refs.spec.ts` against a worktree that
+  `e2e/support/old-app.mjs` builds; the states the old app can't show are listed in
+  `design/modernize/old-app-states.md`. The compare script exits non-zero only when a capture fails, and its
+  `0.1` is a per-pixel tolerance, so a pass doesn't mean the screens match: judge a screen from the diff ratios
+  and the diff images. It runs only where
   `VISUAL_COMPARE_SCRIPT`'s script exists and never on CI, because the references were captured on macOS and
   Linux renders fonts differently (`e2e/support/visual.ts`).
 
@@ -31,6 +36,10 @@ verified: human:panditankit1995@gmail.com
 
 The policy's `checks.commands.test` and `checks.commands.e2e`, plus `npm run test:rules` and the functions'
 `npm --prefix functions run test`. Running some files, and the visual tests only, is in `README.md` ("Scripts").
+
+## History
+
+- 2026-11-04: was references captured from the rewrite; now captures of the old app, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources
 
@@ -41,6 +50,9 @@ The policy's `checks.commands.test` and `checks.commands.e2e`, plus `npm run tes
 - `functions/vitest.config.ts`
 - `playwright.config.ts`
 - `e2e/support/visual.ts`
+- `e2e/old-app-refs.spec.ts`
+- `e2e/support/old-app.mjs`
+- `design/modernize/old-app-states.md`
 - `e2e/support/emulator.ts`
 - `e2e/auth.spec.ts`
 - `README.md`
