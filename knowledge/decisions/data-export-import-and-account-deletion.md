@@ -22,7 +22,9 @@ account must let them delete it ([apps/android-twa](../apps/android-twa.md)). Pa
 
 The developer decided on 2026-11-03:
 
-- **Delete account:** the user re-confirms (password, or Google) and types `DELETE`; the app deletes the Firebase
+- **Delete account** (moved out of part 8 on 2026-11-04 to the Play Store work, with Google re-confirmation by
+  redirect: [decisions/account-deletion-for-play](account-deletion-for-play.md)): the user re-confirms (password,
+  or Google) and types `DELETE`; the app deletes the Firebase
   Auth user; a new function on Auth's user-deletion event, not HTTP, erases the user's tasks, labels,
   notifications, devices and old `fcm/{uid}` document with the Admin SDK. Deleting from the browser alone was
   turned down: a tab closed halfway would leave half the data, or an account without data.
@@ -35,11 +37,19 @@ The developer decided on 2026-11-03:
 - The functions' export test (spec S1 of 2026-11-02) gains the new trigger on purpose; still no HTTP or callable
   export.
 - Importing the same file twice adds everything twice; the preview says so.
-- The behaviour is specified in `docs/specs/2026-11-03-data-and-account.md`.
+- Export and import are specified in `docs/specs/2026-11-03-data-and-account.md`; deleting the account in
+  `docs/specs/2026-11-04-play-store-twa.md`.
+
+## History
+
+- 2026-11-04: deleting the account was part 8, with Google re-confirmation by popup or redirect; now it is built
+  with the Play Store app and re-confirms by redirect only, because Play requires deletion and popups fail in the
+  TWA. See [Account deletion for Play](account-deletion-for-play.md).
 
 ## Sources
 
 - `docs/specs/2026-11-03-data-and-account.md`
+- `docs/specs/2026-11-04-play-store-twa.md`
 - `functions/src/index.ts`
 - `functions/src/reminders.test.ts`
 - `src/views/ProfileView.vue`

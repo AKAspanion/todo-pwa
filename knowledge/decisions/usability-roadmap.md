@@ -32,7 +32,8 @@ and plan, and is merged before the next part's spec is written:
    reminded; snooze; a count on the app icon.
 7. **Recurring tasks**: after the reminders part, because a repeat needs its next reminder.
 8. **Data and account**: export and import, a calendar export
-   ([decisions/ics-export-client-side](ics-export-client-side.md)), and deleting the account.
+   ([decisions/ics-export-client-side](ics-export-client-side.md)). Deleting the account moved to the Play Store
+   work ([decisions/account-deletion-for-play](account-deletion-for-play.md)).
 
 Renaming and deleting labels stays out ([decisions/labels-create-only](labels-create-only.md)).
 
@@ -40,9 +41,15 @@ Renaming and deleting labels stays out ([decisions/labels-create-only](labels-cr
 
 - Part 2 changes a reviewed rule of the home screen: the picked day shows only that day's todo tasks and undated
   ones ([features/task-board](../features/task-board.md)). Its spec has to settle that with the developer.
-- Part 8 may be moved earlier: Play Store apps that let people create an account must let them delete it
-  ([apps/android-twa](../apps/android-twa.md)).
+- Deleting the account is built with the Play Store app, ahead of part 8, because Play requires it
+  ([decisions/account-deletion-for-play](account-deletion-for-play.md)).
 - Part 7 is the riskiest; its requirements are to be grilled before its spec.
+
+## History
+
+- 2026-11-04: part 8 included deleting the account, possibly moved earlier; now deletion is built with the Play
+  Store app and part 8 is export and import only, because Play requires deletion. See
+  [Account deletion for Play](account-deletion-for-play.md).
 
 ## Sources
 

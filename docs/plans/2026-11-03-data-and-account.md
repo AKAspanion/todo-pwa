@@ -12,6 +12,8 @@
 
 **Builds after:** parts 1–7 (`docs/plans/2026-11-03-board-fixes.md` to `docs/plans/2026-11-03-recurring-tasks.md`): the task's fields up to `repeat`, `seriesId` and `spawnedNext`, `cleanChecklist`, `isRepeatRule`, `isPriority`, `isRemindBefore`, `formatRepeat` through `RepeatSummary`'s logic. Their code is taken as already there.
 
+> **2026-11-04:** Delete account moved to `docs/specs/2026-11-04-play-store-twa.md` and its plan. Skip this plan's delete-account steps and files (`src/services/account.ts`, `DeleteAccountDialog.vue`, `functions/src/deleteUserData.ts`); revise the plan before running it.
+
 ## Global Constraints
 
 - §2 E1: "Nothing is sent anywhere."
