@@ -133,7 +133,7 @@ CI (`.github/workflows/ci.yml`) runs on every pull request, and on every push to
 first job of the deploy workflow. It has four parallel jobs: `checks` (lint, typecheck, format
 check, unit tests, Firestore rules tests, the production build, and `pnpm audit` of the shipped
 dependencies), `functions` (the Cloud Functions' build, lint and tests), `e2e` (Playwright in
-Chromium and WebKit), and `secrets` (a gitleaks scan, configured in `.gitleaks.toml`). CodeQL
+Chromium and WebKit, which runs only before deploy, not on pull requests), and `secrets` (a gitleaks scan, configured in `.gitleaks.toml`). CodeQL
 (`.github/workflows/codeql.yml`) scans the code and the workflows on pull requests, pushes to
 `master` and weekly. Every action is pinned to a commit SHA; Dependabot
 (`.github/dependabot.yml`) opens weekly, grouped update PRs for npm packages and for those

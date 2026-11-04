@@ -2,6 +2,7 @@ name: CI
 
 # Pull requests run it directly; every push to master runs it through deploy.yml, which deploys
 # only when it passes.
+# The e2e job runs only before deploy, not on pull requests.
 on:
   pull_request:
   workflow_call:
@@ -92,6 +93,8 @@ jobs:
 
   e2e:
     name: End-to-end (Playwright, Chromium + WebKit, emulators)
+    # Skipped on pull requests: e2e runs only before deploy (decisions/e2e-before-deploy-only).
+    if: ${{ github.event_name != 'pull_request' }}
     # Pinned: Playwright's WebKit builds go up to Ubuntu 24.04, and on 26.04 (ubuntu-latest from
     # 2026-10-19) WebKit can't start, missing libicudata.so.74.
     runs-on: ubuntu-24.04
