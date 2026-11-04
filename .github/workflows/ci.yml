@@ -90,7 +90,9 @@ jobs:
 
   e2e:
     name: End-to-end (Playwright, Chromium + WebKit, emulators)
-    runs-on: ubuntu-latest
+    # Pinned: Playwright's WebKit builds go up to Ubuntu 24.04, and on 26.04 (ubuntu-latest from
+    # 2026-10-19) WebKit can't start, missing libicudata.so.74.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -120,7 +122,8 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          # ImageOS (ubuntu24, ...) keeps browsers built for one OS release off another.
+          key: playwright-${{ env.ImageOS }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium webkit
