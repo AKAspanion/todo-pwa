@@ -1,6 +1,6 @@
 # Spec: Play Store app — Bubblewrap TWA, redirect-only Google sign-in, account deletion, privacy policy
 
-_2026-11-04 · status: draft · decisions: [decisions/android-app-bubblewrap](../../knowledge/decisions/android-app-bubblewrap.md), [decisions/google-sign-in-redirect-only](../../knowledge/decisions/google-sign-in-redirect-only.md), [decisions/account-deletion-for-play](../../knowledge/decisions/account-deletion-for-play.md), [decisions/legal-pages-english-only](../../knowledge/decisions/legal-pages-english-only.md) · takes Delete account (D1–D5) out of [part 8](2026-11-03-data-and-account.md)_
+_2026-11-04 · status: approved 2026-11-04 · decisions: [decisions/android-app-bubblewrap](../../knowledge/decisions/android-app-bubblewrap.md), [decisions/google-sign-in-redirect-only](../../knowledge/decisions/google-sign-in-redirect-only.md), [decisions/account-deletion-for-play](../../knowledge/decisions/account-deletion-for-play.md), [decisions/legal-pages-english-only](../../knowledge/decisions/legal-pages-english-only.md) · takes Delete account (D1–D5) out of [part 8](2026-11-03-data-and-account.md)_
 
 ## §1 Goal
 
