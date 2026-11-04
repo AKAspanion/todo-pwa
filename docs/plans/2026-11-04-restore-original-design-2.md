@@ -1,5 +1,7 @@
 # Restore the original design, part 2 Implementation Plan
 
+**Status:** complete
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Restyle the add, sign-in and sign-up, profile, calendar and notifications screens to match the old app, with the old app's wording, as part 1 did for the shell and home.
@@ -61,20 +63,20 @@
 - Given a save the server rejects, then the form keeps its values and the failure message shows in the old app's style.
 - Given the home edit form, then `e2e/home.spec.ts` still passes: the field changes don't move it.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/add.spec.ts` and the field tests
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/add.spec.ts` and the field tests
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm run e2e -- e2e/add.spec.ts --project chromium`
 Expected: FAIL on the copy, the icons and the new `add-dark` state.
 
-- [ ] **Step 3: Port the old add screen's markup and CSS** into `src/views/TaskAddView.vue`, and the field looks it needs into `DateField.vue` and `TimeField.vue`
-- [ ] **Step 4: Switch the add strings** to the old app's in `src/i18n/locales/en/add.json` and `src/i18n/locales/hi/add.json`
-- [ ] **Step 5: Run them to verify they pass**
+- [x] **Step 3: Port the old add screen's markup and CSS** into `src/views/TaskAddView.vue`, and the field looks it needs into `DateField.vue` and `TimeField.vue`
+- [x] **Step 4: Switch the add strings** to the old app's in `src/i18n/locales/en/add.json` and `src/i18n/locales/hi/add.json`
+- [x] **Step 5: Run them to verify they pass**
 
 Run: `npm run e2e -- e2e/add.spec.ts e2e/home.spec.ts --project chromium`
 Expected: PASS, with each state's ratios in the report
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/views/TaskAddView.vue src/components/fields/DateField.vue src/components/fields/TimeField.vue src/components/fields/DateField.test.ts src/components/fields/TimeField.test.ts src/i18n/locales/en/add.json src/i18n/locales/hi/add.json e2e/add.spec.ts design/modernize/add/compare.json
@@ -110,20 +112,20 @@ git commit -m "feat(ui): the old app's add task screen"
 - Given a wrong password, then the failure shows where and how the old app showed it, and the email and password fields keep their values.
 - Given the existing auth tests in `e2e/auth.spec.ts`, then they pass, with only copy and markup-bound selectors changed.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/auth.spec.ts`
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/auth.spec.ts`
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm run e2e -- e2e/auth.spec.ts --project chromium`
 Expected: FAIL on the copy and the new `auth-dark` state.
 
-- [ ] **Step 3: Port the old sign-in and sign-up markup and CSS** into `src/views/SignInView.vue` and `src/views/SignUpView.vue`
-- [ ] **Step 4: Switch the auth strings** to the old app's in `src/i18n/locales/en/auth.json` and `src/i18n/locales/hi/auth.json`
-- [ ] **Step 5: Run them to verify they pass**
+- [x] **Step 3: Port the old sign-in and sign-up markup and CSS** into `src/views/SignInView.vue` and `src/views/SignUpView.vue`
+- [x] **Step 4: Switch the auth strings** to the old app's in `src/i18n/locales/en/auth.json` and `src/i18n/locales/hi/auth.json`
+- [x] **Step 5: Run them to verify they pass**
 
 Run: `npm run e2e -- e2e/auth.spec.ts --project chromium`
 Expected: PASS, with each state's ratios in the report
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/views/SignInView.vue src/views/SignUpView.vue src/i18n/locales/en/auth.json src/i18n/locales/hi/auth.json e2e/auth.spec.ts design/modernize/auth/compare.json
@@ -158,20 +160,20 @@ git commit -m "feat(ui): the old app's sign-in and sign-up screens"
 - Given the profile screen, then its labels, buttons and messages are the old app's, in `en` and `hi`, from `profile.json`.
 - Given a label name that fails validation, or a rename that fails, then the typed name stays and the message shows (the existing cases keep passing with the old copy).
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/profile.spec.ts`
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/profile.spec.ts`
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm run e2e -- e2e/profile.spec.ts --project chromium`
 Expected: FAIL on the copy, the avatar icon and the new `profile-dark` state.
 
-- [ ] **Step 3: Port the old profile markup and CSS** into `src/views/ProfileView.vue`
-- [ ] **Step 4: Switch the profile strings** to the old app's in `src/i18n/locales/en/profile.json` and `src/i18n/locales/hi/profile.json`
-- [ ] **Step 5: Run them to verify they pass**
+- [x] **Step 3: Port the old profile markup and CSS** into `src/views/ProfileView.vue`
+- [x] **Step 4: Switch the profile strings** to the old app's in `src/i18n/locales/en/profile.json` and `src/i18n/locales/hi/profile.json`
+- [x] **Step 5: Run them to verify they pass**
 
 Run: `npm run e2e -- e2e/profile.spec.ts --project chromium`
 Expected: PASS, with each state's ratios in the report
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/views/ProfileView.vue src/i18n/locales/en/profile.json src/i18n/locales/hi/profile.json e2e/profile.spec.ts design/modernize/profile/compare.json
@@ -207,20 +209,20 @@ git commit -m "feat(ui): the old app's profile screen"
 - Given an event, then it shows in its task's first label colour (passed through `safeColor`), as the old calendar's events did.
 - Given the existing move-and-add and details tests in `e2e/calendar.spec.ts`, then they pass, with only copy and markup-bound selectors changed.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/calendar.spec.ts`
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/calendar.spec.ts`
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm run e2e -- e2e/calendar.spec.ts --project chromium`
 Expected: FAIL on the copy and the new `calendar-dark` state.
 
-- [ ] **Step 3: Port the old calendar markup and CSS** into `src/views/CalendarView.vue`, and the old event card's style into `src/components/calendar/TaskDetailsDialog.vue`
-- [ ] **Step 4: Switch the calendar strings** to the old app's in `src/i18n/locales/en/calendar.json` and `src/i18n/locales/hi/calendar.json`
-- [ ] **Step 5: Run them to verify they pass**
+- [x] **Step 3: Port the old calendar markup and CSS** into `src/views/CalendarView.vue`, and the old event card's style into `src/components/calendar/TaskDetailsDialog.vue`
+- [x] **Step 4: Switch the calendar strings** to the old app's in `src/i18n/locales/en/calendar.json` and `src/i18n/locales/hi/calendar.json`
+- [x] **Step 5: Run them to verify they pass**
 
 Run: `npm run e2e -- e2e/calendar.spec.ts --project chromium`
 Expected: PASS, with each state's ratios in the report
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/views/CalendarView.vue src/components/calendar/TaskDetailsDialog.vue src/i18n/locales/en/calendar.json src/i18n/locales/hi/calendar.json e2e/calendar.spec.ts design/modernize/calendar/compare.json
@@ -255,20 +257,20 @@ git commit -m "feat(ui): the old app's calendar"
 - Given a notification whose old `timestamp` text can't be parsed, then it shows with no time, as today (`domain/legacy-documents`).
 - Given a delete that fails, then the notification stays in the list and the failure shows (the existing case keeps passing with the old copy).
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/notifications.spec.ts`
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `e2e/notifications.spec.ts`
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm run e2e -- e2e/notifications.spec.ts --project chromium`
 Expected: FAIL on the copy and the new `notifications-dark` state.
 
-- [ ] **Step 3: Port the old notifications markup and CSS** into `src/views/NotificationsView.vue`
-- [ ] **Step 4: Switch the notifications strings** to the old app's in `src/i18n/locales/en/notifications.json` and `src/i18n/locales/hi/notifications.json`
-- [ ] **Step 5: Run them to verify they pass**
+- [x] **Step 3: Port the old notifications markup and CSS** into `src/views/NotificationsView.vue`
+- [x] **Step 4: Switch the notifications strings** to the old app's in `src/i18n/locales/en/notifications.json` and `src/i18n/locales/hi/notifications.json`
+- [x] **Step 5: Run them to verify they pass**
 
 Run: `npm run e2e -- e2e/notifications.spec.ts --project chromium`
 Expected: PASS, with each state's ratios in the report
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/views/NotificationsView.vue src/i18n/locales/en/notifications.json src/i18n/locales/hi/notifications.json e2e/notifications.spec.ts design/modernize/notifications/compare.json

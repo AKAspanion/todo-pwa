@@ -1,5 +1,7 @@
 # Restore the original design, part 1 Implementation Plan
 
+**Status:** complete
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Give the Vue 3 app the old app's global look, capture every screen of the old app as the visual references, and restyle the shell and the home screen to match them.
@@ -65,19 +67,19 @@ export const vuetify: Vuetify; // createVuetify({ blueprint: md2, ... })
 - Given the old `style.css` (`git show 'b8af93e^:src/assets/style.css'`), then each of its rules whose class is used by a new component is in `src/assets/style.css`, and no rule is added for a class nothing uses.
 - Given `vite.config.ts`'s manifest, then `theme_color` is still `#1976D2` and `background_color` still `#FAFAFA`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `src/plugins/vuetify.test.ts`
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `src/plugins/vuetify.test.ts`
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm test -- src/plugins/vuetify.test.ts`
 Expected: FAIL on the blueprint and theme colour assertions; the `storedTheme()` cases pass.
 
-- [ ] **Step 3: Write the minimal implementation** in `src/plugins/vuetify.ts` (the `md2` blueprint, both themes' colours) and `src/assets/style.css`
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 3: Write the minimal implementation** in `src/plugins/vuetify.ts` (the `md2` blueprint, both themes' colours) and `src/assets/style.css`
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `npm test -- src/plugins/vuetify.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/plugins/vuetify.ts src/plugins/vuetify.test.ts src/assets/style.css
@@ -138,36 +140,36 @@ Prints:  OLD_APP_URL=http://localhost:5190
 - Given the old app's clock, then every capture shows `2026-11-02` as today (the page clock is fixed at `VISUAL_CLOCK`, as `prepareVisualPage()` does).
 - Given a `-hi` state, then the old app is opened with `localStorage` `lang` `hi`; given a `-dark` state, with `dark` `true`; otherwise `lang` `en` and `dark` `false`.
 
-- [ ] **Step 1: Write the failing test** for the `seedLegacyHomeBoard` case, in `e2e/old-app-refs.spec.ts` (it reads the seeded documents back with `readDoc`, and runs whenever the emulators do)
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 1: Write the failing test** for the `seedLegacyHomeBoard` case, in `e2e/old-app-refs.spec.ts` (it reads the seeded documents back with `readDoc`, and runs whenever the emulators do)
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npm run e2e -- e2e/old-app-refs.spec.ts --project chromium -g "legacy board"`
 Expected: FAIL on the seeded fields, after `seedLegacyHomeBoard` exists with its real signature.
 
-- [ ] **Step 3: Write `seedLegacyHomeBoard`** in `e2e/fixtures/home.ts`
-- [ ] **Step 4: Run it to verify it passes**
+- [x] **Step 3: Write `seedLegacyHomeBoard`** in `e2e/fixtures/home.ts`
+- [x] **Step 4: Run it to verify it passes**
 
 Run: `npm run e2e -- e2e/old-app-refs.spec.ts --project chromium -g "legacy board"`
 Expected: PASS
 
-- [ ] **Step 5: Write `e2e/support/old-app.mjs`** (worktree, demo config, emulator connection, install, serve, `--stop`)
-- [ ] **Step 6: Write the capture states** in `e2e/old-app-refs.spec.ts`, one block per screen, skipped without `OLD_APP_URL`
-- [ ] **Step 7: Start the old app**
+- [x] **Step 5: Write `e2e/support/old-app.mjs`** (worktree, demo config, emulator connection, install, serve, `--stop`)
+- [x] **Step 6: Write the capture states** in `e2e/old-app-refs.spec.ts`, one block per screen, skipped without `OLD_APP_URL`
+- [x] **Step 7: Start the old app**
 
 Run: `node e2e/support/old-app.mjs`
 Expected: `OLD_APP_URL=http://localhost:5190`
 
-- [ ] **Step 8: Capture the references**
+- [x] **Step 8: Capture the references**
 
 Run: `OLD_APP_URL=http://localhost:5190 npm run e2e -- e2e/old-app-refs.spec.ts --project chromium`
 Expected: PASS, with each state's references written or listed in `design/modernize/old-app-states.md`
 
-- [ ] **Step 9: Stop the old app**
+- [x] **Step 9: Stop the old app**
 
 Run: `node e2e/support/old-app.mjs --stop`
 Expected: the worktree is gone from `git worktree list`
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add e2e/support/old-app.mjs e2e/old-app-refs.spec.ts e2e/fixtures/home.ts design/modernize/old-app-states.md design/modernize/auth/refs design/modernize/home/refs design/modernize/add/refs design/modernize/profile/refs design/modernize/calendar/refs design/modernize/notifications/refs
@@ -212,20 +214,20 @@ git commit -m "test(visual): capture the old app's screens as the references"
 - Given the board is loading, then the old app's `v-progress-linear` shows, as in `ContainerMain`, and `data-testid="task-skeleton"` still marks each placeholder.
 - Given the existing non-visual tests in `e2e/home.spec.ts` and `e2e/shell.spec.ts`, then they pass unchanged, except where a selector relied on markup this task replaced, which is updated to a role or label.
 
-- [ ] **Step 1: Write the failing tests**: switch the home visual states to `seedLegacyHomeBoard`, add `home-dark`, and add the bottom-navigation case, in `e2e/home.spec.ts`
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests**: switch the home visual states to `seedLegacyHomeBoard`, add `home-dark`, and add the bottom-navigation case, in `e2e/home.spec.ts`
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm run e2e -- e2e/home.spec.ts --project chromium`
 Expected: FAIL on the visual comparison of `home-empty`, `home-loading` and `home-load-error`, and on the profile tab's icon.
 
-- [ ] **Step 3: Port the old shell's markup and CSS** into `src/App.vue`, `src/components/layout/AppMenu.vue`, `AppNav.vue`, `AppSnackbar.vue` and `src/components/DateBar.vue`
-- [ ] **Step 4: Port the old task list's frame** into `src/views/HomeView.vue` and `src/components/tasks/TaskBoard.vue`
-- [ ] **Step 5: Run them to verify they pass**
+- [x] **Step 3: Port the old shell's markup and CSS** into `src/App.vue`, `src/components/layout/AppMenu.vue`, `AppNav.vue`, `AppSnackbar.vue` and `src/components/DateBar.vue`
+- [x] **Step 4: Port the old task list's frame** into `src/views/HomeView.vue` and `src/components/tasks/TaskBoard.vue`
+- [x] **Step 5: Run them to verify they pass**
 
 Run: `npm run e2e -- e2e/home.spec.ts e2e/shell.spec.ts --project chromium`
 Expected: PASS for the cases above; `home-tasks`, `home-editing` and `home-hi` may still differ in the cards, which Task 4 restyles.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/App.vue src/components/layout/AppMenu.vue src/components/layout/AppNav.vue src/components/layout/AppSnackbar.vue src/components/DateBar.vue src/views/HomeView.vue src/components/tasks/TaskBoard.vue e2e/home.spec.ts design/modernize/home/compare.json design/modernize/home/compare
@@ -265,20 +267,20 @@ git commit -m "feat(ui): the old app's shell and home frame"
 - Given a save that fails while editing, then the form keeps the typed values and the old app's snackbar says the save failed (the existing failed-save case in `e2e/home.spec.ts` keeps passing).
 - Given the existing drag, edit, tick and delete tests in `e2e/home.spec.ts`, then they pass, with only markup-bound selectors moved to a role or label.
 
-- [ ] **Step 1: Write the failing tests** for the icon and chip cases, in `e2e/home.spec.ts`
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for the icon and chip cases, in `e2e/home.spec.ts`
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm run e2e -- e2e/home.spec.ts --project chromium`
 Expected: FAIL on the visual comparison of `home-tasks`, `home-editing`, `home-hi`, `home-dark`, and on the edit form's icons.
 
-- [ ] **Step 3: Port the old card's markup and CSS** into `src/components/tasks/TaskCard.vue`, `TaskColumn.vue` and `LabelChips.vue`
-- [ ] **Step 4: Port the old card's edit mode** into `src/components/tasks/TaskEditForm.vue`
-- [ ] **Step 5: Run them to verify they pass**
+- [x] **Step 3: Port the old card's markup and CSS** into `src/components/tasks/TaskCard.vue`, `TaskColumn.vue` and `LabelChips.vue`
+- [x] **Step 4: Port the old card's edit mode** into `src/components/tasks/TaskEditForm.vue`
+- [x] **Step 5: Run them to verify they pass**
 
 Run: `npm run e2e -- e2e/home.spec.ts --project chromium`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/tasks/TaskCard.vue src/components/tasks/TaskColumn.vue src/components/tasks/LabelChips.vue src/components/tasks/TaskEditForm.vue e2e/home.spec.ts design/modernize/home/compare
