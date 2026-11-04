@@ -26,10 +26,28 @@ service cloud.firestore {
               'remindAt', 'reminded', 'labelIds'];
     }
 
-    // Fields only the old app wrote (`type`: label references, `id`: a copy of the doc id). An
-    // update may remove them while moving a task to the new shape, but never set them.
+    // Fields only the old app writes (`type`: label references, `id`: a copy of the doc id). The
+    // new app removes them while moving a task to the new shape; the old app sets them.
     function legacyTaskFields() {
       return ['type', 'id'];
+    }
+
+    // A task as the old app creates it: no reminder fields, labels in `type`.
+    function legacyCreateFields() {
+      return ['uid', 'title', 'description', 'status', 'indefinite', 'date', 'time', 'type'];
+    }
+
+    // validTaskFields for the old app's writes, which is live again while the new app is
+    // restyled: `'NA'` dates and times, `type` a list of label references, `id` the doc id.
+    // `keys` is a set.
+    function validLegacyTaskFields(d, keys, taskId) {
+      return validTaskFields(d, keys.difference(['date', 'time', 'type', 'id'].toSet()))
+        && (!('date' in keys) || ('date' in d && (d.date == null || d.date == 'NA'
+              || (d.date is string && d.date.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')))))
+        && (!('time' in keys) || ('time' in d && (d.time == null || d.time == 'NA'
+              || (d.time is string && d.time.matches('[0-9]{2}:[0-9]{2}')))))
+        && (!('type' in keys) || !('type' in d) || (d.type is list && d.type.size() <= 100))
+        && (!('id' in keys) || !('id' in d) || d.id == taskId);
     }
 
     // Each key in `keys` holds a valid value in `d`; a removed key fails unless it is legacy.
@@ -59,14 +77,18 @@ service cloud.firestore {
       allow read, delete: if isUser(resource.data.uid);
 
       allow create: if isUser(request.resource.data.uid)
-        && createdKeys().hasAll(taskFields())
-        && createdKeys().hasOnly(taskFields())
-        && validTaskFields(request.resource.data, createdKeys());
+        && ((createdKeys().hasAll(taskFields())
+             && createdKeys().hasOnly(taskFields())
+             && validTaskFields(request.resource.data, createdKeys()))
+          || (createdKeys().hasAll(legacyCreateFields())
+             && createdKeys().hasOnly(legacyCreateFields())
+             && validLegacyTaskFields(request.resource.data, createdKeys().toSet(), taskId)));
 
       allow update: if isUser(resource.data.uid)
         && request.resource.data.uid == resource.data.uid
         && changedKeys().hasOnly(taskFields().concat(legacyTaskFields()))
-        && validTaskFields(request.resource.data, changedKeys());
+        && (validTaskFields(request.resource.data, changedKeys())
+          || validLegacyTaskFields(request.resource.data, changedKeys(), taskId));
     }
 
     // ---- labels (the `types` collection; `label` is the name) ---------------------------------

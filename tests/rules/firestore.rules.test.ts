@@ -199,9 +199,10 @@ describe('tasks', () => {
       await assertFails(userDb('alice').doc('tasks/t1').update({ title: FieldValue.delete() }));
     });
 
-    it('denies Alice adding the legacy `type` field back', async () => {
+    it('denies a legacy `type` that is not a list, or an `id` other than the doc id', async () => {
       const alice = userDb('alice');
-      await assertFails(alice.doc('tasks/t1').update({ type: [alice.doc('types/l1')] }));
+      await assertFails(alice.doc('tasks/t1').update({ type: 'l1' }));
+      await assertFails(alice.doc('tasks/t1').update({ id: 'other' }));
     });
 
     it('denies Alice adding a field the app does not know', async () => {
@@ -315,6 +316,86 @@ describe('legacy tasks', () => {
 
   it('can be updated without touching its legacy fields', async () => {
     await assertSucceeds(userDb('alice').doc('tasks/old').update({ status: 'done' }));
+  });
+});
+
+// The old app, live again while the new one is restyled, writes through these (its src/firebase).
+describe('the old app', () => {
+  /** `addTask`: the form's task with `uid`, `'NA'` for an indefinite date and time, `type` references. */
+  function oldCreate(db: Db, uid: string, overrides: Fields = {}): Fields {
+    return {
+      uid,
+      title: 'Buy milk',
+      date: '2026-11-04',
+      time: '09:00',
+      status: 'todo',
+      description: '',
+      indefinite: false,
+      type: [db.doc('types/l1')],
+      ...overrides,
+    };
+  }
+
+  it('creates a dated task and an indefinite one', async () => {
+    const alice = userDb('alice');
+    await assertSucceeds(alice.collection('tasks').add(oldCreate(alice, 'alice')));
+    await assertSucceeds(
+      alice
+        .collection('tasks')
+        .add(oldCreate(alice, 'alice', { indefinite: true, date: 'NA', time: 'NA', type: [] })),
+    );
+  });
+
+  it('cannot create a task for Bob, with an unknown field, or with a bad date or title', async () => {
+    const alice = userDb('alice');
+    await assertFails(alice.collection('tasks').add(oldCreate(alice, 'bob')));
+    await assertFails(alice.collection('tasks').add(oldCreate(alice, 'alice', { isAdmin: true })));
+    await assertFails(alice.collection('tasks').add(oldCreate(alice, 'alice', { date: 'soon' })));
+    await assertFails(alice.collection('tasks').add(oldCreate(alice, 'alice', { title: '' })));
+  });
+
+  describe('on its own task', () => {
+    beforeEach(async () => {
+      await seed((db) => db.doc('tasks/old').set(legacyTask(db, 'alice')));
+    });
+
+    it('ticks and unticks it (`updateTask` with only `status`)', async () => {
+      await assertSucceeds(userDb('alice').doc('tasks/old').update({ status: 'done' }));
+      await assertSucceeds(userDb('alice').doc('tasks/old').update({ status: 'todo' }));
+    });
+
+    it('edits it, writing its `id` and `type` back', async () => {
+      const alice = userDb('alice');
+      await assertSucceeds(
+        alice.doc('tasks/old').update({
+          ...legacyTask(alice, 'alice'),
+          id: 'old',
+          title: 'Old task, edited',
+          indefinite: false,
+          date: '2026-11-05',
+          time: '18:30',
+          type: [alice.doc('types/l1'), alice.doc('types/l2')],
+        }),
+      );
+    });
+
+    it("edits one of the new app's tasks, adding `id` and `type`", async () => {
+      await seed((db) => db.doc('tasks/t1').set(newTask('alice')));
+      const alice = userDb('alice');
+      await assertSucceeds(
+        alice.doc('tasks/t1').update({ id: 't1', type: [alice.doc('types/l1')], date: 'NA' }),
+      );
+    });
+
+    it('still cannot hand it to Bob, or let Bob edit it', async () => {
+      const alice = userDb('alice');
+      await assertFails(alice.doc('tasks/old').update({ id: 'old', uid: 'bob' }));
+      await assertFails(userDb('bob').doc('tasks/old').update({ status: 'done' }));
+    });
+  });
+
+  it('creates a label (`addTaskType`)', async () => {
+    await assertSucceeds(userDb('alice').collection('types').add(newLabel('alice')));
   });
 });
 

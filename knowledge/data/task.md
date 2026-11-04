@@ -31,11 +31,20 @@ verified: human:panditankit1995@gmail.com
   characters. The add screen checks the same title and description limits before sending
   (`src/views/TaskAddView.vue`); the edit form (`src/components/tasks/TaskEditForm.vue`) doesn't, so an edit
   past them is refused by the rules and shown as a failed save.
-- A create must carry every field and nothing else. An update may change only task fields, and may remove the
-  old app's `type` and `id` fields but never set them, so editing an old task moves it to the new shape.
+- A create must carry every field and nothing else. An update may change only task fields and the old app's
+  `type` and `id`; the new app removes those two, so editing an old task moves it to the new shape.
+- While the old app is live again (2026-11-04, until the new one is restyled), the rules also accept its writes:
+  a create of exactly `uid`, `title`, `description`, `status`, `indefinite`, `date`, `time` and `type`, with
+  `'NA'` allowed for `date` and `time`, `type` a list of at most 100, and `id` equal to the doc id
+  (`validLegacyTaskFields` in `firestore.rules`). Still owner-only.
 - An indefinite task has `date` and `time` `null`; label ids are made distinct (`normalise` in
   `src/services/tasks.ts`).
 - Dates and times are wall-clock values: [domain/local-dates](../domain/local-dates.md).
+
+## History
+
+- 2026-11-04: was "an update may remove `type` and `id` but never set them"; now the old app's create and
+  edit shapes are accepted too, because hosting was rolled back to the old app, whose task writes the rules refused.
 
 ## Sources
 
