@@ -3,11 +3,11 @@ import { join } from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import {
-  AUTH_EMULATOR_HOST,
   createUser,
   listUserEmails,
   resetEmulators,
   seedDoc,
+  setPhotoUrl,
 } from './support/emulator';
 import {
   VISUAL_SKIP_REASON,
@@ -19,10 +19,10 @@ import {
 /** The strings these tests look for, read from the app's own locale files. */
 interface AuthStrings {
   signIn: { title: string; google: string; email: string; submit: string; signUpLink: string };
-  signUp: { title: string; submit: string };
+  signUp: { title: string; google: string; submit: string };
   fields: { email: string; password: string; confirmPassword: string; showPassword: string };
   language: { label: string; en: string; hi: string };
-  menu: { open: string; darkMode: string; author: string; signOut: string };
+  menu: { label: string; open: string; darkMode: string; author: string; signOut: string };
 }
 type Lang = 'en' | 'hi';
 
@@ -34,7 +34,9 @@ const STRINGS: Record<Lang, AuthStrings> = { en: readAuthStrings('en'), hi: read
 const EN = STRINGS.en;
 
 const PASSWORD = 'abc-def_9';
-const NETWORK_ERROR = "Couldn't reach the server. Check your connection and try again.";
+/** The old app showed Firebase's own text for an unreachable server, in its snackbar. */
+const NETWORK_ERROR =
+  'Firebase: A network AuthError (such as timeout, interrupted connection or unreachable host) has occurred. (auth/network-request-failed).';
 /** The emulator reports a wrong password as wrong-password, or invalid-credential with email enumeration protection on. */
 const WRONG_PASSWORD_ERROR =
   /The password is invalid or the user does not have a password\.|The email address or password is incorrect\./;
@@ -127,24 +129,6 @@ function perUserState(page: Page, load: boolean): Promise<PerUserState> {
   }, load);
 }
 
-/** Sets an account's photo URL in the Auth emulator, signing in over REST to do it. */
-async function setPhotoUrl(email: string, password: string, photoUrl: string): Promise<void> {
-  const base = `http://${AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com/v1`;
-  const headers = { 'Content-Type': 'application/json' };
-  const signIn = await fetch(`${base}/accounts:signInWithPassword?key=demo-api-key`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ email, password, returnSecureToken: true }),
-  });
-  const { idToken } = (await signIn.json()) as { idToken: string };
-  const update = await fetch(`${base}/accounts:update?key=demo-api-key`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ idToken, photoUrl, returnSecureToken: false }),
-  });
-  expect(update.ok, await update.text()).toBe(true);
-}
-
 test.describe('sign-in and sign-up', () => {
   test.beforeEach(async () => {
     await resetEmulators();
@@ -161,6 +145,26 @@ test.describe('sign-in and sign-up', () => {
     await expect(page.getByRole('heading', { name: EN.signUp.title })).toBeVisible();
     await expect(page.getByText(/facebook/i)).toHaveCount(0);
     expect(await markupWithoutStyles(page)).not.toContain('facebook');
+  });
+
+  test("both screens carry the old app's words, not the rewrite's", async ({ page }) => {
+    await page.goto('/signin');
+    await expect(page.getByRole('heading', { name: 'Task Manager' })).toBeVisible();
+    await expect(page.getByText('Sign in to application')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign in with Google' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign in with Email' })).toBeVisible();
+
+    await page.goto('/signup');
+    await expect(page.getByRole('heading', { name: 'Task Manager' })).toBeVisible();
+    await expect(page.getByText('Create an account')).toBeVisible();
+    await expect(page.getByText('OR', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Confirm', { exact: true })).toBeVisible();
+
+    await page.addInitScript(() => localStorage.setItem('lang', 'hi'));
+    await page.goto('/signin');
+    await expect(page.getByRole('heading', { name: 'टास्क मैनेजर' })).toBeVisible();
+    await expect(page.getByText('एप्लीकेशन में साइन इन करें')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'गूगल से साइन इन करें' })).toBeVisible();
   });
 
   test('no file under src mentions Facebook (§11.1)', ({ browserName }) => {
@@ -245,7 +249,12 @@ test.describe('sign-in and sign-up', () => {
 
     await signInWithForm(page, 'ada@user.info', 'wrong-pass-1');
 
-    await expect(page.getByTestId('auth-error')).toContainText(WRONG_PASSWORD_ERROR);
+    // As in the old app, the failure is in the bottom snackbar, and the fields keep their values.
+    const error = page.getByTestId('auth-error');
+    await expect(error).toContainText(WRONG_PASSWORD_ERROR);
+    await expect(error.locator('.v-snackbar__wrapper')).toBeVisible();
+    await expect(page.getByLabel(EN.fields.email, { exact: true })).toHaveValue('ada@user.info');
+    await expect(page.getByLabel(EN.fields.password, { exact: true })).toHaveValue('wrong-pass-1');
     const submit = page.getByRole('button', { name: EN.signIn.submit, exact: true });
     await expect(submit).not.toHaveClass(/v-btn--loading/);
     await expect(submit).toBeEnabled();
@@ -420,7 +429,9 @@ test.describe('app menu', () => {
     await signInWithForm(page, 'ada@user.info', PASSWORD);
     await expect(page).toHaveURL(/\/home$/);
 
-    const avatar = page.getByRole('button', { name: EN.menu.open });
+    // The menu's own avatar, in its first row: the bar shows only the three dots.
+    const avatar = page.getByRole('list', { name: EN.menu.label }).locator('.v-avatar').first();
+    await openMenu(page);
     await expect(avatar).toContainText('A');
     await expect(avatar.locator('img')).toHaveCount(0);
 
@@ -429,11 +440,11 @@ test.describe('app menu', () => {
       route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.alloc(0) }),
     );
     // The app reads the photo when it signs in, so sign in again.
-    await openMenu(page);
     await page.getByRole('button', { name: EN.menu.signOut }).click();
     await expect(page).toHaveURL(/\/signin$/);
     await signInWithForm(page, 'ada@user.info', PASSWORD);
     await expect(page).toHaveURL(/\/home$/);
+    await openMenu(page);
 
     await expect(avatar.locator('img')).toHaveAttribute('src', 'https://photos.example/ada.png');
   });
@@ -478,6 +489,9 @@ test.describe('accessibility and layout', () => {
 
     await page.goto('/signup');
     await expect(page.getByRole('heading', { name: EN.signUp.title })).toBeVisible();
+    // The old sign-up has an eye on each password field, both labelled.
+    await expect(page.getByRole('button', { name: EN.fields.showPassword })).toHaveCount(2);
+    await expect(page.getByRole('button', { name: EN.signUp.google })).toBeVisible();
     expect(await nameViolations(page)).toEqual([]);
     expect(await unlabelledIconButtons(page)).toEqual([]);
 
@@ -554,6 +568,14 @@ function authStates(): VisualState[] {
   });
 }
 
+/** The old app showed its sign-in dark after signing out of a dark page (old-app-states.md). */
+const authDarkState = (): VisualState => ({
+  name: 'auth-dark',
+  path: '/signin',
+  theme: 'dark',
+  act: (page) => expect(page.getByRole('heading', { name: EN.signIn.title })).toBeVisible(),
+});
+
 test.describe('visual', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'captured once, in Chromium');
   test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
@@ -565,7 +587,10 @@ test.describe('visual', () => {
   }) => {
     await resetEmulators();
 
-    const result = await compareScreen(browser, baseURL ?? '', 'auth', authStates());
+    const result = await compareScreen(browser, baseURL ?? '', 'auth', [
+      ...authStates(),
+      authDarkState(),
+    ]);
 
     if (result.newReferences.length > 0) {
       test.info().annotations.push({

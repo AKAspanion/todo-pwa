@@ -50,6 +50,17 @@ function eventByTitle(page: Page, title: string): Locator {
   return events(page).filter({ hasText: title });
 }
 
+/** The old calendar's view menu: a button showing the current view that opens Day, Week and Month. */
+function viewPicker(page: Page): { choose: (view: 'day' | 'week' | 'month') => Promise<void> } {
+  return {
+    choose: async (view) => {
+      await page.getByTestId('calendar-view-menu').click();
+      await page.getByTestId(`calendar-view-${view}`).click();
+      await expect(page.getByTestId('calendar-view-list')).toBeHidden();
+    },
+  };
+}
+
 /** The month view's cell for a day, found by its date button's long-date name. */
 function monthCell(page: Page, longDate: string): Locator {
   return page
@@ -130,20 +141,20 @@ test.describe('calendar', () => {
   }) => {
     await openCalendar(page, user);
     const title = page.getByTestId('calendar-title');
-    const views = page.getByRole('group', { name: 'Calendar view' });
+    const views = viewPicker(page);
     await expect(title).toHaveText('November 2026');
 
     // A day's date in the month opens that day.
     await page.getByRole('button', { name: 'Wednesday, 18 November 2026', exact: true }).click();
     await expect(title).toHaveText('Wednesday, 18 November 2026');
 
-    await views.getByRole('button', { name: 'Week' }).click();
+    await views.choose('week');
     await expect(title).toHaveText('15 – 21 November 2026');
 
-    await views.getByRole('button', { name: 'Month' }).click();
+    await views.choose('month');
     await expect(title).toHaveText('November 2026');
 
-    await views.getByRole('button', { name: 'Day' }).click();
+    await views.choose('day');
     await expect(title).toHaveText('Wednesday, 18 November 2026');
 
     await page.getByRole('button', { name: 'Next day' }).click();
@@ -152,12 +163,12 @@ test.describe('calendar', () => {
     await page.getByRole('button', { name: 'Today' }).click();
     await expect(title).toHaveText('Monday, 2 November 2026');
 
-    await views.getByRole('button', { name: 'Month' }).click();
+    await views.choose('month');
     await page.getByRole('button', { name: 'Next month' }).click();
     await expect(title).toHaveText('December 2026');
     await page.getByRole('button', { name: 'Today' }).click();
     await expect(title).toHaveText('November 2026');
-    await views.getByRole('button', { name: 'Week' }).click();
+    await views.choose('week');
     await expect(title).toHaveText('1 – 7 November 2026');
   });
 
@@ -237,7 +248,7 @@ test.describe('calendar', () => {
     await seedTask(user.uid, { id: 'mid', title: 'Dentist', date: '2026-11-05', time: '10:00' });
     await openCalendar(page, user);
     const title = page.getByTestId('calendar-title');
-    const views = page.getByRole('group', { name: 'कैलेंडर दृश्य' });
+    const views = viewPicker(page);
 
     await expect(title).toHaveText('नवम्बर 2026');
     // The weekday headings come from Vuetify, which now follows the app's language.
@@ -247,11 +258,11 @@ test.describe('calendar', () => {
       expect(weekday, 'weekday heading').not.toMatch(/[A-Za-z]/);
     }
 
-    await views.getByRole('button', { name: 'सप्ताह' }).click();
+    await views.choose('week');
     await expect(title).toHaveText('1 – 7 नवम्बर 2026');
     await expect(title).not.toHaveText(ENGLISH_ORDINAL);
 
-    await views.getByRole('button', { name: 'दिन' }).click();
+    await views.choose('day');
     await expect(title).toHaveText('सोमवार, 2 नवम्बर 2026');
     await expect(title).not.toHaveText(ENGLISH_ORDINAL);
     await expect(page.getByRole('button', { name: 'आज' })).toBeVisible();
@@ -309,10 +320,7 @@ const monthReady = async (page: Page): Promise<void> => {
 };
 
 async function showView(page: Page, view: 'Day' | 'Week'): Promise<void> {
-  await page
-    .getByRole('group', { name: 'Calendar view' })
-    .getByRole('button', { name: view })
-    .click();
+  await viewPicker(page).choose(view === 'Day' ? 'day' : 'week');
   await expect(eventByTitle(page, 'Team stand-up')).toBeVisible();
 }
 
@@ -342,6 +350,13 @@ function calendarVisualStates(): CalendarVisualState[] {
         await eventByTitle(page, 'Team stand-up').click();
         await expect(page.getByRole('dialog', { name: 'Team stand-up' })).toBeVisible();
       },
+    },
+    {
+      name: 'calendar-dark',
+      path: '/calendar',
+      theme: 'dark',
+      before: signInFresh,
+      ready: monthReady,
     },
     {
       name: 'calendar-hi',
@@ -409,7 +424,7 @@ test.describe('calendar visual states', () => {
   test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 600_000 });
 
-  test('calendar-month, calendar-week, calendar-day, calendar-details and calendar-hi match their references at 390 and 1280', async ({
+  test('calendar-month, calendar-week, calendar-day, calendar-details, calendar-dark and calendar-hi match their references at 390 and 1280', async ({
     browser,
     baseURL,
   }) => {

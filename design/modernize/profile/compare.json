@@ -26,6 +26,12 @@
       "design": "../reference.html?screen=profile&side=refs&state=profile-hi",
       "app": "reference.html?screen=profile&side=app&state=profile-hi",
       "fullPage": true
+    },
+    {
+      "name": "profile-dark",
+      "design": "../reference.html?screen=profile&side=refs&state=profile-dark",
+      "app": "reference.html?screen=profile&side=app&state=profile-dark",
+      "fullPage": true
     }
   ]
 }

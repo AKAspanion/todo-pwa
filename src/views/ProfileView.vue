@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch, type ComponentPublicIn
 import { useI18n } from 'vue-i18n';
 import { vFocusOnMount } from '@/directives/focusOnMount';
 import { updateDisplayName } from '@/services/auth';
+import { httpsPhotoUrl } from '@/lib/photo';
 import { LABEL_NAME_MAX } from '@/services/labels';
 import { useLabelsStore } from '@/stores/labels';
 import { errorCode, useSessionStore } from '@/stores/session';
@@ -54,16 +55,8 @@ const initials = computed(() => {
   return `${[...first][0] ?? ''}${[...last][0] ?? ''}`.toUpperCase();
 });
 
-/** The provider's photo, only when it is an https URL. */
-const photoUrl = computed(() => {
-  const raw = session.user?.photoURL;
-  if (!raw) return undefined;
-  try {
-    return new URL(raw).protocol === 'https:' ? raw : undefined;
-  } catch {
-    return undefined;
-  }
-});
+/** The provider's photo, only when it is an https URL (`httpsPhotoUrl`). */
+const photoUrl = computed(() => httpsPhotoUrl(session.user?.photoURL) ?? undefined);
 
 // Editing the name
 
@@ -176,172 +169,315 @@ watch(
 
 <template>
   <div class="profile">
-    <v-sheet color="primary" class="profile-header text-center px-4 pt-6 pb-8">
-      <v-avatar size="96" color="surface" :image="photoUrl" aria-hidden="true">
-        <template v-if="!photoUrl">
-          <span v-if="initials" class="text-h4 text-primary">{{ initials }}</span>
-          <v-icon v-else icon="mdi-face" color="primary" size="48" />
-        </template>
-      </v-avatar>
+    <v-card flat tile class="old-app-card">
+      <div class="old-app-wrapper">
+        <div class="old-app-elevated" style="height: calc(224px - 30px)"></div>
+        <div class="old-app-bg bg-primary" style="height: 224px"></div>
+        <div class="old-app-content">
+          <div class="pt-2 pb-4 d-flex justify-center">
+            <v-avatar size="110" class="profile__avatar" aria-hidden="true">
+              <v-img v-if="photoUrl" :src="photoUrl" cover />
+              <template v-else>
+                <span v-if="initials" class="profile__initials">{{ initials }}</span>
+                <v-icon v-else icon="mdi-face-man" color="primary" />
+              </template>
+            </v-avatar>
+          </div>
 
-      <div v-if="!editingName" class="d-flex align-center justify-center ga-1 mt-4">
-        <h1 class="text-h6 profile-name">{{ displayName }}</h1>
-        <v-btn
-          ref="editButton"
-          icon="mdi-pencil"
-          variant="text"
-          size="small"
-          :aria-label="t('profile.name.edit')"
-          @click="startNameEdit"
-        />
-      </div>
-      <template v-else>
-        <h1 class="d-sr-only">{{ displayName }}</h1>
-        <form
-          class="name-form d-flex align-center ga-1 mt-4 mx-auto"
-          @submit.prevent="saveName"
-          @keydown.esc="cancelNameEdit"
-        >
-          <v-text-field
-            v-model="nameDraft"
-            v-focus-on-mount
-            :label="t('profile.name.field')"
-            :readonly="nameSaving"
-            variant="solo"
-            density="compact"
-            bg-color="surface"
-            hide-details
-          />
-          <v-btn
-            type="submit"
-            icon="mdi-check"
-            variant="text"
-            :loading="nameSaving"
-            :aria-label="t('profile.name.save')"
-          />
-          <v-btn
-            icon="mdi-close"
-            variant="text"
-            :disabled="nameSaving"
-            :aria-label="t('profile.name.cancel')"
-            @click="cancelNameEdit"
-          />
-        </form>
-        <v-alert
-          v-if="nameError"
-          type="error"
-          density="compact"
-          class="name-form mt-2 mx-auto text-start"
-          :text="t(nameError)"
-        />
-        <v-alert
-          v-else-if="nameStill.still.value"
-          type="info"
-          density="compact"
-          class="name-form mt-2 mx-auto text-start"
-          :text="t('profile.stillSaving')"
-        />
-      </template>
-
-      <p class="text-subtitle-2 mt-2 profile-email">{{ email }}</p>
-    </v-sheet>
-
-    <v-container class="labels">
-      <h2 id="profile-labels-heading" class="text-overline">{{ t('profile.labels.heading') }}</h2>
-      <v-card variant="outlined">
-        <form class="d-flex align-start ga-2 pa-3" novalidate @submit.prevent="addLabel">
-          <input
-            v-model="labelColor"
-            type="color"
-            class="label-color mt-1"
-            :aria-label="t('profile.labels.color')"
-            :disabled="labelSaving"
-          />
-          <v-text-field
-            v-model="labelName"
-            :label="t('profile.labels.create')"
-            :readonly="labelSaving"
-            :error-messages="labelErrorText"
-            :messages="labelStill.still.value ? t('profile.stillSaving') : undefined"
-            variant="outlined"
-            density="compact"
-            @update:model-value="labelError = null"
-          />
-          <v-btn
-            type="submit"
-            icon="mdi-plus"
-            variant="text"
-            :color="labelColor"
-            :loading="labelSaving"
-            :aria-label="t('profile.labels.add')"
-          />
-        </form>
-
-        <v-alert
-          v-if="labels.error"
-          type="error"
-          variant="tonal"
-          density="compact"
-          class="mx-3 mb-3"
-          :text="t('profile.labels.loadError')"
-        >
-          <template #append>
-            <v-btn variant="text" :loading="labels.loading" @click="labels.load()">
-              {{ t('profile.labels.retry') }}
-            </v-btn>
+          <div v-if="!editingName" class="profile__row profile__name-row mb-n2">
+            <h1 class="profile__name text-white">{{ displayName }}</h1>
+            <v-btn
+              ref="editButton"
+              icon="mdi-pencil"
+              variant="text"
+              size="small"
+              class="profile__edit text-white"
+              :aria-label="t('profile.name.edit')"
+              @click="startNameEdit"
+            />
+          </div>
+          <template v-else>
+            <h1 class="d-sr-only">{{ displayName }}</h1>
+            <form
+              class="profile__row profile__name-row mb-n2"
+              @submit.prevent="saveName"
+              @keydown.esc="cancelNameEdit"
+            >
+              <v-text-field
+                v-model="nameDraft"
+                v-focus-on-mount
+                theme="light"
+                class="profile__name-field"
+                :aria-label="t('profile.name.field')"
+                :readonly="nameSaving"
+                variant="solo"
+                density="compact"
+                hide-details
+                single-line
+              >
+                <template #append-inner>
+                  <v-btn
+                    icon="mdi-close"
+                    variant="text"
+                    size="x-small"
+                    style="color: rgba(0, 0, 0, 0.54)"
+                    :disabled="nameSaving"
+                    :aria-label="t('profile.name.cancel')"
+                    @click="cancelNameEdit"
+                  />
+                </template>
+              </v-text-field>
+              <v-btn
+                type="submit"
+                icon="mdi-check"
+                variant="text"
+                size="small"
+                class="profile__check mx-2 text-white"
+                :loading="nameSaving"
+                :aria-label="t('profile.name.save')"
+              />
+            </form>
+            <v-alert
+              v-if="nameError"
+              type="error"
+              density="compact"
+              class="profile__note mt-2 mx-auto text-start"
+              :text="t(nameError)"
+            />
+            <v-alert
+              v-else-if="nameStill.still.value"
+              type="info"
+              density="compact"
+              class="profile__note mt-2 mx-auto text-start"
+              :text="t('profile.stillSaving')"
+            />
           </template>
-        </v-alert>
 
-        <div v-if="labels.loading && labels.labels.length === 0">
-          <v-skeleton-loader v-for="i in 3" :key="i" type="list-item-avatar" />
+          <div class="text-subtitle-2 mt-3 text-white profile__email">{{ email }}</div>
+
+          <div class="d-flex justify-center">
+            <div class="profile__labels mt-6">
+              <h2
+                id="profile-labels-heading"
+                class="profile__label-heading text-overline text-left py-3"
+              >
+                {{ t('profile.labels.heading') }}
+              </h2>
+              <v-card variant="outlined" class="profile__card">
+                <form class="profile__create profile__row" novalidate @submit.prevent="addLabel">
+                  <v-btn
+                    type="submit"
+                    icon="mdi-plus-circle"
+                    variant="text"
+                    :color="labelColor"
+                    :loading="labelSaving"
+                    :ripple="false"
+                    class="profile__add"
+                    :aria-label="t('profile.labels.add')"
+                  />
+                  <v-text-field
+                    v-model="labelName"
+                    class="profile__label-field"
+                    :aria-label="t('profile.labels.create')"
+                    :placeholder="t('profile.labels.create')"
+                    :readonly="labelSaving"
+                    :error-messages="labelErrorText"
+                    :messages="labelStill.still.value ? t('profile.stillSaving') : undefined"
+                    variant="solo"
+                    flat
+                    density="compact"
+                    bg-color="transparent"
+                    hide-details="auto"
+                    single-line
+                    @update:model-value="labelError = null"
+                  />
+                  <span class="profile__palette">
+                    <v-icon icon="mdi-palette" :color="labelColor" />
+                    <input
+                      v-model="labelColor"
+                      type="color"
+                      class="profile__color"
+                      :aria-label="t('profile.labels.color')"
+                      :disabled="labelSaving"
+                    />
+                  </span>
+                </form>
+
+                <v-alert
+                  v-if="labels.error"
+                  type="error"
+                  variant="tonal"
+                  density="compact"
+                  class="mx-3 mb-3"
+                  :text="t('profile.labels.loadError')"
+                >
+                  <template #append>
+                    <v-btn variant="text" :loading="labels.loading" @click="labels.load()">
+                      {{ t('profile.labels.retry') }}
+                    </v-btn>
+                  </template>
+                </v-alert>
+
+                <div v-if="labels.loading && labels.labels.length === 0">
+                  <div v-for="i in 3" :key="i" class="d-flex align-center px-6 py-4">
+                    <div class="animate icon-shimmer"></div>
+                    <div class="animate title-shimmer ml-11" style="width: 50%"></div>
+                  </div>
+                </div>
+                <v-list
+                  v-else-if="labels.labels.length > 0"
+                  aria-labelledby="profile-labels-heading"
+                  class="pa-0"
+                  bg-color="transparent"
+                >
+                  <v-list-item v-for="label in labels.labels" :key="label.id" class="profile__item">
+                    <template #prepend>
+                      <v-icon icon="mdi-label" :color="label.color" class="profile__label-icon" />
+                    </template>
+                    <span class="profile__label-name">{{ label.label }}</span>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </div>
+          </div>
         </div>
-        <v-list
-          v-else-if="labels.labels.length > 0"
-          aria-labelledby="profile-labels-heading"
-          density="compact"
-        >
-          <v-list-item v-for="label in labels.labels" :key="label.id" :title="label.label">
-            <template #prepend>
-              <v-icon icon="mdi-label" :color="label.color" />
-            </template>
-          </v-list-item>
-        </v-list>
-      </v-card>
-    </v-container>
+      </div>
+    </v-card>
   </div>
 </template>
 
+<!-- The old Profile: a colour band with the avatar, name and email, the labels in an outlined card. -->
 <style scoped>
-.profile-name,
-.profile-email {
+.profile__avatar {
+  background: #fff;
+  color: rgba(0, 0, 0, 0.87);
+}
+.v-theme--dark .profile__avatar {
+  background: #404040;
+  color: #fff;
+}
+.profile__avatar :deep(.v-icon) {
+  font-size: 24px;
+}
+.profile__initials {
+  font-size: 2.125rem;
+  font-weight: 500;
+  line-height: 2.5rem;
+  letter-spacing: 0.0073529412em;
+}
+.profile__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+/* The old row ran 32px past the right edge, where its hidden pencil sat, so the name stayed centred. */
+.profile__name-row {
+  margin-right: -32px;
+}
+.profile__name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 2rem;
+  letter-spacing: 0.0125em;
   overflow-wrap: anywhere;
 }
-
-.name-form {
+.profile__edit {
+  width: 32px;
+  height: 32px;
+  margin: 0 0 0 0;
+}
+.profile__check {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+.profile__item :deep(.v-list-item__spacer) {
+  width: 0;
+}
+.profile__name-field {
+  flex: 0 1 300px;
+  max-width: 300px;
+}
+.profile__email {
+  overflow-wrap: anywhere;
+}
+.profile__note {
   max-width: 360px;
 }
-
-.labels {
+.profile__labels {
+  width: 100%;
   max-width: 500px;
+  padding: 16px;
 }
-
-.label-color {
-  inline-size: 32px;
-  block-size: 32px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: none;
-  cursor: pointer;
+.profile__card {
+  padding: 8px 0;
+  border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+  text-align: left;
+}
+.profile__create {
+  padding: 0 16px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 56px;
+}
+.profile__add {
+  opacity: 1;
+  margin-top: 8px;
   flex: none;
+  width: 40px;
+  height: 40px;
+  margin-right: 28px;
 }
-
-.label-color::-webkit-color-swatch-wrapper {
-  padding: 0;
+.profile__label-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-top: 8px;
 }
-
-.label-color::-webkit-color-swatch {
-  border: none;
+.profile__label-field :deep(.v-input__details) {
+  padding-inline: 0;
+}
+.profile__label-field :deep(.v-field__input) {
+  padding-inline: 0;
+}
+.profile__palette {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-top: 14px;
   border-radius: 50%;
+}
+.profile__palette:focus-within {
+  outline: 2px solid currentColor;
+}
+.profile__color {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  cursor: pointer;
+}
+.profile__item.v-list-item {
+  min-height: 56px;
+  padding: 0 16px;
+}
+.profile__label-heading {
+  margin: 0;
+}
+.profile__label-icon {
+  opacity: 1;
+  width: 40px;
+  margin-right: 28px;
+}
+.profile__label-name {
+  font-size: 0.875rem;
 }
 </style>

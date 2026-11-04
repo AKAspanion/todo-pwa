@@ -28,6 +28,12 @@
       "fullPage": true
     },
     {
+      "name": "calendar-dark",
+      "design": "../reference.html?screen=calendar&side=refs&state=calendar-dark",
+      "app": "reference.html?screen=calendar&side=app&state=calendar-dark",
+      "fullPage": true
+    },
+    {
       "name": "calendar-hi",
       "design": "../reference.html?screen=calendar&side=refs&state=calendar-hi",
       "app": "reference.html?screen=calendar&side=app&state=calendar-hi",

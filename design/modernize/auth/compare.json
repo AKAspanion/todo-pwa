@@ -50,6 +50,12 @@
       "design": "../reference.html?screen=auth&side=refs&state=signup-hi",
       "app": "reference.html?screen=auth&side=app&state=signup-hi",
       "fullPage": true
+    },
+    {
+      "name": "auth-dark",
+      "design": "../reference.html?screen=auth&side=refs&state=auth-dark",
+      "app": "reference.html?screen=auth&side=app&state=auth-dark",
+      "fullPage": true
     }
   ]
 }

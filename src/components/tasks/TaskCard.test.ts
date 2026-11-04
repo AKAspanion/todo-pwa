@@ -48,7 +48,7 @@ function makeTask(overrides: Partial<Task> = {}): Task {
 }
 
 const HOME: Label = { id: 'a', uid: 'u1', label: 'Home', color: '#E91E63' };
-const SAVE_ERROR = "Couldn't save. Try again.";
+const SAVE_ERROR = 'Task updating task';
 
 const global = { plugins: [vuetify, i18n] };
 
@@ -260,8 +260,8 @@ describe('TaskEditForm', () => {
 
     expect(wrapper.find('input[type="date"]').exists()).toBe(false);
     expect(wrapper.find('input[type="time"]').exists()).toBe(false);
-    expect(inputValue(wrapper, 'input[name="date"]')).toBe('Monday, 2 November 2026');
-    expect(inputValue(wrapper, 'input[name="time"]')).toBe('9:00 AM');
+    expect(inputValue(wrapper, 'input[name="date"]')).toBe('Nov, 2nd, 26');
+    expect(inputValue(wrapper, 'input[name="time"]')).toBe('09:00 AM');
   });
 
   it('submits a day picked in the date picker as that local day (D1)', async () => {
@@ -304,7 +304,7 @@ describe('TaskEditForm', () => {
     expect(wrapper.findComponent(TimeField).props('readonly')).toBe(true);
   });
 
-  it('shows a selected label chip filled with its colour and an unselected one tonal, as Add task does', () => {
+  it('shows every label chip filled with its colour, the selected one with its check, as the old card did', () => {
     const work: Label = { id: 'w', uid: 'u1', label: 'Work', color: '#1976D2' };
     const wrapper = mountForm({
       task: makeTask({ labelIds: ['a'] }),
@@ -318,7 +318,7 @@ describe('TaskEditForm', () => {
     expect(home.classes()).toEqual(
       expect.arrayContaining(['v-chip--selected', 'v-chip--variant-flat']),
     );
-    expect(other.classes()).toContain('v-chip--variant-tonal');
+    expect(other.classes()).toContain('v-chip--variant-flat');
     expect(other.classes()).not.toContain('v-chip--selected');
   });
 

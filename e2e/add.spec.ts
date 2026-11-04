@@ -71,13 +71,14 @@ function addDays(ymd: string, days: number): string {
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 }
 
-/** 'Monday, 2 November 2026': the screen's long English date. */
+/** 'Monday, November 2nd, 2026': the old app's date field text. */
 function longDate(ymd: string): string {
   const [y, m, d] = ymdParts(ymd);
   const day = new Date(Date.UTC(y, m - 1, d));
   const part = (options: Intl.DateTimeFormatOptions) =>
     new Intl.DateTimeFormat('en-US', { ...options, timeZone: 'UTC' }).format(day);
-  return `${part({ weekday: 'long' })}, ${d} ${part({ month: 'long' })} ${y}`;
+  const suffix = d % 100 >= 11 && d % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][d % 10] ?? 'th');
+  return `${part({ weekday: 'long' })}, ${part({ month: 'long' })} ${d}${suffix}, ${y}`;
 }
 
 /** How far `timeZone`'s wall clock is ahead of UTC at the instant `utcMs`. */
@@ -125,7 +126,7 @@ async function seedLabelA(user: TestUser): Promise<void> {
 
 const titleField = (page: Page) => page.getByLabel('Title', { exact: true });
 const descriptionField = (page: Page) => page.getByLabel('Description', { exact: true });
-const submitButton = (page: Page) => page.getByRole('button', { name: 'Add task', exact: true });
+const submitButton = (page: Page) => page.getByRole('button', { name: 'Add Task', exact: true });
 
 /** Picks a day in the date picker, moving to the next month when the day is in it. */
 async function pickDate(page: Page, ymd: string): Promise<void> {
@@ -190,7 +191,7 @@ test.describe('add task', () => {
     await pickDate(page, tomorrow);
     await pickTime(page, '09', '00');
     await expect(page.getByLabel('Select date', { exact: true })).toHaveValue(longDate(tomorrow));
-    await expect(page.getByLabel('Select time', { exact: true })).toHaveValue('9:00 AM');
+    await expect(page.getByLabel('Select time', { exact: true })).toHaveValue('09:00 AM');
     await page.locator(`[data-label-id="${LABEL_A.id}"]`).click();
 
     await submitButton(page).click();
@@ -220,7 +221,7 @@ test.describe('add task', () => {
 
   test('an indefinite task stores no date, time or reminder', async ({ page }) => {
     await titleField(page).fill('Someday');
-    await page.getByLabel('Indefinite task?', { exact: true }).check();
+    await page.getByLabel('No due date?', { exact: true }).check();
     await expect(page.getByLabel('Select date', { exact: true })).toBeDisabled();
     await expect(page.getByLabel('Select time', { exact: true })).toBeDisabled();
 
@@ -238,14 +239,32 @@ test.describe('add task', () => {
     });
   });
 
-  test('an empty title blocks the save with "Title is required"', async ({ page }) => {
+  test('an empty title blocks the save with the old "Enter task\'s title"', async ({ page }) => {
+    await submitButton(page).click();
+
+    await expect(page.getByText("Enter task's title")).toBeVisible();
+    await expect(page).toHaveURL(/\/add$/);
+    expect(await listStoredTasks()).toEqual([]);
+  });
+
+  test('a title of only spaces blocks the save with the old "Only white spaces not allowed"', async ({
+    page,
+  }) => {
     await titleField(page).fill('   ');
 
     await submitButton(page).click();
 
-    await expect(page.getByText('Title is required')).toBeVisible();
+    await expect(page.getByText('Only white spaces not allowed')).toBeVisible();
     await expect(page).toHaveURL(/\/add$/);
     expect(await listStoredTasks()).toEqual([]);
+  });
+
+  test("the screen shows the old app's icons and placeholders", async ({ page }) => {
+    await expect(page.locator('.v-field:has(textarea) .mdi-card-text')).toBeVisible();
+    await expect(page.locator('.add-task .mdi-clock')).toBeVisible();
+    await expect(page.getByPlaceholder('Name your task')).toBeVisible();
+    await expect(page.getByPlaceholder('A detailed description of the task')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Create a new label' })).toBeVisible();
   });
 
   test('a 201-character title blocks the save', async ({ page }) => {
@@ -284,6 +303,7 @@ test.describe('add task', () => {
     await submitButton(page).click();
 
     await expect(page.getByText("Couldn't save. Try again.")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByLabel('Select date', { exact: true })).toBeVisible();
     await expectFormStillFilled(page);
     expect(await listStoredTasks()).toEqual([]);
   });
@@ -319,10 +339,10 @@ test.describe('add task', () => {
 
     await expect(page.getByLabel('तारीख चुनें', { exact: true })).toBeVisible();
     await expect(page.getByLabel('समय चुनें', { exact: true })).toBeVisible();
-    await expect(page.getByLabel('अनिश्चित टास्क?', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('कोई नियत तारीख नहीं?', { exact: true })).toBeVisible();
     await expect(page.getByLabel('शीर्षक', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'टास्क जोड़ें', exact: true })).toBeVisible();
-    for (const english of ['Select date', 'Select time', 'Indefinite task?']) {
+    await expect(page.getByRole('button', { name: 'कार्य बनाएँ', exact: true })).toBeVisible();
+    for (const english of ['No due date?', 'Add Task']) {
       await expect(page.getByText(english, { exact: true })).toHaveCount(0);
     }
   });
@@ -333,7 +353,7 @@ test.describe('add task visuals', () => {
   test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 300_000 });
 
-  test('add-empty, add-filled, add-error and add-hi match their references at 390 and 1280', async ({
+  test('add-empty, add-filled, add-error, add-hi and add-dark match their references at 390 and 1280', async ({
     browser,
     baseURL,
   }) => {
@@ -363,10 +383,12 @@ test.describe('add task visuals', () => {
         act: async (page) => {
           await labelsShown(page);
           await submitButton(page).click();
-          await expect(page.getByText('Title is required')).toBeVisible();
+          await expect(page.getByText("Enter task's title")).toBeVisible();
         },
       },
       { name: 'add-hi', path: '/add', locale: 'hi', before: signIn, act: labelsShown },
+      // The old capture of the add screen in dark mode is the empty form (old-app-refs.spec.ts).
+      { name: 'add-dark', path: '/add', theme: 'dark', before: signIn, act: labelsShown },
     ];
 
     const result = await compareScreen(browser, baseURL ?? '', 'add', states);

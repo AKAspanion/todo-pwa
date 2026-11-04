@@ -73,8 +73,8 @@ const cards = (page: Page) => page.getByTestId('notification');
 const card = (page: Page, id: string) => page.locator(`[data-notification-id="${id}"]`);
 const pushToggle = (page: Page) =>
   page
-    .getByRole('switch', { name: 'Reminders on this device' })
-    .or(page.getByRole('checkbox', { name: 'Reminders on this device' }));
+    .getByRole('switch', { name: 'Notification permission' })
+    .or(page.getByRole('checkbox', { name: 'Notification permission' }));
 
 /** Removes window.Notification before the app loads, as on iOS Safari. */
 async function withoutNotificationApi(page: Page): Promise<void> {
@@ -167,6 +167,28 @@ test.describe('notifications screen', () => {
     expect(shownIn(TIME_ZONE, NOTES[0].at)).toContain('Oct 31, 2026');
   });
 
+  for (const lang of ['en', 'hi'] as const) {
+    test(`the delete button on a card is visible against the card's colour (${lang})`, async ({
+      page,
+    }) => {
+      await page.evaluate((l) => localStorage.setItem('lang', l), lang);
+      await page.goto('/notification');
+      await expect(cards(page)).toHaveCount(3);
+
+      const colours = await card(page, 'note-mid').evaluate((el) => {
+        const button = el.querySelector('button[aria-label]') as HTMLElement;
+        const icon = button.querySelector('.v-icon') as HTMLElement;
+        return {
+          icon: getComputedStyle(icon).color,
+          background: getComputedStyle(el).backgroundColor,
+        };
+      });
+
+      expect(colours.icon).not.toBe(colours.background);
+      expect(colours.icon).toBe('rgb(255, 255, 255)');
+    });
+  }
+
   test('deleting a reminder removes it, and it stays gone after reload', async ({ page }) => {
     await page.goto('/notification');
     await expect(cards(page)).toHaveCount(3);
@@ -183,7 +205,7 @@ test.describe('notifications screen', () => {
     await expect(card(page, 'note-mid')).toHaveCount(0);
   });
 
-  test('a delete the server rejects keeps the reminder and says "Couldn\'t delete. Try again."', async ({
+  test('a delete the server rejects keeps the reminder and says "Error deleting notification"', async ({
     page,
   }) => {
     // Someone else's notification: the security rules reject any delete of it.
@@ -208,7 +230,7 @@ test.describe('notifications screen', () => {
 
     await card(page, 'note-mid').getByRole('button', { name: 'Delete notification' }).click();
 
-    await expect(page.getByText("Couldn't delete. Try again.")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('Error deleting notification')).toBeVisible({ timeout: 15_000 });
     await expect(card(page, 'note-mid')).toBeVisible();
     await expect(cards(page)).toHaveCount(3);
     expect(await readDoc('notifications/note-mid')).not.toBeNull();
@@ -231,10 +253,10 @@ test.describe('notifications screen', () => {
 
     await page.goto('/notification');
 
-    await expect(page.getByText('इस डिवाइस पर रिमाइंडर')).toBeVisible();
+    await expect(page.getByText('अधिसूचना अनुमति')).toBeVisible();
     await expect(cards(page)).toHaveCount(3);
     await expect(page.getByRole('button', { name: 'अधिसूचना हटाएं' })).toHaveCount(3);
-    for (const english of ['Reminders on this device', 'Delete notification']) {
+    for (const english of ['Notification permission', 'Delete notification']) {
       await expect(page.getByText(english, { exact: true })).toHaveCount(0);
     }
   });
@@ -245,7 +267,7 @@ test.describe('notifications visuals', () => {
   test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 300_000 });
 
-  test('notifications-empty, -list, -unsupported and -hi match their references at 390 and 1280', async ({
+  test('notifications-empty, -list, -unsupported, -dark and -hi match their references at 390 and 1280', async ({
     browser,
     baseURL,
   }) => {
@@ -275,6 +297,13 @@ test.describe('notifications visuals', () => {
           await listShown(page);
           await expect(page.getByText(UNSUPPORTED)).toBeVisible();
         },
+      },
+      {
+        name: 'notifications-dark',
+        path: '/notification',
+        theme: 'dark',
+        before: signIn(user),
+        act: listShown,
       },
       {
         name: 'notifications-hi',

@@ -2,6 +2,7 @@
 import { computed, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 import type { VForm } from 'vuetify/components';
 import { authErrorCode, authErrorKey, isStrongPassword } from '@/lib/authForm';
 import { safeRedirect } from '@/router/guard';
@@ -12,6 +13,7 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const ui = useUiStore();
+const { xs } = useDisplay();
 
 const form = useTemplateRef<InstanceType<typeof VForm>>('form');
 const email = ref('');
@@ -22,15 +24,27 @@ const showPassword = ref(false);
 const busy = ref<'email' | 'google' | null>(null);
 /** The locale key of the last error, so it follows a change of language. */
 const errorKey = ref<string | null>(null);
+/** The old sign-up showed a failure in a snackbar; closing it clears the message, never the fields. */
+const errorShown = computed({
+  get: () => errorKey.value !== null,
+  set: (open: boolean) => {
+    if (!open) errorKey.value = null;
+  },
+});
+/** The old fields were dense on phones only. */
+const density = computed(() => (xs.value ? 'compact' : 'default'));
 
 /** Any address Firebase accepts is accepted: Firebase itself judges the format (D14). */
 const rules = {
   email: [(v: string) => v.trim() !== '' || t('auth.rules.emailRequired')],
   password: [
-    (v: string) => v !== '' || t('auth.rules.passwordRequired'),
+    (v: string) => v !== '' || t('auth.rules.passwordEnter'),
     (v: string) => isStrongPassword(v) || t('auth.rules.passwordStrength'),
   ],
-  confirm: [(v: string) => v === password.value || t('auth.rules.passwordsMatch')],
+  confirm: [
+    (v: string) => v !== '' || t('auth.rules.confirmRequired'),
+    (v: string) => v === password.value || t('auth.rules.passwordsMatch'),
+  ],
 };
 
 const locale = computed({
@@ -86,143 +100,200 @@ async function signUpGoogle(): Promise<void> {
 </script>
 
 <template>
-  <v-container class="auth-screen d-flex align-center justify-center">
-    <v-card class="auth-card pa-6" width="100%" max-width="420" variant="flat">
-      <h1 class="text-h5 text-center">{{ t('auth.signUp.title') }}</h1>
-      <p class="text-body-2 text-center text-medium-emphasis mb-6">
-        {{ t('auth.signUp.subtitle') }}
-      </p>
+  <div class="signup-container auth-page">
+    <div class="auth-layout px-7">
+      <v-card variant="outlined" class="auth-card mt-2 pb-8 px-8">
+        <div class="d-flex flex-column align-center pt-4">
+          <h1 class="pt-4 auth-title">{{ t('auth.signUp.title') }}</h1>
+          <div class="pa-2 text-caption font-weight-light">{{ t('auth.signUp.subtitle') }}</div>
+        </div>
 
-      <v-alert
-        v-if="errorKey"
-        type="error"
-        variant="tonal"
-        density="compact"
-        class="mb-4"
-        role="alert"
-        data-testid="auth-error"
-      >
-        {{ t(errorKey) }}
-      </v-alert>
+        <v-card-text class="auth-form">
+          <v-form ref="form" validate-on="submit" @submit.prevent="submitEmail">
+            <v-card-text class="px-0 pb-0">
+              <v-row>
+                <v-col cols="12" class="py-0">
+                  <v-text-field
+                    v-model="email"
+                    type="email"
+                    name="email"
+                    autocomplete="email"
+                    maxlength="254"
+                    variant="outlined"
+                    color="primary"
+                    :density="density"
+                    :label="t('auth.fields.email')"
+                    :rules="rules.email"
+                  />
+                </v-col>
+                <v-col cols="12" sm="6" class="py-0">
+                  <v-text-field
+                    v-model="password"
+                    name="new-password"
+                    autocomplete="new-password"
+                    maxlength="4096"
+                    variant="outlined"
+                    color="primary"
+                    :density="density"
+                    :type="showPassword ? 'text' : 'password'"
+                    :label="t('auth.fields.password')"
+                    :rules="rules.password"
+                  >
+                    <template #append-inner>
+                      <v-btn
+                        variant="text"
+                        size="small"
+                        density="comfortable"
+                        :icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                        :aria-label="
+                          showPassword
+                            ? t('auth.fields.hidePassword')
+                            : t('auth.fields.showPassword')
+                        "
+                        @click="showPassword = !showPassword"
+                      />
+                    </template>
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" class="py-0">
+                  <v-text-field
+                    v-model="confirm"
+                    name="confirm-password"
+                    autocomplete="new-password"
+                    maxlength="4096"
+                    variant="outlined"
+                    color="primary"
+                    :density="density"
+                    :type="showPassword ? 'text' : 'password'"
+                    :label="t('auth.fields.confirmPassword')"
+                    :rules="rules.confirm"
+                  >
+                    <template #append-inner>
+                      <v-btn
+                        variant="text"
+                        size="small"
+                        density="comfortable"
+                        :icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                        :aria-label="
+                          showPassword
+                            ? t('auth.fields.hidePassword')
+                            : t('auth.fields.showPassword')
+                        "
+                        @click="showPassword = !showPassword"
+                      />
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-actions class="px-0 py-4">
+              <v-btn
+                type="submit"
+                size="large"
+                block
+                color="primary"
+                class="auth-btn"
+                :loading="busy === 'email'"
+                :disabled="busy === 'google'"
+              >
+                {{ t('auth.signUp.submit') }}
+              </v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card-text>
 
-      <v-form ref="form" validate-on="submit" @submit.prevent="submitEmail">
-        <v-text-field
-          v-model="email"
-          type="email"
-          name="email"
-          autocomplete="email"
-          maxlength="254"
-          variant="outlined"
-          class="mb-2"
-          :label="t('auth.fields.email')"
-          :rules="rules.email"
-        />
-        <v-text-field
-          v-model="password"
-          name="new-password"
-          autocomplete="new-password"
-          maxlength="4096"
-          variant="outlined"
-          class="mb-2"
-          :type="showPassword ? 'text' : 'password'"
-          :label="t('auth.fields.password')"
-          :rules="rules.password"
-        >
-          <template #append-inner>
-            <v-btn
-              variant="text"
-              size="small"
-              density="comfortable"
-              :icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-              :aria-label="
-                showPassword ? t('auth.fields.hidePassword') : t('auth.fields.showPassword')
-              "
-              @click="showPassword = !showPassword"
-            />
-          </template>
-        </v-text-field>
-        <v-text-field
-          v-model="confirm"
-          name="confirm-password"
-          autocomplete="new-password"
-          maxlength="4096"
-          variant="outlined"
-          class="mb-2"
-          :type="showPassword ? 'text' : 'password'"
-          :label="t('auth.fields.confirmPassword')"
-          :rules="rules.confirm"
-        />
-        <v-btn
-          type="submit"
-          block
-          size="large"
-          color="primary"
-          class="auth-btn"
-          :loading="busy === 'email'"
-          :disabled="busy === 'google'"
-        >
-          {{ t('auth.signUp.submit') }}
-        </v-btn>
-      </v-form>
+        <div class="text-overline py-0">{{ t('auth.signUp.or') }}</div>
+        <v-card-text>
+          <div>
+            <span class="pa-1">
+              <v-btn
+                size="large"
+                icon
+                variant="text"
+                :aria-label="t('auth.signUp.google')"
+                :loading="busy === 'google'"
+                :disabled="busy === 'email'"
+                @click="signUpGoogle"
+              >
+                <v-icon color="#179c52" icon="mdi-google" />
+              </v-btn>
+            </span>
+          </div>
+        </v-card-text>
 
-      <div class="d-flex align-center my-4">
-        <v-divider />
-        <span class="text-caption text-medium-emphasis px-3">{{ t('auth.signUp.or') }}</span>
-        <v-divider />
-      </div>
+        <v-card-text class="pt-0 pb-7">
+          <span class="text-caption">{{ t('auth.signUp.hasAccount') }}&nbsp;</span>
+          <router-link class="auth-link text-caption" :to="signInLink">{{
+            t('auth.signUp.signInLink')
+          }}</router-link>
+        </v-card-text>
 
-      <v-btn
-        block
-        size="large"
-        variant="outlined"
-        prepend-icon="mdi-google"
-        class="auth-btn"
-        :loading="busy === 'google'"
-        :disabled="busy === 'email'"
-        @click="signUpGoogle"
-      >
-        {{ t('auth.signUp.google') }}
-      </v-btn>
-
-      <p class="text-body-2 text-center mt-6">
-        {{ t('auth.signUp.hasAccount') }}
-        <router-link :to="signInLink">{{ t('auth.signUp.signInLink') }}</router-link>
-      </p>
-
-      <div class="d-flex justify-center mt-4">
         <v-btn-toggle
           v-model="locale"
           mandatory
           density="compact"
-          variant="outlined"
-          divided
+          variant="text"
+          class="auth-lang"
           :aria-label="t('auth.language.label')"
           role="group"
         >
-          <v-btn value="en" size="small" lang="en" :aria-pressed="locale === 'en'">{{
-            t('auth.language.en')
-          }}</v-btn>
-          <v-btn value="hi" size="small" lang="hi" :aria-pressed="locale === 'hi'">{{
-            t('auth.language.hi')
-          }}</v-btn>
+          <v-btn
+            value="en"
+            size="x-small"
+            lang="en"
+            :aria-label="t('auth.language.en')"
+            :aria-pressed="locale === 'en'"
+            >en</v-btn
+          >
+          <v-btn
+            value="hi"
+            size="x-small"
+            lang="hi"
+            :aria-label="t('auth.language.hi')"
+            :aria-pressed="locale === 'hi'"
+            >hi</v-btn
+          >
         </v-btn-toggle>
-      </div>
-    </v-card>
-  </v-container>
+      </v-card>
+    </div>
+
+    <v-snackbar
+      v-model="errorShown"
+      :timeout="5000"
+      multi-line
+      location="bottom"
+      class="app-snackbar"
+      data-testid="auth-error"
+      role="alert"
+    >
+      {{ errorKey ? t(errorKey) : '' }}
+      <template #actions>
+        <v-btn variant="text" @click="errorShown = false">{{ t('common.close') }}</v-btn>
+      </template>
+    </v-snackbar>
+  </div>
 </template>
 
 <style scoped>
-.auth-screen {
+.signup-container {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+.signup-container::-webkit-scrollbar {
+  width: 0;
+}
+.auth-layout {
+  display: flex;
   min-height: 100%;
+  align-items: center;
+  justify-content: center;
 }
-/* Long Hindi labels wrap inside the button instead of overflowing it at phone width. */
-.auth-btn {
-  height: auto !important;
-  min-height: 44px;
-  white-space: normal;
-}
-.auth-btn :deep(.v-btn__content) {
-  white-space: normal;
+.auth-form {
+  max-width: 420px;
+  margin: 0 auto;
   text-align: center;
 }
 </style>

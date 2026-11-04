@@ -1,22 +1,22 @@
 {
-  "count": "no tasks | {n} task | {n} tasks",
+  "count": "{n} tasks | {n} task | {n} tasks",
   "header": {
     "relative": "{tasks} {day}",
     "onDate": "{tasks} on {day}",
-    "all": "{tasks} to do"
+    "all": "{tasks} todo"
   },
   "columns": {
-    "todo": "To do",
+    "todo": "TODO",
     "done": "Done"
   },
   "empty": {
     "todo": {
-      "title": "No task to do",
+      "title": "No task todo",
       "caption": "Create a task and it will appear here"
     },
     "done": {
       "title": "No task done",
-      "caption": "Complete a task, or drag one here, and it will appear here"
+      "caption": "Complete a task and it will appear here"
     },
     "create": "Create"
   },
@@ -42,7 +42,7 @@
     "confirm": "Delete",
     "labels": "Labels",
     "pending": "Saving…",
-    "when": "{day}, {time}"
+    "when": "{day} at {time}"
   },
   "form": {
     "label": "Edit task",
@@ -50,7 +50,7 @@
     "description": "Description",
     "labels": "Labels",
     "noLabels": "No labels yet. Create one on your profile.",
-    "indefinite": "No due date",
+    "indefinite": "Indefinite task?",
     "date": "Date",
     "time": "Time",
     "save": "Save",
@@ -59,14 +59,14 @@
     "dateRequired": "Pick a date"
   },
   "errors": {
-    "load": "Couldn't load your data. Try again.",
-    "save": "Couldn't save. Try again.",
+    "load": "Error getting tasks. Please try later!",
+    "save": "Task updating task",
     "slowSave": "Still saving. Check your connection.",
-    "delete": "Couldn't delete the task. Try again.",
+    "delete": "Error deleting task",
     "retry": "Retry"
   },
   "toast": {
-    "saved": "Task updated",
-    "deleted": "Task deleted"
+    "saved": "Task updated successfully",
+    "deleted": "Task deleted successfully"
   }
 }

@@ -57,6 +57,13 @@ afterEach(() => {
 });
 
 describe('TimeField', () => {
+  it("writes the old add screen's '09:30 AM' with oldFormat", () => {
+    const wrapper = mountField({ oldFormat: true });
+
+    expect(input(wrapper).value).toBe('09:30 AM');
+    wrapper.unmount();
+  });
+
   it('shows the time on a 12-hour clock in a text field, not a native time input', () => {
     const wrapper = mountField();
 

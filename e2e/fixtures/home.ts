@@ -95,35 +95,68 @@ export async function seedLabel(
   await seedDoc(`types/${label.id}`, { uid, label: label.label, color: label.color });
 }
 
+/** The tasks of the board the visual states show: three todo tasks (one indefinite), one done. */
+function homeBoardTasks(today: string): SeedTask[] {
+  return [
+    {
+      id: 'milk',
+      title: 'Buy milk',
+      description: 'From the corner shop',
+      date: today,
+      time: '09:30',
+      labelIds: ['home'],
+    },
+    {
+      id: 'report',
+      title: 'Send the quarterly report',
+      description: '**Q4** numbers and the [summary](https://example.com/summary)',
+      date: today,
+      time: '14:00',
+      labelIds: ['work'],
+    },
+    { id: 'trip', title: 'Plan the winter trip', date: null },
+    {
+      id: 'rent',
+      title: 'Pay rent',
+      status: 'done',
+      date: today,
+      time: '08:00',
+      labelIds: ['home', 'work'],
+    },
+  ];
+}
+
 /** The board the visual states show: two labels, three todo tasks (one indefinite), one done. */
 export async function seedHomeBoard(uid: string, today: string): Promise<void> {
   await seedLabel(uid, { id: 'work', label: 'Work', color: '#1976D2' });
   await seedLabel(uid, { id: 'home', label: 'Home', color: '#F8BBD0' });
-  await seedTask(uid, {
-    id: 'milk',
-    title: 'Buy milk',
-    description: 'From the corner shop',
-    date: today,
-    time: '09:30',
-    labelIds: ['home'],
+  for (const task of homeBoardTasks(today)) await seedTask(uid, task);
+}
+
+/**
+ * A task as the old app's own add form wrote it: `description` and `indefinite` as written, 'NA' for
+ * the date and time of an indefinite task, labels as `type` references, and none of the fields only
+ * this version of the app writes (`labelIds`, `timeZone`, `remindAt`, `reminded`).
+ */
+export async function seedLegacyBoardTask(uid: string, task: SeedTask): Promise<void> {
+  const dated = task.date !== undefined && task.date !== null;
+  await seedDoc(`tasks/${task.id}`, {
+    uid,
+    title: task.title,
+    description: task.description ?? '',
+    status: task.status ?? 'todo',
+    indefinite: !dated,
+    date: dated ? task.date : 'NA',
+    time: dated ? (task.time ?? 'NA') : 'NA',
+    type: (task.labelIds ?? []).map((id) => docRef(`types/${id}`)),
   });
-  await seedTask(uid, {
-    id: 'report',
-    title: 'Send the quarterly report',
-    description: '**Q4** numbers and the [summary](https://example.com/summary)',
-    date: today,
-    time: '14:00',
-    labelIds: ['work'],
-  });
-  await seedTask(uid, { id: 'trip', title: 'Plan the winter trip', date: null });
-  await seedTask(uid, {
-    id: 'rent',
-    title: 'Pay rent',
-    status: 'done',
-    date: today,
-    time: '08:00',
-    labelIds: ['home', 'work'],
-  });
+}
+
+/** The same board seedHomeBoard seeds, in the old app's shape: `type` references, 'NA' for no date or time. */
+export async function seedLegacyHomeBoard(uid: string, today: string): Promise<void> {
+  await seedLabel(uid, { id: 'work', label: 'Work', color: '#1976D2' });
+  await seedLabel(uid, { id: 'home', label: 'Home', color: '#F8BBD0' });
+  for (const task of homeBoardTasks(today)) await seedLegacyBoardTask(uid, task);
 }
 
 const RULES_URL = `http://${FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/${PROJECT_ID}:securityRules`;

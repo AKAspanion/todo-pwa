@@ -11,6 +11,13 @@
     "notification": "अधिसूचना",
     "profile": "प्रोफ़ाइल"
   },
+  "bar": {
+    "add": "कार्य बनाएँ",
+    "calendar": "कैलेंडर",
+    "notification": "अधिसूचना",
+    "profile": "प्रोफ़ाइल",
+    "back": "वापस"
+  },
   "screens": {
     "signIn": "साइन इन",
     "signUp": "साइन अप करें",

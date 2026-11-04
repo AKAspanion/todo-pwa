@@ -22,6 +22,12 @@
       "fullPage": true
     },
     {
+      "name": "notifications-dark",
+      "design": "../reference.html?screen=notifications&side=refs&state=notifications-dark",
+      "app": "reference.html?screen=notifications&side=app&state=notifications-dark",
+      "fullPage": true
+    },
+    {
       "name": "notifications-hi",
       "design": "../reference.html?screen=notifications&side=refs&state=notifications-hi",
       "app": "reference.html?screen=notifications&side=app&state=notifications-hi",

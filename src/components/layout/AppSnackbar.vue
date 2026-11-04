@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/** The one snackbar, drawn as the old ContainerMain drew it: multi-line, at the bottom, with a text Close. */
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useUiStore } from '@/stores/ui';
@@ -22,19 +23,34 @@ function runAction(): void {
 </script>
 
 <template>
-  <v-snackbar v-model="open" :timeout="ui.snack?.timeoutMs ?? -1" location="bottom">
+  <v-snackbar
+    v-model="open"
+    :timeout="ui.snack?.timeoutMs ?? -1"
+    multi-line
+    location="bottom"
+    class="app-snackbar"
+  >
     {{ ui.snack?.text }}
     <template #actions>
-      <v-btn v-if="ui.snack?.actionLabel" color="primary" variant="text" @click="runAction">
+      <v-btn v-if="ui.snack?.actionLabel" variant="text" @click="runAction">
         {{ ui.snack.actionLabel }}
       </v-btn>
-      <v-btn
-        icon="mdi-close"
-        variant="text"
-        size="small"
-        :aria-label="t('common.close')"
-        @click="ui.dismissSnack()"
-      />
+      <v-btn variant="text" @click="ui.dismissSnack()">{{ t('common.close') }}</v-btn>
     </template>
   </v-snackbar>
 </template>
+
+<style>
+/* The old snackbar's dark grey, in both themes (Vuetify 2's #323232). */
+.app-snackbar .v-snackbar__wrapper {
+  background: #323232;
+  color: #fff;
+}
+.app-snackbar .v-btn {
+  color: #fff;
+}
+/* The old snackbar sat over the bottom navigation: it does not make room for it. */
+.app-snackbar.v-snackbar {
+  padding: 0 !important;
+}
+</style>

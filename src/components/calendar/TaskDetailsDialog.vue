@@ -8,6 +8,7 @@ import { computed, ref, useId, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import MarkdownView from '@/components/MarkdownView.vue';
 import LabelChips from '@/components/tasks/LabelChips.vue';
+import { resolveLabels, safeColor, textColorFor } from '@/components/tasks/labels';
 import { formatLongDate, formatTime12, type DateLocale } from '@/lib/dates';
 import { useLabelsStore } from '@/stores/labels';
 import type { Task } from '@/types/models';
@@ -29,6 +30,14 @@ watch(
     if (task) shown.value = task;
   },
 );
+
+/** The card's band takes the colour the task's event has on the calendar (first label, else the old blue). */
+const band = computed(() => {
+  const task = shown.value;
+  if (task?.status === 'done') return '#9E9E9E';
+  const first = task ? resolveLabels(task.labelIds, labelsStore.labels)[0] : undefined;
+  return safeColor(first?.color) ?? '#4285F4';
+});
 
 const when = computed(() => {
   const task = shown.value;
@@ -52,21 +61,25 @@ function onOpenChange(open: boolean): void {
     data-testid="task-details"
     @update:model-value="onOpenChange"
   >
-    <v-card v-if="shown">
-      <v-card-item>
-        <v-card-title :id="titleId" class="task-details__title" data-testid="task-details-title">
+    <v-card v-if="shown" flat min-width="320" class="task-details">
+      <v-toolbar
+        flat
+        class="task-details__band"
+        :style="{ backgroundColor: band, color: textColorFor(band) }"
+      >
+        <v-toolbar-title :id="titleId" class="task-details__title" data-testid="task-details-title">
           {{ shown.title }}
-        </v-card-title>
-        <v-card-subtitle v-if="when" class="task-details__when" data-testid="task-details-when">
-          {{ when }}
-        </v-card-subtitle>
+        </v-toolbar-title>
         <template v-if="shown.status === 'done'" #append>
-          <v-chip size="small" color="success" variant="tonal" label>
+          <v-chip size="small" variant="outlined" label class="mr-2">
             {{ t('calendar.details.done') }}
           </v-chip>
         </template>
-      </v-card-item>
-      <v-card-text class="pt-2">
+      </v-toolbar>
+      <v-card-text class="pt-3">
+        <div v-if="when" class="task-details__when mb-2" data-testid="task-details-when">
+          {{ when }}
+        </div>
         <LabelChips :label-ids="shown.labelIds" :labels="labelsStore.labels" class="mb-3" />
         <div class="text-body-medium" data-testid="task-details-description">
           <MarkdownView v-if="shown.description" :source="shown.description" />
@@ -74,8 +87,9 @@ function onOpenChange(open: boolean): void {
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
-        <v-btn variant="text" @click="emit('close')">{{ t('calendar.details.close') }}</v-btn>
+        <v-btn variant="text" color="secondary" @click="emit('close')">{{
+          t('calendar.details.close')
+        }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -89,5 +103,7 @@ function onOpenChange(open: boolean): void {
 }
 .task-details__when {
   white-space: normal;
+  font-size: 0.875rem;
+  opacity: 0.7;
 }
 </style>
