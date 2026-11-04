@@ -1,5 +1,7 @@
 # E2E only before deploy Implementation Plan
 
+**Status:** complete
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** The `e2e` CI job runs only when `deploy.yml` calls `ci.yml`, and is skipped on pull requests.
@@ -44,19 +46,19 @@
 - Given `ci.yml`'s header comment and the README's CI paragraph, then each says the e2e job runs only before deploy, not on pull requests.
 - Given the changed files, when `npm run format:check` runs, then it exits `0`.
 
-- [ ] **Step 1: Search for the condition and confirm it's missing**
+- [x] **Step 1: Search for the condition and confirm it's missing**
 
 Run: `grep -n "github.event_name != 'pull_request'" .github/workflows/ci.yml`
 Expected: no match
 
-- [ ] **Step 2: Add the condition** to the `e2e` job, with its comment, and update the header comment and the README paragraph
+- [x] **Step 2: Add the condition** to the `e2e` job, with its comment, and update the header comment and the README paragraph
 
-- [ ] **Step 3: Search again and run the format check, and confirm they pass**
+- [x] **Step 3: Search again and run the format check, and confirm they pass**
 
 Run: `grep -n "github.event_name != 'pull_request'" .github/workflows/ci.yml` and `npm run format:check`
 Expected: one match, in the `e2e` job; format check exits `0`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add .github/workflows/ci.yml README.md
