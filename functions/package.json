@@ -9,10 +9,10 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
-    "test": "sh -c 'firebase emulators:exec --project demo-todo --only firestore \"vitest run $*\"' --",
+    "test": "sh -c '../node_modules/.bin/firebase emulators:exec --project demo-todo --only firestore \"vitest run $*\"' --",
     "migrate": "tsx scripts/migrate-legacy.ts",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "deploy": "../node_modules/.bin/firebase deploy --only functions",
+    "logs": "../node_modules/.bin/firebase functions:log"
   },
   "dependencies": {
     "firebase-admin": "^14.5.0",

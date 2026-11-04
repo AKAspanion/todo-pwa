@@ -201,7 +201,7 @@ function workflowTriggers(workflow: string): string {
 test.describe('CI workflow', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'checks a file, not a browser');
 
-  test('runs every gate on every pull request and, through deploy.yml, on every push to master, on Node 24 with Java 21 and the demo env', () => {
+  test('runs every gate with pnpm on pull requests (e2e only before deploy) and, through deploy.yml, on every push to master, on Node 24 with Java 21 and the demo env', () => {
     const ci = readFileSync('.github/workflows/ci.yml', 'utf8');
     const deploy = readFileSync('.github/workflows/deploy.yml', 'utf8');
     const nvmrc = readFileSync('.nvmrc', 'utf8').trim();
@@ -225,20 +225,33 @@ test.describe('CI workflow', () => {
       expect(job, id).toContain('node-version-file: .nvmrc');
       expect(job, id).toMatch(/java-version:\s*'21'/);
       expect(job, id).toContain(`grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"`);
+      // pnpm comes from package.json's packageManager, set up before setup-node caches its store.
+      expect(job, id).toMatch(
+        /uses: pnpm\/action-setup@[0-9a-f]{40}\b[\s\S]*uses: actions\/setup-node@/,
+      );
+      expect(job, id).toContain('cache: pnpm');
+      expect(job, id).toMatch(/run: pnpm install --frozen-lockfile(\s|$)/);
+    }
+
+    // e2e runs only before deploy (decisions/e2e-before-deploy-only); the other jobs run on every PR.
+    expect(jobs.e2e).toMatch(/^    if: \$\{\{ github\.event_name != 'pull_request' \}\}\s*$/m);
+    for (const id of ['checks', 'functions', 'secrets']) {
+      expect(jobs[id], id).not.toMatch(/^    if:/m);
     }
 
     const gates: [job: string, command: string][] = [
-      ['checks', 'npm run lint'],
-      ['checks', 'npm run typecheck'],
-      ['checks', 'npm run format:check'],
-      ['checks', 'npm run test -- src'],
-      ['checks', 'npm run test:rules'],
-      ['checks', 'npm run build'],
-      ['checks', 'npm audit --omit=dev'],
-      ['functions', 'npm --prefix functions run build'],
-      ['functions', 'npm --prefix functions run lint'],
-      ['functions', 'npm --prefix functions run test'],
-      ['e2e', 'npm run e2e'],
+      ['checks', 'pnpm run lint'],
+      ['checks', 'pnpm run typecheck'],
+      ['checks', 'pnpm run format:check'],
+      ['checks', 'pnpm run test src'],
+      ['checks', 'pnpm run test:rules'],
+      ['checks', 'pnpm run build'],
+      ['checks', 'pnpm audit --prod --audit-level moderate'],
+      ['functions', 'pnpm --dir functions install --frozen-lockfile'],
+      ['functions', 'pnpm --dir functions run build'],
+      ['functions', 'pnpm --dir functions run lint'],
+      ['functions', 'pnpm --dir functions run test'],
+      ['e2e', 'pnpm run e2e'],
     ];
     for (const [job, command] of gates) {
       expect(jobs[job], `${job}: ${command}`).toMatch(
