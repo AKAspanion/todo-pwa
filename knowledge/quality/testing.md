@@ -34,8 +34,8 @@ verified: human:panditankit1995@gmail.com
 
 ## How to run it
 
-The policy's `checks.commands.test` and `checks.commands.e2e`, plus `npm run test:rules` and the functions'
-`npm --prefix functions run test`. Running some files, and the visual tests only, is in `README.md` ("Scripts").
+The policy's `checks.commands.test` and `checks.commands.e2e`, plus `pnpm run test:rules` and the functions'
+`pnpm --dir functions run test`. Running some files, and the visual tests only, is in `README.md` ("Scripts").
 
 ## History
 

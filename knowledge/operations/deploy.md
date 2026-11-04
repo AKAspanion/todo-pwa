@@ -24,8 +24,8 @@ verified: human:panditankit1995@gmail.com
   functions, and hosting, in that order.
 - A "Check deploy configuration" step stops the deploy and names any missing repository variable or the
   missing `FIREBASE_SERVICE_ACCOUNT` secret, without printing values.
-- The deploy key is written to a temporary file only inside the functions step; every `npm ci` runs
-  earlier, without it and with `--ignore-scripts`, so no install script runs while the key is on the runner.
+- The deploy key is written to a temporary file only inside the functions step; every `pnpm install` runs
+  earlier, without it and with `--frozen-lockfile --ignore-scripts`, so no install script runs while the key is on the runner.
 
 ## Before the first deploy
 
@@ -36,6 +36,9 @@ run the data migration once ([domain/legacy-documents](../domain/legacy-document
 [integrations/cloud-billing](../integrations/cloud-billing.md).
 
 ## History
+
+- 2026-11-04: was every install an `npm ci`; now `pnpm install --frozen-lockfile --ignore-scripts`, because the
+  project moved to pnpm; the rule that installs run before the key is unchanged.
 
 - 2026-11-04: was the Deploy workflow deploying the Firestore rules and indexes before hosting on every push; now
   they deploy by hand and the workflow deploys hosting only, because the developer chose it after the deploy

@@ -15,16 +15,20 @@ verified: human:panditankit1995@gmail.com
 - Node at the version in `.nvmrc` (the functions run on Node 22 in production, but their tests and build run
   on the local Node).
 - Java 21 or later, for the Firebase emulators.
-- The Firebase CLI comes with the dev dependencies (`npx firebase`).
+- The Firebase CLI comes with the dev dependencies (`pnpm exec firebase`).
 
 ## Steps
 
-1. Install: `npm install`, `npm --prefix functions install`, and once `npx playwright install chromium webkit`.
+1. Install: `pnpm install`, `pnpm --dir functions install`, and once `pnpm exec playwright install chromium webkit`.
 2. `cp .env.example .env.local`, keeping `VITE_USE_EMULATORS=true`; the Firebase values can stay empty.
-3. Start the emulators for the demo project: `npx firebase emulators:start --project demo-todo`. Their ports
+3. Start the emulators for the demo project: `pnpm exec firebase emulators:start --project demo-todo`. Their ports
    are in `firebase.json` (`emulators`); they start empty, so sign up in the app first.
-4. Start the app: `npm run dev`. The app's other scripts are in `package.json` and explained in `README.md`
+4. Start the app: `pnpm run dev`. The app's other scripts are in `package.json` and explained in `README.md`
    ("Scripts"); `test`, `test:rules` and `e2e` start and stop the emulators themselves.
+
+## History
+
+- 2026-11-04: was npm commands (`npm install`, `npx`); now pnpm, because the project moved to pnpm (`packageManager` in `package.json`).
 
 ## Sources
 

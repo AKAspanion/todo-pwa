@@ -33,7 +33,7 @@ The screens are drawn like the old Vue 2 app, on Vuetify's md2 blueprint
 - `src/App.vue` lays out the menu, the routed view, the bottom navigation and the snackbar, and calls
   `setupPwa()` (`src/pwa/index.ts`) once on mount.
 - `src/sw.ts` is the service worker; `vite.config.ts` builds it and the web manifest.
-- The dev server's port is Vite's default (`npm run dev`); the e2e server's is `E2E_PORT` in `playwright.config.ts`.
+- The dev server's port is Vite's default (`pnpm run dev`); the e2e server's is `E2E_PORT` in `playwright.config.ts`.
 
 ## Screens and routes
 

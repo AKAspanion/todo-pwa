@@ -17,8 +17,8 @@ verified: human:panditankit1995@gmail.com
   key. Whether these are done isn't recorded. The first-deploy steps, deleting the old `testFunction` and
   `testSchedule` among them, are done ([operations/deploy](../operations/deploy.md)).
 - **Dependency advisories left:** a `minimatch` advisory in `firebase-tools` and `superstatic`, and `deepmerge`
-  under `workbox-build`, all dev-only, waiting on upstream releases. The `overrides` in `package.json` and
-  `functions/package.json` should be dropped when they ship (`docs/SECURITY.md`, "Dependency audit").
+  under `workbox-build`, all dev-only, waiting on upstream releases. The `overrides:` in `pnpm-workspace.yaml` and
+  `functions/pnpm-workspace.yaml` should be dropped when they ship (`docs/SECURITY.md`, "Dependency audit").
 - **`docs/FIXES_REPORT.md` still opens with "nothing has been run yet"**, though the gates now pass
   ([decisions/modernisation-verified](../decisions/modernisation-verified.md)): the warning is out of date.
 - **The edit form doesn't check the title and description limits** that the add screen checks, so an over-long
@@ -34,6 +34,8 @@ verified: human:panditankit1995@gmail.com
 - `docs/FIXES_REPORT.md`
 - `package.json`
 - `functions/package.json`
+- `pnpm-workspace.yaml`
+- `functions/pnpm-workspace.yaml`
 - `src/components/tasks/TaskEditForm.vue`
 - `src/views/TaskAddView.vue`
 - `packages/ios/src/Task Manager/Settings.swift`
