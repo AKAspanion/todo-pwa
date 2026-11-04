@@ -131,7 +131,7 @@ Cloud Functions (`functions/`):
 
 CI (`.github/workflows/ci.yml`) runs on every pull request, and on every push to `master` as the
 first job of the deploy workflow. It has four parallel jobs: `checks` (lint, typecheck, format
-check, unit tests, Firestore rules tests, the production build, and `npm audit` of the shipped
+check, unit tests, Firestore rules tests, the production build, and `pnpm audit` of the shipped
 dependencies), `functions` (the Cloud Functions' build, lint and tests), `e2e` (Playwright in
 Chromium and WebKit), and `secrets` (a gitleaks scan, configured in `.gitleaks.toml`). CodeQL
 (`.github/workflows/codeql.yml`) scans the code and the workflows on pull requests, pushes to
@@ -336,7 +336,7 @@ The key is a long-lived credential:
   `spanion-todo-*.json`, `service-account*.json`), and CI's gitleaks scan looks for private keys,
   but keep key files out of the repository folder altogether. The workflow writes it to a
   temporary file only inside the rules and functions deploy steps, and removes it afterwards.
-  Every `npm ci` runs earlier, without the key and with `--ignore-scripts`, so no dependency's
+  Every `pnpm install` runs earlier, without the key and with `--ignore-scripts`, so no dependency's
   install script runs while the key is on the runner.
 - **Rotate it** every 90 days or so, and at once if it may have leaked: create a new key, update
   the secret as above, check that a deploy works, then delete the old key

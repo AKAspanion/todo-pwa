@@ -57,13 +57,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
           cache-dependency-path: |
-            package-lock.json
-            functions/package-lock.json
+            pnpm-lock.yaml
+            functions/pnpm-lock.yaml
       # Names what is missing; never prints a value.
       - name: Check deploy configuration
         env:
@@ -91,12 +92,12 @@ jobs:
       # Installs run before any step that holds the deploy key, and without dependency install
       # scripts, so no third-party package code runs while the key is on the runner. None of these
       # packages needs its install script to build or deploy.
-      - run: npm ci --ignore-scripts
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Install the Cloud Functions' dependencies
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_functions }}
-        run: npm --prefix functions ci --ignore-scripts
-      - run: npm run build
-      # The functions step uses the project's own firebase-tools (npm ci above), signed in with the
+        run: pnpm --dir functions install --frozen-lockfile --ignore-scripts
+      - run: pnpm run build
+      # The functions step uses the project's own firebase-tools (pnpm install above), signed in with the
       # service account key written to a temporary file that is removed afterwards. The key is in
       # that step's environment only, never in an install step's.
       # Functions need the Blaze (pay as you go) plan. The first functions deploy deletes the legacy
@@ -116,7 +117,7 @@ jobs:
           creds="$RUNNER_TEMP/sa.json"
           trap 'rm -f "$creds"' EXIT
           (umask 077; printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$creds")
-          GOOGLE_APPLICATION_CREDENTIALS="$creds" npx firebase deploy \
+          GOOGLE_APPLICATION_CREDENTIALS="$creds" pnpm exec firebase deploy \
             --only functions --project "$PROJECT_ID" --non-interactive --force
       # Last, so new functions are live before the app that needs them.
       - name: Deploy hosting

@@ -38,7 +38,7 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
    key, stored only as the repository secret `FIREBASE_SERVICE_ACCOUNT` (Settings > Secrets and
    variables > Actions). Hosting gets it through `FirebaseExtended/action-hosting-deploy`; the
    rules and functions steps write it to a temporary file on the runner, readable only by the
-   runner user, and remove it when the step ends. Every `npm ci` runs earlier, without the key and
+   runner user, and remove it when the step ends. Every `pnpm install` runs earlier, without the key and
    with `--ignore-scripts` (as does the action's own `npx firebase-tools`), so no dependency's
    install script runs while the key is on the runner. It is a long-lived credential: never commit it
    (`.gitignore` covers `*-firebase-adminsdk-*.json`, `spanion-todo-*.json` and
@@ -60,9 +60,9 @@ the public `testFunction` removed) are in [FIXES_REPORT.md](FIXES_REPORT.md), se
 | Environment files | `.env.example` lists every `VITE_` variable the app reads; `.env.ci` holds only demo values (project `demo-todo`); `.env`, `.env.local`, `functions/.env` and `functions/.env.*` (except the example) are git-ignored. |
 | Secret scan | gitleaks 8.30.1 over the whole history: 6 findings before the allowlists, all reviewed (item 3 above), none after. Runs in CI on every pull request and every push to `master`. |
 | Hosting headers | `firebase.json` sends `X-Content-Type-Options`, `Referrer-Policy` and `Permissions-Policy` on every path, and the Content Security Policy (with `frame-ancestors 'none'`) and `X-Frame-Options: DENY` on every path except Firebase's reserved `/__/**` (a `regex` rule, as Hosting's globs can't exclude a path), so the app can frame its own `/__/auth/iframe` for Google sign-in. The CSP allows no `unsafe-eval` and no inline script (the built `index.html` has none); inline styles are allowed for Vuetify. |
-| CI and deploy | Workflows run with a read-only token (`contents: read`; the gitleaks job adds `pull-requests: read`). Every action is pinned to a full commit SHA, which Dependabot updates weekly, and checkouts don't persist the token. Deploy runs on a push to `master` and calls the CI workflow first: hosting deploys only if every CI job passes. The Firestore rules and indexes are deployed by hand, before the change that needs them is merged. Functions deploy only from a manual run with their box ticked. The deploy key is never in an install step's environment, and installs run with `--ignore-scripts`. A "Check deploy configuration" step names missing variables or the missing secret without printing values. |
+| CI and deploy | Workflows run with a read-only token (`contents: read`; the gitleaks job adds `pull-requests: read`). Every action is pinned to a full commit SHA, which Dependabot updates weekly, and checkouts don't persist the token. Deploy runs on a push to `master` and calls the CI workflow first: hosting deploys only if every CI job passes. The Firestore rules and indexes are deployed by hand, before the change that needs them is merged. Functions deploy only from a manual run with their box ticked. The deploy key is never in an install step's environment, and installs run with `--frozen-lockfile --ignore-scripts`. A "Check deploy configuration" step names missing variables or the missing secret without printing values. |
 | Code scanning | CodeQL (`.github/workflows/codeql.yml`), `security-and-quality` queries over JavaScript/TypeScript and the workflows themselves, on pull requests, pushes to `master` and weekly. |
-| Shipped-dependency audit in CI | `npm audit --omit=dev --audit-level=moderate` in the `checks` job: the findings left (below) are all in dev-only packages, which `--omit=dev` leaves out, so a new moderate or worse advisory in a runtime dependency is what fails CI. |
+| Shipped-dependency audit in CI | `pnpm audit --prod --audit-level moderate` in the `checks` job: the findings left (below) are all in dev-only packages, which `--prod` leaves out, so a new moderate or worse advisory in a runtime dependency is what fails CI. |
 
 ## Dependency audit
 
@@ -75,9 +75,9 @@ _Checked 2026-11-02 with `npm audit` (root) and `npm --prefix functions audit`._
 
 ### What was fixed, and how
 
-The advisories were all in transitive dependencies. They are lifted to patched versions with npm
-`overrides` (in `package.json` and `functions/package.json`), each scoped to the consumers that
-were checked to work with the new version. Nothing was downgraded, and npm audit's "fix"
+The advisories were all in transitive dependencies. They are lifted to patched versions with pnpm
+`overrides` (in `pnpm-workspace.yaml` and `functions/pnpm-workspace.yaml`), each scoped to the consumers that
+were checked to work with the new version. Nothing was downgraded, and the audit's "fix"
 suggestions (all downgrades, such as `firebase-tools@3.18.2`) were not applied.
 
 | Advisory | Was | Now | Consumer, and why the override is safe |
@@ -102,4 +102,4 @@ npm reports the packages that depend on these (`firebase-tools`, `superstatic`, 
 `vite-plugin-pwa`, `@rollup/plugin-node-resolve`) as the other findings in the count of 7.
 
 Dependabot (`.github/dependabot.yml`) opens weekly update PRs. When firebase-tools or workbox-build
-ship patched versions, drop the matching overrides and check `npm audit` again.
+ship patched versions, drop the matching overrides and check `pnpm audit` again.

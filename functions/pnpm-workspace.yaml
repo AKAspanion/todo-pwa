@@ -2,3 +2,8 @@ allowBuilds:
   '@firebase/util': true
   esbuild: true
   protobufjs: true
+overrides:
+  'rimraf>glob': ^14.0.3
+  'eslint>minimatch': ^11.0.4
+  '@eslint/config-array>minimatch': ^11.0.4
+  '@typescript-eslint/typescript-estree>minimatch': ^11.0.4
