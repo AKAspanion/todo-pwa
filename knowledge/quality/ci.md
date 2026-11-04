@@ -26,7 +26,10 @@ verified: human:panditankit1995@gmail.com
 - `checks`: lint, typecheck, format check, the unit tests under `src`, the rules tests, the production build,
   and `npm audit --omit=dev --audit-level=moderate` (only shipped dependencies fail it).
 - `functions`: the functions' build, lint and tests.
-- `e2e`: Playwright in Chromium and WebKit (visual tests skip on CI).
+- `e2e`: Playwright in Chromium and WebKit (visual tests skip on CI). It runs on `ubuntu-24.04`, not
+  `ubuntu-latest`: on Ubuntu 26.04 Playwright's WebKit can't start (it needs `libicudata.so.74`). The browser
+  cache is keyed by the runner image (`ImageOS`), so browsers built for one Ubuntu release are never restored
+  on another.
 - `secrets`: a gitleaks scan, configured in `.gitleaks.toml`.
 
 Workflows run with a read-only token, every action is pinned to a commit SHA, and checkouts don't keep the
