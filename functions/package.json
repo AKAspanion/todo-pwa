@@ -28,19 +28,5 @@
     "typescript": "~6.0",
     "typescript-eslint": "^8.72.1",
     "vitest": "^5.0.5"
-  },
-  "overrides": {
-    "rimraf": {
-      "glob": "^14.0.3"
-    },
-    "eslint": {
-      "minimatch": "^11.0.4"
-    },
-    "@eslint/config-array": {
-      "minimatch": "^11.0.4"
-    },
-    "@typescript-eslint/typescript-estree": {
-      "minimatch": "^11.0.4"
-    }
   }
 }

@@ -28,7 +28,7 @@ the Firestore emulator (`functions/vitest.config.ts`).
 - `functions/src/index.ts` initialises the Admin SDK and exports `sendReminders` (`functions/src/reminders.ts`)
   and `stopBillingOnBudget` (`functions/src/budget.ts`). A test in `functions/src/reminders.test.ts` fails on any HTTP or callable export: the old public
   `testFunction` leaked every user's tokens and task titles (spec S1).
-- `functions/scripts/migrate-legacy.ts`: the migration, run by hand with `npm --prefix functions run migrate`.
+- `functions/scripts/migrate-legacy.ts`: the migration, run by hand with `pnpm --dir functions run migrate`.
 - The one param, `APP_URL`, is defined in `functions/src/reminders.ts` and set in `functions/.env`
   (see `functions/.env.example`).
 

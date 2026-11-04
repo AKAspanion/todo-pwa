@@ -10,6 +10,8 @@ design/**/app/
 # Generated or third-party
 package-lock.json
 functions/package-lock.json
+pnpm-lock.yaml
+functions/pnpm-lock.yaml
 functions/lib/
 packages/
 public/

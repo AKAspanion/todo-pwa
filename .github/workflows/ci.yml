@@ -2,6 +2,7 @@ name: CI
 
 # Pull requests run it directly; every push to master runs it through deploy.yml, which deploys
 # only when it passes.
+# The e2e job runs only before deploy, not on pull requests.
 on:
   pull_request:
   workflow_call:
@@ -22,10 +23,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
       # The Firebase emulators run on Java.
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
@@ -34,25 +36,25 @@ jobs:
       # Demo Firebase settings: every test runs against the emulators (project demo-todo).
       - name: Use the demo environment
         run: grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
       - name: Cache the Firebase emulators
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/firebase/emulators
-          key: firebase-emulators-${{ hashFiles('package-lock.json') }}
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run format:check
+          key: firebase-emulators-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run format:check
       # tests/rules has its own step below, so this runs the app's unit tests only.
       - name: Unit tests
-        run: npm run test -- src
+        run: pnpm run test src
       - name: Firestore security rules tests
-        run: npm run test:rules
+        run: pnpm run test:rules
       # The demo build checks that the app builds; deploy.yml builds its own with the live config.
       - name: Production build
-        run: npm run build
+        run: pnpm run build
       - name: Audit shipped dependencies
-        run: npm audit --omit=dev --audit-level=moderate
+        run: pnpm audit --prod --audit-level moderate
 
   functions:
     name: Cloud Functions (build, lint, tests)
@@ -62,13 +64,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
           cache-dependency-path: |
-            package-lock.json
-            functions/package-lock.json
+            pnpm-lock.yaml
+            functions/pnpm-lock.yaml
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
@@ -76,20 +79,22 @@ jobs:
       - name: Use the demo environment
         run: grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"
       # The root install provides firebase-tools, which the functions' tests start the emulator with.
-      - run: npm ci
-      - run: npm --prefix functions ci
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir functions install --frozen-lockfile
       - name: Cache the Firebase emulators
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/firebase/emulators
-          key: firebase-emulators-${{ hashFiles('package-lock.json') }}
-      - run: npm --prefix functions run build
-      - run: npm --prefix functions run lint
+          key: firebase-emulators-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm --dir functions run build
+      - run: pnpm --dir functions run lint
       - name: Unit tests (Firestore emulator)
-        run: npm --prefix functions run test
+        run: pnpm --dir functions run test
 
   e2e:
     name: End-to-end (Playwright, Chromium + WebKit, emulators)
+    # Skipped on pull requests: e2e runs only before deploy (decisions/e2e-before-deploy-only).
+    if: ${{ github.event_name != 'pull_request' }}
     # Pinned: Playwright's WebKit builds go up to Ubuntu 24.04, and on 26.04 (ubuntu-latest from
     # 2026-10-19) WebKit can't start, missing libicudata.so.74.
     runs-on: ubuntu-24.04
@@ -98,22 +103,23 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
           java-version: '21'
       - name: Use the demo environment
         run: grep -vE '^[[:space:]]*(#|$)' .env.ci >> "$GITHUB_ENV"
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
       - name: Cache the Firebase emulators
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/firebase/emulators
-          key: firebase-emulators-${{ hashFiles('package-lock.json') }}
+          key: firebase-emulators-${{ hashFiles('pnpm-lock.yaml') }}
       # ImageOS (ubuntu24, ...) is the runner's shell variable, not in the workflow's env context.
       - name: Read the Playwright version and the runner image
         id: playwright
@@ -129,13 +135,13 @@ jobs:
           key: playwright-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium webkit
+        run: pnpm exec playwright install --with-deps chromium webkit
       # The cache holds the browsers only; their system libraries are installed on every run.
       - name: Install Playwright system dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium webkit
+        run: pnpm exec playwright install-deps chromium webkit
       - name: Run e2e suite against Auth + Firestore emulators
-        run: npm run e2e
+        run: pnpm run e2e
       - name: Upload Playwright report
         if: ${{ failure() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

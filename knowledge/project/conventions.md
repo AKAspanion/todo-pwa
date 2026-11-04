@@ -54,7 +54,7 @@ verified: human:panditankit1995@gmail.com
 ## Commands
 
 - The root checks are policy keys: `checks.commands.typecheck`, `checks.commands.lint`, `checks.commands.lint-fix`, `checks.commands.format-check`, `checks.commands.test`, `checks.commands.e2e`. `test` and `e2e` start the emulators themselves and need Java 21+.
-- The functions have their own: `npm --prefix functions run build`, `lint` and `test` (`functions/package.json`).
+- The functions have their own: `pnpm --dir functions run build`, `lint` and `test` (`functions/package.json`).
 
 ## History
 

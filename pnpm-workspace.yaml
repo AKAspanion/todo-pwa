@@ -1,3 +1,20 @@
 allowBuilds:
   '@firebase/util': true
   protobufjs: true
+  # Optional native regex engine of superstatic (via firebase-tools), installed on Node >= 24.15
+  # only. Not built: superstatic falls back to RegExp, and no third-party build runs in CI.
+  re2: false
+overrides:
+  '@firebase/firestore>@grpc/grpc-js': ^1.14.7
+  '@google-cloud/pubsub>@opentelemetry/core': ^2.8.0
+  'gaxios>uuid': ^11.1.1
+  'firebase-tools>glob': ^14.0.3
+  'workbox-build>glob': ^14.0.3
+  'js-beautify>glob': ^14.0.3
+  'rimraf>glob': ^14.0.3
+  'eslint>minimatch': ^11.0.4
+  '@eslint/config-array>minimatch': ^11.0.4
+  '@typescript-eslint/typescript-estree>minimatch': ^11.0.4
+  'editorconfig>minimatch': ^11.0.4
+  'readdir-glob>minimatch': ^11.0.4
+  'filelist>minimatch': ^11.0.4
