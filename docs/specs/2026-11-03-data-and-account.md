@@ -2,6 +2,8 @@
 
 _2026-11-03 · status: approved 2026-11-03 · part 8 of [decisions/usability-roadmap](../../knowledge/decisions/usability-roadmap.md) · decisions: [decisions/data-export-import-and-account-deletion](../../knowledge/decisions/data-export-import-and-account-deletion.md), [decisions/ics-export-client-side](../../knowledge/decisions/ics-export-client-side.md) · builds after part 7, `docs/plans/2026-11-03-recurring-tasks.md`_
 
+> **2026-11-04:** Delete account (P1's button, D1–D5 and their tests) moved to `docs/specs/2026-11-04-play-store-twa.md`, with Google re-confirmation by redirect only. This part now builds export and import only. See [decisions/account-deletion-for-play](../../knowledge/decisions/account-deletion-for-play.md).
+
 ## §1 Goal
 
 A user can take their tasks out (JSON, CSV, a calendar file), bring a JSON export back in, and delete their account
