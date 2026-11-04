@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   computeRemindAt,
   formatLongDate,
+  formatCalendarTime,
   formatTime12,
   onDayChange,
   parseLocalDate,
@@ -88,6 +89,25 @@ describe('formatTime12 and formatLongDate', () => {
   it('formats a long date without English ordinals in Hindi (D4)', () => {
     expect(formatLongDate('2026-11-05', 'en')).toBe('Thursday, 5 November 2026');
     expect(formatLongDate('2026-11-05', 'hi')).toBe('गुरूवार, 5 नवम्बर 2026');
+  });
+});
+
+describe('formatCalendarTime', () => {
+  it('drops zero minutes in English, as the old calendar did', () => {
+    expect(formatCalendarTime('08:00', 'en')).toBe('8 AM');
+    expect(formatCalendarTime('14:00', 'en')).toBe('2 PM');
+    expect(formatCalendarTime('09:30', 'en')).toBe('9:30 AM');
+    expect(formatCalendarTime('00:15', 'en')).toBe('12:15 AM');
+    expect(formatCalendarTime('12:00', 'en')).toBe('12 PM');
+  });
+
+  it('uses the day-part word and Devanagari digits in Hindi', () => {
+    expect(formatCalendarTime('08:00', 'hi')).toBe('सुबह ८');
+    expect(formatCalendarTime('14:30', 'hi')).toBe('दोपहर २:३०');
+  });
+
+  it('is empty for an invalid time', () => {
+    expect(formatCalendarTime('nonsense', 'en')).toBe('');
   });
 });
 

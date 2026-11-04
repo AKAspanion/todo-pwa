@@ -197,3 +197,25 @@ export async function listUserEmails(): Promise<string[]> {
   );
   return (result.userInfo ?? []).map((u) => u.email ?? '').sort();
 }
+
+/** Sets an account's photo URL in the Auth emulator, signing in over REST to do it. */
+export async function setPhotoUrl(
+  email: string,
+  password: string,
+  photoUrl: string,
+): Promise<void> {
+  const base = `http://${AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com/v1`;
+  const headers = { 'Content-Type': 'application/json' };
+  const signIn = await fetch(`${base}/accounts:signInWithPassword?key=demo-api-key`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ email, password, returnSecureToken: true }),
+  });
+  const { idToken } = (await signIn.json()) as { idToken: string };
+  const update = await fetch(`${base}/accounts:update?key=demo-api-key`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ idToken, photoUrl, returnSecureToken: false }),
+  });
+  if (!update.ok) throw new Error(`setting the photo failed: ${await update.text()}`);
+}

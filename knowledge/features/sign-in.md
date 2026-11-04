@@ -22,6 +22,9 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 
 - `/signin`: `src/views/SignInView.vue`; `/signup`: `src/views/SignUpView.vue`. Each links to the other,
   keeping the `redirect` query.
+- Both screens are drawn and worded like the old Signin and Signup; failures show in a snackbar. The
+  show-password eye and the password hint (which names the letter-and-digit rule the app applies) are the
+  rewrite's, kept in the old style.
 - The language can be switched on both screens; the menu and bottom navigation are hidden on them.
 
 ## Rules
@@ -34,6 +37,10 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 - After signing in, the app goes to the `redirect` query only when it is an in-app path that isn't sign-in or
   sign-up; anything else goes to `/home` (`safeRedirect` in `src/router/guard.ts`).
 - Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`).
+
+## History
+
+- 2026-11-04: was the rewrite's layout and text; now the old Signin's and Signup's, with the show-password eye kept, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources
 

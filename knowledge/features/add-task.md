@@ -17,7 +17,8 @@ user's labels. A new task is always `todo`.
 
 ## Screens and routes
 
-`/add`: `src/views/TaskAddView.vue`, with `src/components/fields/DateField.vue` and `TimeField.vue`.
+`/add`: `src/views/TaskAddView.vue`, drawn and worded like the old TaskAdd, under the old plain top bar every
+non-home route has (`src/components/layout/AppMenu.vue`; its titles are `common.bar.*`), with `src/components/fields/DateField.vue` and `TimeField.vue`.
 
 ## Rules
 
@@ -26,13 +27,18 @@ user's labels. A new task is always `todo`.
 - The date and time are taken as the device's local wall-clock time; the store adds `timeZone`, `remindAt`
   and `reminded` ([data/task](../data/task.md)).
 - The save never times out or retries; after 15 s the form says it is still saving, and a rejected save keeps
-  the input with an error ([decisions/saves-never-time-out](../decisions/saves-never-time-out.md)).
+  the input and shows the error in the snackbar ([decisions/saves-never-time-out](../decisions/saves-never-time-out.md)).
+
+## History
+
+- 2026-11-04: was the rewrite's layout and text; now the old TaskAdd's, with a failed save shown in the snackbar, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources
 
 - `src/views/TaskAddView.vue`
 - `src/components/fields/DateField.vue`
 - `src/components/fields/TimeField.vue`
+- `src/components/layout/AppMenu.vue`
 - `src/stores/tasks.ts`
 - `src/services/tasks.ts`
 - `firestore.rules`

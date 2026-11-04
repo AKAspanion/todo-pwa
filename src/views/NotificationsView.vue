@@ -8,6 +8,7 @@
  */
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useDisplay } from 'vuetify';
 import { useMessaging } from '@/pwa/useMessaging';
 import { useNotificationsStore } from '@/stores/notifications';
 import { errorCode, useSessionStore } from '@/stores/session';
@@ -18,6 +19,7 @@ const { t, locale } = useI18n();
 const session = useSessionStore();
 const notifications = useNotificationsStore();
 const ui = useUiStore();
+const { xs } = useDisplay();
 const { supported, permission, enabled, enable, disable } = useMessaging();
 
 const toggling = ref(false);
@@ -37,8 +39,8 @@ function shownTime(n: AppNotification): string {
   return n.createdAt.getTime() > 0 ? dateTimeFormat.value.format(n.createdAt) : '';
 }
 
+/** Under the list when push can be used: what the switch does, or why it can't be turned on. */
 const pushHint = computed(() => {
-  if (!supported.value) return t('notifications.push.unsupported');
   if (permission.value === 'denied') return t('notifications.push.blocked');
   return t('notifications.push.hint');
 });
@@ -94,91 +96,140 @@ async function remove(n: AppNotification): Promise<void> {
 </script>
 
 <template>
-  <v-container class="notifications">
-    <h1 class="text-h6 mb-4">{{ t('common.screens.notification') }}</h1>
+  <div class="notifications">
+    <v-card flat tile class="old-app-card">
+      <div class="old-app-wrapper">
+        <div class="notifications__content px-4 px-sm-5 pb-4">
+          <div class="px-1 px-sm-3">
+            <div class="d-flex align-center justify-space-between pb-1">
+              <h1 class="text-overline text-left">{{ t('notifications.list.heading') }}</h1>
+              <v-switch
+                :model-value="enabled"
+                :label="t('notifications.push.label')"
+                :disabled="!supported || toggling"
+                :loading="toggling"
+                color="primary"
+                density="compact"
+                hide-details
+                class="notifications__toggle flex-grow-0"
+                data-testid="push-toggle"
+                @update:model-value="onToggle"
+              />
+            </div>
 
-    <v-card variant="outlined" class="mb-6">
-      <v-card-text>
-        <v-switch
-          :model-value="enabled"
-          :label="t('notifications.push.label')"
-          :messages="pushHint"
-          :disabled="!supported || toggling"
-          :loading="toggling"
-          color="primary"
-          inset
-          data-testid="push-toggle"
-          @update:model-value="onToggle"
-        />
-      </v-card-text>
+            <v-card
+              v-if="!supported"
+              variant="outlined"
+              width="100%"
+              class="text-left pa-4 my-3"
+              data-testid="push-hint"
+            >
+              <div class="text-subtitle-2">{{ t('notifications.push.unsupported') }}</div>
+            </v-card>
+
+            <v-card
+              v-if="notifications.error"
+              variant="outlined"
+              width="100%"
+              class="text-left pa-4 my-3"
+              role="alert"
+            >
+              <div class="d-flex align-center justify-space-between">
+                <div class="text-subtitle-2">{{ t('notifications.list.loadFailed') }}</div>
+                <v-btn variant="text" size="small" @click="notifications.load()">
+                  {{ t('notifications.list.retry') }}
+                </v-btn>
+              </div>
+            </v-card>
+
+            <div v-if="showSkeleton" role="status" :aria-label="t('notifications.list.loading')">
+              <v-skeleton-loader v-for="i in 3" :key="i" type="list-item-two-line" class="mb-2" />
+            </div>
+
+            <v-card
+              v-else-if="showEmpty"
+              variant="outlined"
+              width="100%"
+              class="text-left pa-4 my-3"
+            >
+              <div class="text-subtitle-2">{{ t('notifications.list.empty') }}</div>
+              <div class="text-caption">{{ t('notifications.list.emptyHint') }}</div>
+            </v-card>
+
+            <ul v-else class="notification-list">
+              <v-card
+                v-for="n in notifications.items"
+                :key="n.id"
+                tag="li"
+                color="primary"
+                width="100%"
+                elevation="2"
+                class="text-left pa-4 mt-3"
+                data-testid="notification"
+                :data-notification-id="n.id"
+              >
+                <div class="d-flex align-center justify-space-between">
+                  <div class="notification-text">
+                    <div class="text-subtitle-2">
+                      {{ n.title }}
+                      <time
+                        v-if="shownTime(n)"
+                        class="text-caption notification-time ml-2"
+                        :datetime="n.createdAt.toISOString()"
+                        >{{ shownTime(n) }}</time
+                      >
+                    </div>
+                    <div v-if="n.body" class="text-caption">{{ n.body }}</div>
+                  </div>
+                  <v-btn
+                    icon="mdi-delete"
+                    variant="text"
+                    color="white"
+                    :size="xs ? 'small' : 'default'"
+                    density="comfortable"
+                    :aria-label="t('notifications.list.delete')"
+                    :loading="deleting === n.id"
+                    :disabled="deleting !== null"
+                    @click="remove(n)"
+                  />
+                </div>
+              </v-card>
+            </ul>
+
+            <div v-if="supported" class="text-caption text-left mt-3">
+              {{ pushHint }}
+            </div>
+          </div>
+        </div>
+      </div>
     </v-card>
-
-    <h2 class="text-subtitle-1 mb-2">{{ t('notifications.list.heading') }}</h2>
-
-    <v-alert v-if="notifications.error" type="error" variant="tonal" density="compact" class="mb-3">
-      {{ t('notifications.list.loadFailed') }}
-      <template #append>
-        <v-btn variant="text" color="error" size="small" @click="notifications.load()">
-          {{ t('notifications.list.retry') }}
-        </v-btn>
-      </template>
-    </v-alert>
-
-    <div v-if="showSkeleton" role="status" :aria-label="t('notifications.list.loading')">
-      <v-skeleton-loader v-for="i in 3" :key="i" type="list-item-two-line" class="mb-2" />
-    </div>
-
-    <v-card v-else-if="showEmpty" variant="outlined" class="pa-4">
-      <div class="text-subtitle-2">{{ t('notifications.list.empty') }}</div>
-      <div class="text-body-2 text-medium-emphasis">{{ t('notifications.list.emptyHint') }}</div>
-    </v-card>
-
-    <ul v-else class="notification-list">
-      <v-card
-        v-for="n in notifications.items"
-        :key="n.id"
-        tag="li"
-        color="primary"
-        variant="tonal"
-        class="mb-3"
-        data-testid="notification"
-        :data-notification-id="n.id"
-      >
-        <v-card-item>
-          <v-card-title class="text-subtitle-1 notification-text">{{ n.title }}</v-card-title>
-          <v-card-subtitle v-if="shownTime(n)">
-            <time :datetime="n.createdAt.toISOString()">{{ shownTime(n) }}</time>
-          </v-card-subtitle>
-          <template #append>
-            <v-btn
-              icon="mdi-delete"
-              variant="text"
-              size="small"
-              :aria-label="t('notifications.list.delete')"
-              :loading="deleting === n.id"
-              :disabled="deleting !== null"
-              @click="remove(n)"
-            />
-          </template>
-        </v-card-item>
-        <v-card-text v-if="n.body" class="notification-text">{{ n.body }}</v-card-text>
-      </v-card>
-    </ul>
-  </v-container>
+  </div>
 </template>
 
 <style scoped>
-.notifications {
-  max-width: 760px;
-}
-
 .notification-list {
   list-style: none;
   padding: 0;
 }
 
 .notification-text {
+  min-width: 0;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+.notification-time {
+  opacity: 0.8;
+}
+
+.notifications__toggle {
+  margin-top: -6px;
+  margin-bottom: -6px;
+  --v-input-control-height: 32px;
+}
+
+.notifications__toggle :deep(.v-label) {
+  font-size: 0.75rem;
+  opacity: 1;
 }
 </style>

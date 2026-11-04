@@ -19,7 +19,8 @@ screen. When reminders are sent is [domain/reminder-schedule](../domain/reminder
 
 ## Screens and routes
 
-- `/notification`: `src/views/NotificationsView.vue`, with `src/stores/notifications.ts` and
+- `/notification`: `src/views/NotificationsView.vue`, drawn and worded like the old Notification (the delete
+  icon is white on the card; the push switch and newest-first order are the rewrite's), with `src/stores/notifications.ts` and
   `src/services/notifications.ts`.
 - Push on the client: `src/pwa/useMessaging.ts`; in the background: `src/sw.ts`.
 
@@ -37,6 +38,10 @@ screen. When reminders are sent is [domain/reminder-schedule](../domain/reminder
   (`listNotifications` in `src/services/notifications.ts`). Times are shown in the browser's zone (spec D5).
 - The client can only read and delete notifications; only the function writes them
   ([security/roles](../security/roles.md)).
+
+## History
+
+- 2026-11-04: was the rewrite's layout and text; now the old Notification's, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources
 

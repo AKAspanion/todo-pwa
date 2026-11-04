@@ -131,31 +131,18 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="task-board">
-    <TaskColumn
-      v-for="column in columns"
-      :key="column.status"
-      :status="column.status"
-      :tasks="column.tasks"
-      :labels="labels"
-      :skeleton="showSkeletons"
-      @toggle="onToggle"
-      @save="onSave"
-      @remove="onRemove"
-      @move="onMove"
-    />
-  </div>
+  <v-row no-gutters class="task-board ma-0">
+    <v-col v-for="column in columns" :key="column.status" cols="12" md="6" class="pa-0">
+      <TaskColumn
+        :status="column.status"
+        :tasks="column.tasks"
+        :labels="labels"
+        :skeleton="showSkeletons"
+        @toggle="onToggle"
+        @save="onSave"
+        @remove="onRemove"
+        @move="onMove"
+      />
+    </v-col>
+  </v-row>
 </template>
-
-<style scoped>
-.task-board {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px 24px;
-}
-@media (min-width: 960px) {
-  .task-board {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-</style>

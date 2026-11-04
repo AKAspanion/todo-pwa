@@ -11,6 +11,13 @@
     "notification": "Notifications",
     "profile": "Profile"
   },
+  "bar": {
+    "add": "Add Task",
+    "calendar": "Calendar",
+    "notification": "Notification",
+    "profile": "Profile",
+    "back": "Back"
+  },
   "screens": {
     "signIn": "Sign in",
     "signUp": "Sign up",

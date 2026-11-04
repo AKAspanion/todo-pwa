@@ -6,7 +6,14 @@
  */
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { formatLongDate, parseLocalDate, todayYmd, type DateLocale } from '@/lib/dates';
+import {
+  formatFieldDate,
+  formatReadableDate,
+  formatLongDate,
+  parseLocalDate,
+  todayYmd,
+  type DateLocale,
+} from '@/lib/dates';
 
 const props = defineProps<{
   /** Defaults to "Select date". */
@@ -18,6 +25,18 @@ const props = defineProps<{
   errorMessages?: string | string[];
   rules?: ((value: string) => true | string)[];
   density?: 'default' | 'comfortable' | 'compact';
+  /** The field's look; the old app's edit card used the filled-in solo field. */
+  variant?: 'outlined' | 'solo';
+  /** Hides the label once the field has a value, as the old app's unlabelled fields did. */
+  singleLine?: boolean;
+  /** Draws no card shadow or border around a solo field. */
+  flat?: boolean;
+  bgColor?: string;
+  /**
+   * Writes the value as the old app's field text instead of the long form: `true` is the edit
+   * form's short 'Nov, 2nd, 26', 'long' the add screen's 'Monday, November 2nd, 2026'.
+   */
+  oldFormat?: boolean | 'long';
   name?: string;
 }>();
 /** 'YYYY-MM-DD', the device's local day; '' for none. */
@@ -27,7 +46,15 @@ const { t, locale } = useI18n();
 const open = ref(false);
 
 const dateLocale = computed<DateLocale>(() => (locale.value === 'hi' ? 'hi' : 'en'));
-const text = computed(() => (props.disabled ? '' : formatLongDate(model.value, dateLocale.value)));
+const text = computed(() =>
+  props.disabled
+    ? ''
+    : props.oldFormat === 'long'
+      ? formatReadableDate(model.value, dateLocale.value)
+      : props.oldFormat
+        ? formatFieldDate(model.value, dateLocale.value)
+        : formatLongDate(model.value, dateLocale.value),
+);
 const pickerDate = computed(() => {
   const day = parseLocalDate(model.value);
   return day.isValid() ? day.toDate() : undefined;
@@ -61,7 +88,10 @@ function openFromKeyboard(): void {
         :rules="fieldRules"
         :density="density"
         prepend-inner-icon="mdi-calendar"
-        variant="outlined"
+        :variant="variant ?? 'outlined'"
+        :single-line="singleLine"
+        :flat="flat"
+        :bg-color="bgColor"
         readonly
         @keydown.enter.prevent="openFromKeyboard"
         @keydown.space.prevent="openFromKeyboard"

@@ -44,14 +44,8 @@
     border-radius: 50%;
 }
 
-.small-icon-shimmer {
-    height: 16px;
-    width: 16px;
-    border-radius: 50%;
-}
 
-
-.theme--light .animate,
+.v-theme--light .animate,
 .light--animate {
     /* width: 100%; */
     animation: shimmer 2s infinite;
@@ -59,7 +53,7 @@
     background-size: 1000px 100%;
 }
 
-.theme--dark .animate,
+.v-theme--dark .animate,
 .dark--animate {
     /* width: 100%; */
     animation: shimmer 2s infinite linear;
@@ -119,4 +113,141 @@
         -webkit-transform: scale(1) translate(0, 1px);
         transform: scale(1) translate(0, 1px);
     }
+}
+
+/*
+ * Vuetify 2's type classes the old screens used (`overline`, `subtitle-2`, `caption`): Vuetify 4
+ * has the Material 3 scale only, so these keep the old sizes under the names Vuetify 4 would use.
+ */
+.text-overline {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 2rem;
+    letter-spacing: 0.1666666667em;
+    text-transform: uppercase;
+}
+
+.text-subtitle-2 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.375rem;
+    letter-spacing: 0.0071428571em;
+}
+
+.text-caption {
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+    letter-spacing: 0.0333333333em;
+}
+
+/* Vuetify 2's card title (`v-card-title`), which Vuetify 4 sets smaller. */
+.v-card-title.old-card-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 2rem;
+    letter-spacing: 0.0125em;
+    padding: 4px 16px;
+    margin: 0;
+}
+
+/* Sign-in and sign-up, as the old Signin.vue and Signup.vue drew them in Vuetify 2. */
+.auth-page .auth-card {
+  text-align: center;
+  border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+.auth-page .auth-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 2rem;
+  letter-spacing: 0.0073529412em;
+}
+.auth-page .auth-btn {
+  max-width: none;
+  height: auto !important;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.0892857143em;
+  white-space: normal;
+}
+.auth-page .auth-btn .v-btn__content {
+  white-space: normal;
+  text-align: center;
+  width: 100%;
+}
+.auth-page .auth-btn__row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.auth-page .auth-btn__text {
+  width: 200px;
+  text-align: left;
+}
+.auth-page .auth-link {
+  color: #2196f3;
+  text-decoration: none;
+}
+.auth-page .auth-lang {
+  height: 28px;
+  border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+.auth-page .auth-lang .v-btn {
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.0892857143em;
+  color: inherit;
+}
+.auth-page .auth-lang .v-btn--active {
+  background: rgba(var(--v-theme-on-surface), 0.2);
+}
+.auth-page .auth-lang .v-btn--active .v-btn__overlay {
+  opacity: 0;
+}
+
+/*
+ * The old ContainerApp: a flat card the height of the screen between the bars, with a rounded,
+ * raised colour band behind the top of its content (the old profile, as the new home draws it).
+ */
+.old-app-card {
+  height: calc(100vh - 80px - 56px);
+}
+.old-app-wrapper {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+.old-app-wrapper::-webkit-scrollbar {
+  width: 0;
+}
+.old-app-bg,
+.old-app-elevated {
+  width: 100%;
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+}
+.old-app-elevated {
+  top: 30px;
+  z-index: 2;
+  box-shadow:
+    0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+.old-app-content {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
 }

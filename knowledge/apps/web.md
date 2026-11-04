@@ -22,6 +22,11 @@ Vue 3 with Vuetify, vue-router, Pinia and vue-i18n, Firebase's modular SDK, dayj
 and vite-plugin-pwa (Workbox). Versions are in `package.json`; the Node version is in `.nvmrc`, and
 `.browserslistrc` sets the browsers.
 
+## Look
+
+The screens are drawn like the old Vue 2 app, on Vuetify's md2 blueprint
+([decisions/restore-original-design](../decisions/restore-original-design.md), [design-system/tokens](../design-system/tokens.md)).
+
 ## Entry points
 
 - `index.html` loads `src/main.ts`, which installs Pinia, the router, i18n and Vuetify and mounts `src/App.vue`.

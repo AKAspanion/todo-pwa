@@ -38,6 +38,12 @@
       "design": "../reference.html?screen=home&side=refs&state=home-hi",
       "app": "reference.html?screen=home&side=app&state=home-hi",
       "fullPage": true
+    },
+    {
+      "name": "home-dark",
+      "design": "../reference.html?screen=home&side=refs&state=home-dark",
+      "app": "reference.html?screen=home&side=app&state=home-dark",
+      "fullPage": true
     }
   ]
 }

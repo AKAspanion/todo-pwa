@@ -66,6 +66,16 @@ describe('DateField', () => {
     wrapper.unmount();
   });
 
+  it("writes the old add screen's text with oldFormat 'long', in English and Hindi", async () => {
+    const wrapper = mountField({ oldFormat: 'long' });
+    expect(input(wrapper).value).toBe('Monday, November 2nd, 2026');
+
+    i18n.global.locale.value = 'hi';
+    await flushPromises();
+    expect(input(wrapper).value).toBe('सोमवार, नवम्बर २, २०२६');
+    wrapper.unmount();
+  });
+
   it('is labelled "Select date" unless given a label, in English and Hindi', async () => {
     const wrapper = mountField();
     expect(wrapper.find('label').text()).toBe('Select date');

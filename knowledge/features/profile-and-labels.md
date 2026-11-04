@@ -18,7 +18,8 @@ labels and creates new ones with a name and a colour. Labels are create-only by 
 
 ## Screens and routes
 
-`/profile`: `src/views/ProfileView.vue`.
+`/profile`: `src/views/ProfileView.vue`, drawn and worded like the old Profile; with no photo the avatar is
+`mdi-face-man`.
 
 ## Rules
 
@@ -26,12 +27,17 @@ labels and creates new ones with a name and a colour. Labels are create-only by 
   auth change for a profile update, so the screen updates the session's copy itself.
 - A label name is 1–`LABEL_NAME_MAX` characters after trimming, counted as code points; a colour is required
   (`createLabel` in `src/services/labels.ts`, spec D15). The colour picker starts at `DEFAULT_LABEL_COLOR`.
-- The photo is shown only when its URL is https, since anyone can set the account's photo URL.
+- The photo is shown only when its URL is https (`httpsPhotoUrl` in `src/lib/photo.ts`), since anyone can set the account's photo URL.
 - Saves never time out ([decisions/saves-never-time-out](../decisions/saves-never-time-out.md)).
+
+## History
+
+- 2026-11-04: was the rewrite's layout and text; now the old Profile's, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources
 
 - `src/views/ProfileView.vue`
+- `src/lib/photo.ts`
 - `src/services/auth.ts`
 - `src/services/labels.ts`
 - `src/stores/labels.ts`

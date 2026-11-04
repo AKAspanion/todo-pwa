@@ -6,7 +6,7 @@
     "edit": "Edit name",
     "save": "Save name",
     "cancel": "Cancel editing the name",
-    "error": "Couldn't update your name. Try again."
+    "error": "Error updating name"
   },
   "labels": {
     "heading": "LABELS",
@@ -15,7 +15,7 @@
     "add": "Add label",
     "required": "Enter a label name",
     "tooLong": "Keep it under {max} characters",
-    "error": "Couldn't create the label. Try again.",
+    "error": "Error creating label",
     "loadError": "Couldn't load your data. Try again.",
     "retry": "Retry"
   }

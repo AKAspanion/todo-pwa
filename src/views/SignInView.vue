@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 import type { VForm } from 'vuetify/components';
 import { vFocusOnMount } from '@/directives/focusOnMount';
 import { authErrorCode, authErrorKey } from '@/lib/authForm';
@@ -13,16 +14,26 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const ui = useUiStore();
+const { xs } = useDisplay();
 
 const form = useTemplateRef<InstanceType<typeof VForm>>('form');
 const emailOpen = ref(false);
 const email = ref('');
-const password = ref('');
 const showPassword = ref(false);
+const password = ref('');
 /** Which sign-in is under way, so only its button spins and the other waits. */
 const busy = ref<'email' | 'google' | null>(null);
 /** The locale key of the last error, so it follows a change of language. */
 const errorKey = ref<string | null>(null);
+/** The old sign-in showed a failure in a snackbar; closing it clears the message, never the fields. */
+const errorShown = computed({
+  get: () => errorKey.value !== null,
+  set: (open: boolean) => {
+    if (!open) errorKey.value = null;
+  },
+});
+/** The old fields were dense on phones only. */
+const density = computed(() => (xs.value ? 'compact' : 'default'));
 
 const rules = {
   email: [(v: string) => v.trim() !== '' || t('auth.rules.emailRequired')],
@@ -91,142 +102,183 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-container class="auth-screen d-flex align-center justify-center">
-    <v-card class="auth-card pa-6" width="100%" max-width="420" variant="flat">
-      <h1 class="text-h5 text-center">{{ t('auth.signIn.title') }}</h1>
-      <p class="text-body-2 text-center text-medium-emphasis mb-6">
-        {{ t('auth.signIn.subtitle') }}
-      </p>
+  <div class="signin-container auth-page">
+    <div class="auth-layout px-7">
+      <v-card variant="outlined" class="auth-card mt-2 pb-8 px-8">
+        <div class="d-flex flex-column align-center pt-4">
+          <h1 class="pt-4 auth-title">{{ t('auth.signIn.title') }}</h1>
+          <div class="pa-2 text-caption font-weight-light">{{ t('auth.signIn.subtitle') }}</div>
+        </div>
 
-      <v-alert
-        v-if="errorKey"
-        type="error"
-        variant="tonal"
-        density="compact"
-        class="mb-4"
-        role="alert"
-        data-testid="auth-error"
-      >
-        {{ t(errorKey) }}
-      </v-alert>
-
-      <v-btn
-        block
-        size="large"
-        variant="outlined"
-        prepend-icon="mdi-google"
-        class="auth-btn"
-        :loading="busy === 'google'"
-        :disabled="busy === 'email'"
-        @click="signInGoogle"
-      >
-        {{ t('auth.signIn.google') }}
-      </v-btn>
-
-      <v-divider class="my-4" />
-
-      <v-btn
-        v-if="!emailOpen"
-        block
-        size="large"
-        variant="tonal"
-        prepend-icon="mdi-email"
-        class="auth-btn"
-        :disabled="busy !== null"
-        @click="emailOpen = true"
-      >
-        {{ t('auth.signIn.email') }}
-      </v-btn>
-
-      <v-form v-else ref="form" validate-on="submit" @submit.prevent="submitEmail">
-        <v-text-field
-          v-model="email"
-          v-focus-on-mount
-          type="email"
-          name="email"
-          autocomplete="email"
-          maxlength="254"
-          variant="outlined"
-          class="mb-2"
-          :label="t('auth.fields.email')"
-          :rules="rules.email"
-        />
-        <v-text-field
-          v-model="password"
-          name="password"
-          autocomplete="current-password"
-          maxlength="4096"
-          variant="outlined"
-          class="mb-2"
-          :type="showPassword ? 'text' : 'password'"
-          :label="t('auth.fields.password')"
-          :rules="rules.password"
-        >
-          <template #append-inner>
+        <v-card-text class="pb-0 px-0">
+          <div class="py-3">
             <v-btn
-              variant="text"
-              size="small"
-              density="comfortable"
-              :icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-              :aria-label="
-                showPassword ? t('auth.fields.hidePassword') : t('auth.fields.showPassword')
-              "
-              @click="showPassword = !showPassword"
-            />
-          </template>
-        </v-text-field>
-        <v-btn
-          type="submit"
-          block
-          size="large"
-          color="primary"
-          class="auth-btn"
-          :loading="busy === 'email'"
-          :disabled="busy === 'google'"
-        >
-          {{ t('auth.signIn.submit') }}
-        </v-btn>
-      </v-form>
+              width="280"
+              size="large"
+              color="#179c52"
+              class="auth-btn"
+              :loading="busy === 'google'"
+              :disabled="busy === 'email'"
+              @click="signInGoogle"
+            >
+              <span class="auth-btn__row">
+                <v-icon start icon="mdi-google" />
+                <v-spacer />
+                <div class="auth-btn__text">{{ t('auth.signIn.google') }}</div>
+              </span>
+            </v-btn>
+          </div>
+          <div>
+            <v-divider class="my-1" />
+            <v-expand-transition>
+              <div v-if="emailOpen">
+                <v-form ref="form" validate-on="submit" @submit.prevent="submitEmail">
+                  <div class="auth-fields px-0 pb-3">
+                    <v-text-field
+                      v-model="email"
+                      v-focus-on-mount
+                      type="email"
+                      name="email"
+                      autocomplete="email"
+                      maxlength="254"
+                      variant="outlined"
+                      color="primary"
+                      class="mb-1"
+                      :density="density"
+                      :label="t('auth.fields.email')"
+                      :rules="rules.email"
+                      @keyup.enter="submitEmail"
+                    />
+                    <v-text-field
+                      v-model="password"
+                      :type="showPassword ? 'text' : 'password'"
+                      name="password"
+                      autocomplete="current-password"
+                      maxlength="4096"
+                      variant="outlined"
+                      color="primary"
+                      class="mb-1"
+                      :density="density"
+                      :label="t('auth.fields.password')"
+                      :rules="rules.password"
+                      @keyup.enter="submitEmail"
+                    >
+                      <template #append-inner>
+                        <v-btn
+                          variant="text"
+                          size="small"
+                          density="comfortable"
+                          :icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                          :aria-label="
+                            showPassword
+                              ? t('auth.fields.hidePassword')
+                              : t('auth.fields.showPassword')
+                          "
+                          @click="showPassword = !showPassword"
+                        />
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-form>
+              </div>
+            </v-expand-transition>
+          </div>
+          <div>
+            <v-btn
+              v-if="!emailOpen"
+              width="280"
+              size="large"
+              class="auth-btn"
+              :disabled="busy !== null"
+              @click="emailOpen = true"
+            >
+              <span class="auth-btn__row">
+                <v-icon start icon="mdi-email" />
+                <v-spacer />
+                <div class="auth-btn__text">{{ t('auth.signIn.email') }}</div>
+              </span>
+            </v-btn>
+            <v-btn
+              v-else
+              width="280"
+              size="large"
+              color="primary"
+              class="auth-btn"
+              :loading="busy === 'email'"
+              :disabled="busy === 'google'"
+              @click="submitEmail"
+            >
+              {{ t('auth.signIn.submit') }}
+            </v-btn>
+          </div>
+        </v-card-text>
 
-      <p class="text-body-2 text-center mt-6">
-        {{ t('auth.signIn.noAccount') }}
-        <router-link :to="signUpLink">{{ t('auth.signIn.signUpLink') }}</router-link>
-      </p>
+        <v-card-text class="pt-9 pb-7">
+          <span class="text-caption">{{ t('auth.signIn.noAccount') }}&nbsp;</span>
+          <router-link class="auth-link text-caption" :to="signUpLink">{{
+            t('auth.signIn.signUpLink')
+          }}</router-link>
+        </v-card-text>
 
-      <div class="d-flex justify-center mt-4">
         <v-btn-toggle
           v-model="locale"
           mandatory
           density="compact"
-          variant="outlined"
-          divided
+          variant="text"
+          class="auth-lang"
           :aria-label="t('auth.language.label')"
           role="group"
         >
-          <v-btn value="en" size="small" lang="en" :aria-pressed="locale === 'en'">{{
-            t('auth.language.en')
-          }}</v-btn>
-          <v-btn value="hi" size="small" lang="hi" :aria-pressed="locale === 'hi'">{{
-            t('auth.language.hi')
-          }}</v-btn>
+          <v-btn
+            value="en"
+            size="x-small"
+            lang="en"
+            :aria-label="t('auth.language.en')"
+            :aria-pressed="locale === 'en'"
+            >en</v-btn
+          >
+          <v-btn
+            value="hi"
+            size="x-small"
+            lang="hi"
+            :aria-label="t('auth.language.hi')"
+            :aria-pressed="locale === 'hi'"
+            >hi</v-btn
+          >
         </v-btn-toggle>
-      </div>
-    </v-card>
-  </v-container>
+      </v-card>
+    </div>
+
+    <v-snackbar
+      v-model="errorShown"
+      :timeout="5000"
+      multi-line
+      location="bottom"
+      class="app-snackbar"
+      data-testid="auth-error"
+      role="alert"
+    >
+      {{ errorKey ? t(errorKey) : '' }}
+      <template #actions>
+        <v-btn variant="text" @click="errorShown = false">{{ t('common.close') }}</v-btn>
+      </template>
+    </v-snackbar>
+  </div>
 </template>
 
 <style scoped>
-.auth-screen {
-  min-height: 100%;
+.signin-container {
+  height: 100vh;
 }
-/* Long Hindi labels wrap inside the button instead of overflowing it at phone width. */
-.auth-btn {
-  height: auto !important;
-  min-height: 44px;
-  white-space: normal;
+.auth-layout {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 }
-.auth-btn :deep(.v-btn__content) {
-  white-space: normal;
+.auth-fields {
+  max-width: 280px;
+  margin: 0 auto;
   text-align: center;
 }
 </style>

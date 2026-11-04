@@ -109,6 +109,104 @@ export function formatLongDate(ymd: string, locale: DateLocale): string {
   return day.isValid() ? day.locale(locale).format('dddd, D MMMM YYYY') : '';
 }
 
+const DEVANAGARI_DIGITS = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+
+/** Hindi writes digits in Devanagari, as the old app's moment did. */
+function localDigits(text: string, locale: DateLocale): string {
+  return locale === 'hi'
+    ? text.replace(/\d/g, (digit) => DEVANAGARI_DIGITS[Number(digit)] ?? digit)
+    : text;
+}
+
+/** The old app's day-part words for Hindi times (moment's `hi` meridiem). */
+function hindiMeridiem(hour: number): string {
+  if (hour < 4) return 'रात';
+  if (hour < 10) return 'सुबह';
+  if (hour < 17) return 'दोपहर';
+  if (hour < 20) return 'शाम';
+  return 'रात';
+}
+
+/** '21:05' as '9:05 PM' (English) or 'रात ९:०५' (Hindi), as the old card showed it; '' if invalid. */
+function clockText(hhmm: string, locale: DateLocale, pad: boolean): string {
+  const time = parseHm(hhmm);
+  if (!time) return '';
+  const hour12 = time.h % 12 === 0 ? 12 : time.h % 12;
+  const hours = pad ? String(hour12).padStart(2, '0') : String(hour12);
+  const minutes = String(time.min).padStart(2, '0');
+  if (locale === 'hi') return localDigits(`${hindiMeridiem(time.h)} ${hours}:${minutes}`, 'hi');
+  return `${hours}:${minutes} ${time.h < 12 ? 'AM' : 'PM'}`;
+}
+
+/**
+ * An event's time as the old calendar wrote it: '8 AM', '9:30 AM' (the minutes only when not
+ * zero), or in Hindi the day-part word and Devanagari digits ('सुबह ८', 'दोपहर २:३०'); '' if invalid.
+ */
+export function formatCalendarTime(hhmm: string, locale: DateLocale): string {
+  const text = clockText(hhmm, locale, false);
+  return text.replace(/:(00|००)(?=\s|$)/, '');
+}
+
+/** The old edit form's time field text: '09:05 PM' (English) or 'रात ०९:०५' (Hindi). */
+export function formatFieldTime(hhmm: string, locale: DateLocale): string {
+  return clockText(hhmm, locale, true);
+}
+
+/** The day's number with the old moment ordinal: '2nd' in English, the bare number in Hindi. */
+function oldOrdinal(n: number, locale: DateLocale): string {
+  if (locale === 'hi') return String(n);
+  return `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th')}`;
+}
+
+/** The old edit form's date field text: 'Nov, 2nd, 26' (English), the same in Hindi words and digits. */
+export function formatFieldDate(ymd: string, locale: DateLocale): string {
+  const day = parseLocalDate(ymd);
+  if (!day.isValid()) return '';
+  const text = `${day.locale(locale).format('MMM')}, ${oldOrdinal(day.date(), locale)}, ${day.format('YY')}`;
+  return localDigits(text, locale);
+}
+
+/** The old add screen's date field text: 'Monday, November 2nd, 2026' (moment's `dddd, MMMM Do, YYYY`). */
+export function formatReadableDate(ymd: string, locale: DateLocale): string {
+  const day = parseLocalDate(ymd);
+  if (!day.isValid()) return '';
+  const l = day.locale(locale);
+  const text = `${l.format('dddd')}, ${l.format('MMMM')} ${oldOrdinal(day.date(), locale)}, ${day.format('YYYY')}`;
+  return localDigits(text, locale);
+}
+
+/**
+ * A task's due moment as the old card's `moment().calendar()` wrote it ('Today at 9:30 AM',
+ * 'Monday at 2:00 PM', 'Last Monday at 2:00 PM'); a date further out is 'MM/DD/YYYY' (English) or
+ * 'DD/MM/YYYY' (Hindi). `at` is the locale's word joining day and time, as `{day} at {time}`.
+ * Without a time it is the day alone.
+ */
+export function calendarLabel(
+  ymd: string,
+  hhmm: string | null | undefined,
+  locale: DateLocale,
+  now: Date,
+  join: (day: string, time: string) => string,
+): string {
+  const day = parseYmd(ymd);
+  const today = parseYmd(todayYmd(now));
+  if (!day || !today) return '';
+  const diff = daysBetween(today, day);
+  const names = RELATIVE_DAY_NAMES[locale];
+  const cap = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
+  const weekday = parseLocalDate(ymd).locale(locale).format('dddd');
+  const date = parseLocalDate(ymd);
+  let label: string;
+  if (diff === 0) label = cap(names.today);
+  else if (diff === 1) label = cap(names.tomorrow);
+  else if (diff === -1) label = cap(names.yesterday);
+  else if (diff > 1 && diff < 7) label = weekday;
+  else if (diff < -1 && diff >= -6) label = `${locale === 'hi' ? 'पिछले' : 'Last'} ${weekday}`;
+  else return localDigits(date.format(locale === 'hi' ? 'DD/MM/YYYY' : 'MM/DD/YYYY'), locale);
+  const clock = hhmm ? clockText(hhmm, locale, false) : '';
+  return clock ? join(label, clock) : label;
+}
+
 /** The device's IANA time zone, such as 'Asia/Kolkata'. */
 export function deviceTimeZone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';

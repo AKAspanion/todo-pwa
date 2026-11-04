@@ -5,17 +5,19 @@
  * the store derives the time zone and reminder fields on save (P6).
  *
  * A save never times out or retries (a timeout risks a duplicate write): the form keeps its input
- * in a saving state, says so after 15 s without an answer, and shows an error when the save is
- * rejected (Review Focus 1).
+ * in a saving state, says so after 15 s without an answer, and says so in the snackbar, as the old
+ * app did, when the save is rejected (Review Focus 1). Laid out as the old app's TaskAdd was
+ * (restore-original-design §4.3).
  */
 import dayjs from 'dayjs';
 import { onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 import type { VForm } from 'vuetify/components';
 import DateField from '@/components/fields/DateField.vue';
 import TimeField from '@/components/fields/TimeField.vue';
-import { safeColor } from '@/components/tasks/labels';
+import { safeColor, textColorFor } from '@/components/tasks/labels';
 import { vFocusOnMount } from '@/directives/focusOnMount';
 import { todayYmd } from '@/lib/dates';
 import { useLabelsStore } from '@/stores/labels';
@@ -47,6 +49,7 @@ const session = useSessionStore();
 const labels = useLabelsStore();
 const tasks = useTasksStore();
 const ui = useUiStore();
+const { mdAndUp } = useDisplay();
 
 const now = new Date();
 const form = reactive<AddTaskForm>({
@@ -61,7 +64,6 @@ const form = reactive<AddTaskForm>({
 const formRef = ref<InstanceType<typeof VForm> | null>(null);
 const saving = ref(false);
 const stillSaving = ref(false);
-const saveFailed = ref(false);
 let stillSavingTimer: ReturnType<typeof setTimeout> | undefined;
 let left = false;
 
@@ -69,7 +71,8 @@ let left = false;
 const length = (value: string): number => [...value].length;
 
 const titleRules = [
-  (v: string) => v.trim() !== '' || t('add.title.required'),
+  (v: string) => v !== '' || t('add.title.required'),
+  (v: string) => v.trim() !== '' || t('add.title.blank'),
   (v: string) => length(v.trim()) <= TITLE_MAX || t('add.title.tooLong'),
 ];
 const descriptionRules = [
@@ -100,7 +103,6 @@ async function submit(): Promise<void> {
     labelIds: [...form.labelIds],
   };
   saving.value = true;
-  saveFailed.value = false;
   stillSaving.value = false;
   stillSavingTimer = setTimeout(() => {
     stillSaving.value = true;
@@ -121,11 +123,9 @@ async function submit(): Promise<void> {
     ui.showSnack(t('add.added'));
     // Someone who left the screen while it saved stays where they went.
     if (!left) await router.push('/home');
-  } else if (left) {
-    // The form is gone once the user has left it: the snackbar says the task wasn't saved.
-    ui.showSnack(t('add.saveFailed'));
   } else {
-    saveFailed.value = true;
+    // The old app said so in its snackbar; the form stays as it was, filled.
+    ui.showSnack(t('add.saveFailed'));
   }
 }
 
@@ -136,56 +136,48 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <v-container class="add-task">
-    <h1 class="text-h6 mb-4">{{ t('common.screens.add') }}</h1>
+  <div class="add-task">
     <v-form ref="formRef" :readonly="saving" @submit.prevent="submit">
-      <v-row density="compact">
-        <v-col cols="12">
-          <v-text-field
-            v-model="form.title"
-            v-focus-on-mount
-            :label="t('add.title.label')"
-            :placeholder="t('add.title.placeholder')"
-            :rules="titleRules"
-            :counter="TITLE_MAX"
-            prepend-inner-icon="mdi-format-title"
-            variant="outlined"
-          />
-        </v-col>
+      <div class="add-task__grid">
+        <v-text-field
+          v-model="form.title"
+          v-focus-on-mount
+          class="add-task__title"
+          :aria-label="t('add.title.label')"
+          :placeholder="t('add.title.placeholder')"
+          :rules="titleRules"
+          :density="mdAndUp ? 'default' : 'compact'"
+          prepend-inner-icon="mdi-format-title"
+          variant="outlined"
+          single-line
+        />
 
-        <v-col cols="12" sm="6">
-          <DateField v-model="form.date" :disabled="form.indefinite" :readonly="saving" />
-        </v-col>
+        <TimeField
+          v-model="form.time"
+          :disabled="form.indefinite"
+          :readonly="saving"
+          :density="mdAndUp ? 'default' : 'compact'"
+          old-format
+          single-line
+        />
 
-        <v-col cols="12" sm="6">
-          <TimeField v-model="form.time" :disabled="form.indefinite" :readonly="saving" />
-        </v-col>
+        <DateField
+          v-model="form.date"
+          :disabled="form.indefinite"
+          :readonly="saving"
+          :density="mdAndUp ? 'default' : 'compact'"
+          old-format="long"
+          single-line
+        />
 
-        <v-col cols="12">
-          <v-switch
-            v-model="form.indefinite"
-            :label="t('add.indefinite')"
-            color="primary"
-            hide-details
-            inset
-          />
-        </v-col>
-
-        <v-col cols="12">
-          <div id="add-labels-heading" class="text-subtitle-2 mb-1">
-            {{ t('add.labels.label') }}
-          </div>
-          <div
-            class="d-flex align-center flex-wrap ga-2"
-            role="group"
-            aria-labelledby="add-labels-heading"
-          >
-            <v-progress-circular
+        <div class="add-task__labels">
+          <v-icon icon="mdi-label" class="add-task__labels-icon" />
+          <div class="add-task__labels-body" role="group" :aria-label="t('add.labels.label')">
+            <div
               v-if="labels.loading && labels.labels.length === 0"
+              class="animate label-shimmer"
+              role="status"
               :aria-label="t('add.labels.loading')"
-              indeterminate
-              size="20"
-              width="2"
             />
             <template v-else-if="labels.error && labels.labels.length === 0">
               <span class="text-body-2 text-error">{{ t('add.labels.loadFailed') }}</span>
@@ -193,71 +185,213 @@ onBeforeUnmount(() => {
                 {{ t('add.labels.retry') }}
               </v-btn>
             </template>
-            <v-chip-group
-              v-else-if="labels.labels.length > 0"
-              v-model="form.labelIds"
-              :disabled="saving"
-              multiple
-              column
-            >
+            <v-chip-group v-else v-model="form.labelIds" :disabled="saving" multiple>
               <v-chip
                 v-for="label in labels.labels"
                 :key="label.id"
                 :value="label.id"
                 :color="safeColor(label.color)"
-                :variant="form.labelIds.includes(label.id) ? 'flat' : 'tonal'"
+                :style="{
+                  backgroundColor: safeColor(label.color),
+                  color: textColorFor(safeColor(label.color)),
+                }"
+                :size="mdAndUp ? 'default' : 'small'"
                 :data-label-id="label.id"
                 class="label-choice"
+                variant="flat"
                 filter
                 label
               >
                 {{ label.label }}
               </v-chip>
+              <v-chip
+                to="/profile"
+                :size="mdAndUp ? 'default' : 'small'"
+                :aria-label="t('add.labels.create')"
+                class="add-task__create"
+                variant="flat"
+                label
+              >
+                <v-icon icon="mdi-plus-circle" size="small" color="primary" />
+              </v-chip>
             </v-chip-group>
-            <span v-else class="text-body-2 text-medium-emphasis">{{ t('add.labels.none') }}</span>
-            <v-chip to="/profile" prepend-icon="mdi-plus" variant="outlined" label>
-              {{ t('add.labels.create') }}
-            </v-chip>
+            <span
+              v-if="!labels.loading && labels.labels.length === 0 && !labels.error"
+              class="add-task__none"
+            >
+              {{ t('add.labels.none') }}
+            </span>
           </div>
-        </v-col>
+        </div>
 
-        <v-col cols="12" class="mt-2">
-          <v-textarea
-            v-model="form.description"
-            :label="t('add.description.label')"
-            :placeholder="t('add.description.placeholder')"
-            :rules="descriptionRules"
-            prepend-inner-icon="mdi-text"
-            variant="outlined"
-            rows="3"
-            auto-grow
-          />
-        </v-col>
+        <v-textarea
+          v-model="form.description"
+          class="add-task__description"
+          :aria-label="t('add.description.label')"
+          :placeholder="t('add.description.placeholder')"
+          :rules="descriptionRules"
+          :density="mdAndUp ? 'default' : 'compact'"
+          prepend-inner-icon="mdi-card-text"
+          variant="outlined"
+          hide-details="auto"
+          single-line
+          rows="1"
+          auto-grow
+        />
 
-        <v-col v-if="stillSaving" cols="12">
-          <v-alert type="info" variant="tonal" density="compact" role="status">
-            {{ t('add.stillSaving') }}
-          </v-alert>
-        </v-col>
-        <v-col v-if="saveFailed" cols="12">
-          <v-alert type="error" variant="tonal" density="compact">
-            {{ t('add.saveFailed') }}
-          </v-alert>
-        </v-col>
+        <v-switch
+          v-model="form.indefinite"
+          class="add-task__indefinite"
+          :label="t('add.indefinite')"
+          color="primary"
+          hide-details
+        />
 
-        <v-col cols="12">
-          <v-btn type="submit" color="primary" size="large" :loading="saving" block>
-            {{ t('add.submit') }}
-          </v-btn>
-        </v-col>
-      </v-row>
+        <v-alert
+          v-if="stillSaving"
+          class="add-task__wide"
+          type="info"
+          variant="tonal"
+          density="compact"
+          role="status"
+        >
+          {{ t('add.stillSaving') }}
+        </v-alert>
+
+        <v-btn
+          class="add-task__wide"
+          type="submit"
+          color="primary"
+          size="large"
+          :loading="saving"
+          block
+        >
+          {{ t('add.submit') }}
+        </v-btn>
+      </div>
     </v-form>
-  </v-container>
+  </div>
 </template>
 
+<!-- The old TaskAdd: one flat page of outlined fields, the labels in a bordered strip. -->
 <style scoped>
 .add-task {
-  max-width: 760px;
+  padding: 24px 20px 12px;
+}
+.add-task__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 16px;
+}
+.add-task__labels,
+.add-task__description,
+.add-task__indefinite,
+.add-task__wide {
+  grid-column: 1 / -1;
+}
+.add-task__labels {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  margin-bottom: 28px;
+  border: 1px solid rgba(0, 0, 0, 0.24);
+  border-radius: 4px;
+}
+.v-theme--dark .add-task__labels {
+  border-color: rgb(192, 192, 192);
+}
+.add-task__labels:focus-within {
+  margin: -1px -1px 27px;
+  border: 2px solid rgb(var(--v-theme-primary));
+}
+.add-task__labels:focus-within .add-task__labels-icon {
+  color: rgb(var(--v-theme-primary));
+}
+.add-task__labels-icon {
+  margin-right: 12px;
+}
+.add-task__labels-body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+.add-task__none {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+.add-task__create {
+  background: rgba(0, 0, 0, 0.12);
+}
+.v-theme--dark .add-task__create {
+  background: rgba(255, 255, 255, 0.24);
+}
+.add-task__description {
+  margin-bottom: 20px;
+}
+.add-task__description :deep(.v-field__prepend-inner) {
+  align-items: flex-start;
+  padding-top: 8px;
+}
+.add-task__indefinite {
+  margin-bottom: 32px;
+}
+.add-task__indefinite :deep(.v-selection-control) {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+.add-task__indefinite {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 36px;
+}
+.add-task__description :deep(.v-field) {
+  min-height: 124px;
+}
+.add-task__indefinite :deep(.v-label) {
+  opacity: 1;
+  padding-inline-end: 8px;
+  padding-inline-start: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.add-task :deep(input) {
+  font-size: 16px;
+}
+.add-task :deep(textarea) {
+  margin-top: 4px;
+}
+@media (max-width: 599.98px) {
+  .add-task :deep(.v-input) {
+    --v-input-control-height: 36px;
+  }
+  .add-task :deep(input),
+  .add-task :deep(textarea) {
+    font-size: 13px;
+  }
+}
+@media (min-width: 600px) {
+  .add-task__indefinite {
+    margin-bottom: 24px;
+  }
+  .add-task {
+    padding: 24px 32px 12px;
+  }
+  .add-task__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .add-task__title {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 960px) {
+  .add-task__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .add-task__title {
+    grid-column: auto;
+  }
 }
 /*
  * A selected label chip shows the label's own colour: the check mark and the solid fill already

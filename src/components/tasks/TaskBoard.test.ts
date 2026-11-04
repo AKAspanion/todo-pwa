@@ -97,7 +97,7 @@ describe('TaskBoard loading (D10)', () => {
     const wrapper = mountBoard({ todo: [], done: [], labels: [], loading: false });
 
     expect(wrapper.findAll(SKELETON)).toHaveLength(0);
-    expect(wrapper.text()).toContain('No task to do');
+    expect(wrapper.text()).toContain('No task todo');
     expect(wrapper.text()).toContain('No task done');
   });
 });
@@ -118,9 +118,7 @@ describe('TaskBoard saving an edit (D7)', () => {
       expect.objectContaining({ title: 'Buy oat milk' }),
     );
     expect(wrapper.find('form').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="save-error"]').text()).toContain(
-      "Couldn't save. Try again.",
-    );
+    expect(wrapper.find('[data-testid="save-error"]').text()).toContain('Task updating task');
     expect(titleValue(wrapper)).toBe('Buy oat milk');
     expect(warn).toHaveBeenCalledWith('[home] save failed:', 'permission-denied');
   });
@@ -154,7 +152,7 @@ describe('TaskBoard saving an edit (D7)', () => {
     await flushPromises();
 
     expect(wrapper.find('form').exists()).toBe(false);
-    expect(useUiStore().snack?.text).toBe('Task updated');
+    expect(useUiStore().snack?.text).toBe('Task updated successfully');
   });
 
   it('a save after a failure clears the old error', async () => {
@@ -197,7 +195,7 @@ describe('TaskBoard status changes', () => {
     await wrapper.find('button[aria-label="Mark as done"]').trigger('click');
     await flushPromises();
 
-    expect(useUiStore().snack?.text).toBe("Couldn't save. Try again.");
+    expect(useUiStore().snack?.text).toBe('Task updating task');
     expect(warn).toHaveBeenCalledWith('[home] status change failed:', 'Error');
   });
 });

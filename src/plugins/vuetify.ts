@@ -1,7 +1,9 @@
 import '@mdi/font/css/materialdesignicons.css';
 import 'vuetify/styles';
+import '@/assets/style.css';
 import { useI18n } from 'vue-i18n';
 import { createVuetify, type LocaleInstance } from 'vuetify';
+import { md2 } from 'vuetify/blueprints';
 import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n';
 import type { Theme } from '@/stores/ui';
 import { i18n } from './i18n';
@@ -61,13 +63,40 @@ function withAppMessageKeys(instance: LocaleInstance): LocaleInstance {
  */
 export const vuetifyLocaleAdapter = withAppMessageKeys(createVueI18nAdapter({ i18n, useI18n }));
 
+/** Vuetify 2.6.10's secondary to warning colours, the same in both themes. */
+const SHARED_COLORS = {
+  secondary: '#424242',
+  error: '#FF5252',
+  info: '#2196F3',
+  success: '#4CAF50',
+  warning: '#FB8C00',
+};
+
 export const vuetify = createVuetify({
+  blueprint: md2,
   locale: { adapter: vuetifyLocaleAdapter },
   theme: {
     defaultTheme: storedTheme(),
     themes: {
-      light: { colors: { primary: THEME_COLOR, background: BACKGROUND_COLOR } },
-      dark: { colors: { primary: THEME_COLOR } },
+      light: {
+        colors: {
+          ...SHARED_COLORS,
+          primary: THEME_COLOR,
+          accent: '#82B1FF',
+          background: '#FFFFFF',
+          surface: '#FFFFFF',
+        },
+      },
+      dark: {
+        colors: {
+          ...SHARED_COLORS,
+          // The old app set no dark primary, so it showed Vuetify 2's dark preset's.
+          primary: '#2196F3',
+          accent: '#FF4081',
+          background: '#121212',
+          surface: '#1E1E1E',
+        },
+      },
     },
   },
 });

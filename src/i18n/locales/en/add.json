@@ -2,25 +2,26 @@
   "title": {
     "label": "Title",
     "placeholder": "Name your task",
-    "required": "Title is required",
+    "required": "Enter task's title",
+    "blank": "Only white spaces not allowed",
     "tooLong": "Keep the title under 200 characters"
   },
   "description": {
     "label": "Description",
-    "placeholder": "Details, in Markdown",
+    "placeholder": "A detailed description of the task",
     "tooLong": "Keep the description under 5000 characters"
   },
-  "indefinite": "Indefinite task?",
+  "indefinite": "No due date?",
   "labels": {
-    "label": "Labels",
+    "label": "Label",
     "loading": "Loading labels",
     "loadFailed": "Couldn't load your labels.",
     "retry": "Retry",
-    "none": "No labels yet.",
-    "create": "Create a label"
+    "none": "No label available, create one in profile page",
+    "create": "Create a new label"
   },
-  "submit": "Add task",
-  "added": "Task added",
+  "submit": "Add Task",
+  "added": "Task addedd succesfully",
   "saveFailed": "Couldn't save. Try again.",
   "stillSaving": "Still saving. Check your connection."
 }

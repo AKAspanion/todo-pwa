@@ -21,6 +21,9 @@ the title and description, label chips filter, and a date bar picks the day show
 - `/home`: `src/views/HomeView.vue`, with `src/components/DateBar.vue` and the board in
   `src/components/tasks/` (`TaskBoard.vue`, `TaskColumn.vue`, `TaskCard.vue`, `TaskEditForm.vue`,
   `LabelChips.vue`).
+- The home screen uses the old app's wording and date formats ("0 tasks today", "TODO", "Today at 9:30 AM",
+  "Indefinite task?"), through the old-format helpers in `src/lib/dates.ts` and the locale files
+  `src/i18n/locales/*/tasks.json` ([decisions/restore-original-design](../decisions/restore-original-design.md)).
 - It loads tasks and labels as soon as Firebase reports the user (`src/stores/tasks.ts`, `src/stores/labels.ts`).
 
 ## Rules
@@ -39,6 +42,10 @@ the title and description, label chips filter, and a date bar picks the day show
 - While loading with nothing to show, skeleton cards are shown, never alongside real cards (spec D10).
 - A label id with no label is left off the card (spec D6).
 
+## History
+
+- 2026-11-04: was the rewrite's text and date formats; now the old app's on the home screen, because the developer chose them at the home checkpoint. See [decisions/restore-original-design](../decisions/restore-original-design.md).
+
 ## Sources
 
 - `src/views/HomeView.vue`
@@ -51,3 +58,4 @@ the title and description, label chips filter, and a date bar picks the day show
 - `src/stores/tasks.ts`
 - `src/stores/labels.ts`
 - `src/lib/dates.ts`
+- `src/i18n/locales/en/tasks.json`

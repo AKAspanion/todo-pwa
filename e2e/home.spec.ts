@@ -9,7 +9,7 @@ import {
   HOME_TIME_ZONE,
   freshHomeUser,
   restoreFirestoreRules,
-  seedHomeBoard,
+  seedLegacyHomeBoard,
   seedLabel,
   seedLegacyTask,
   seedTask,
@@ -17,7 +17,7 @@ import {
   todayUtc,
 } from './fixtures/home';
 import { dragCard } from './support/drag';
-import { readDoc, signInAs, type TestUser } from './support/emulator';
+import { readDoc, setPhotoUrl, signInAs, type TestUser } from './support/emulator';
 import {
   VISUAL_CLOCK,
   VISUAL_SKIP_REASON,
@@ -31,9 +31,9 @@ import {
   type VisualState,
 } from './support/visual';
 
-const SAVE_ERROR = "Couldn't save. Try again.";
+const SAVE_ERROR = 'Task updating task';
 const SLOW_SAVE = 'Still saving. Check your connection.';
-const LOAD_ERROR = "Couldn't load your data. Try again.";
+const LOAD_ERROR = 'Error getting tasks. Please try later!';
 
 test.use({ timezoneId: HOME_TIME_ZONE });
 
@@ -217,12 +217,14 @@ test.describe('home board', () => {
     await openHome(page, user);
     await expect(page.getByTestId('task-card')).toHaveCount(3);
 
-    await page.getByLabel('Search tasks', { exact: true }).fill('milk');
+    // The search field sits in a menu, as in the old app: open it from the search button.
+    await page.getByRole('button', { name: 'Search tasks' }).click();
+    await page.getByRole('searchbox', { name: 'Search tasks' }).fill('milk');
 
     await expect(cardByTitle(page, 'Buy Milk')).toBeVisible();
     await expect(page.getByTestId('task-card')).toHaveCount(1);
 
-    await page.getByLabel('Search tasks', { exact: true }).fill('park');
+    await page.getByRole('searchbox', { name: 'Search tasks' }).fill('park');
 
     await expect(cardByTitle(page, 'Walk the dog')).toBeVisible();
     await expect(page.getByTestId('task-card')).toHaveCount(1);
@@ -237,6 +239,8 @@ test.describe('home board', () => {
     await openHome(page, user);
     await expect(page.getByTestId('task-card')).toHaveCount(2);
 
+    // The label filter sits in the search menu, as the old app's filters did.
+    await page.getByRole('button', { name: 'Search tasks' }).click();
     await page.getByTestId('label-filter').getByText('a', { exact: true }).click();
 
     await expect(cardByTitle(page, 'Tagged a')).toBeVisible();
@@ -259,6 +263,48 @@ test.describe('home board', () => {
     await expect(legacy.getByTestId('task-when')).toHaveText('No due date');
     await expect(legacy.getByTestId('label-chip')).toHaveCount(0);
     await expect(legacy.locator('.v-chip')).toHaveCount(0);
+  });
+
+  test('the edit form shows mdi-clock on its time field and none on its description, and writes the time and date as the old card did', async ({
+    page,
+  }) => {
+    await seedTask(user.uid, { id: 'icons', title: 'Icons', date: today, time: '09:30' });
+    await openHome(page, user);
+    await expect(cardByTitle(page, 'Icons').getByTestId('task-when')).toHaveText(
+      'Today at 9:30 AM',
+    );
+    await cardByTitle(page, 'Icons').getByRole('button', { name: 'Edit task' }).click();
+    const form = page.getByRole('form', { name: 'Edit task' });
+
+    await expect(form.locator('.v-field:has(input[name="time"]) .mdi-clock')).toHaveCount(1);
+    await expect(form.locator('.v-field:has(textarea[name="description"]) .v-icon')).toHaveCount(0);
+    await expect(form.locator('input[name="time"]')).toHaveValue('09:30 AM');
+    await expect(form.locator('input[name="date"]')).toHaveValue(
+      /^[A-Z][a-z]{2}, \d{1,2}(st|nd|rd|th), \d{2}$/,
+    );
+    await expect(form.getByLabel('Indefinite task?')).toBeVisible();
+  });
+
+  test('a chip shows its label name in the label colour, on a chip in the card text colour, and a done title is struck through', async ({
+    page,
+  }) => {
+    await seedLabel(user.uid, { id: 'pink', label: 'Pinky', color: '#F8BBD0' });
+    await seedTask(user.uid, {
+      id: 'chips',
+      title: 'Tagged',
+      date: today,
+      labelIds: ['pink'],
+      status: 'done',
+    });
+    await openHome(page, user);
+    const card = cardByTitle(page, 'Tagged');
+
+    const chip = card.getByTestId('label-chip');
+    await expect(chip).toHaveText('Pinky');
+    await expect(chip).toHaveCSS('color', 'rgb(248, 187, 208)');
+    // The card is in the label colour, so its text is dark, and so is the chip it sits on.
+    await expect(chip).toHaveCSS('background-color', 'rgb(51, 51, 51)');
+    await expect(card.getByTestId('task-title')).toHaveClass(/line-through-text/);
   });
 
   test('check, edit and delete show without hover at phone width (D11)', async ({ page }) => {
@@ -323,6 +369,46 @@ test.describe('home across midnight', () => {
   });
 });
 
+test.describe('bottom navigation', () => {
+  test('has home, calendar, add, notifications and profile in that order, each labelled', async ({
+    page,
+  }) => {
+    const user = await freshHomeUser();
+    await openHome(page, user);
+
+    const nav = page.getByRole('navigation', { name: 'Main navigation' });
+    await expect(nav.getByRole('link')).toHaveCount(5);
+    expect(
+      await nav.getByRole('link').evaluateAll((links) => links.map((a) => a.ariaLabel)),
+    ).toEqual(['Home', 'Calendar', 'Add task', 'Notifications', 'Profile']);
+  });
+
+  test('the profile tab shows mdi-face-man without a photo, and a 24 px photo with one', async ({
+    page,
+  }) => {
+    const user = await freshHomeUser();
+    await openHome(page, user);
+    const profile = page
+      .getByRole('navigation', { name: 'Main navigation' })
+      .getByRole('link', { name: 'Profile' });
+    await expect(profile.locator('.mdi-face-man')).toHaveCount(1);
+    await expect(profile.locator('img')).toHaveCount(0);
+
+    await page.route('https://photos.example/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.alloc(0) }),
+    );
+    await setPhotoUrl(user.email, user.password, 'https://photos.example/home.png');
+    // The app reads the photo when it signs in, so sign in again.
+    await page.reload();
+    await signInAs(page, user.email, user.password);
+    await page.goto('/home');
+
+    await expect(profile.locator('img')).toHaveAttribute('src', 'https://photos.example/home.png');
+    await expect(profile.locator('.v-avatar')).toHaveCSS('width', '24px');
+    await expect(profile.locator('.mdi-face-man')).toHaveCount(0);
+  });
+});
+
 /** A visual state of Home: it waits on what the state shows, not on network idle. */
 interface HomeVisualState extends VisualState {
   /** Resolves once the state is on screen. */
@@ -360,7 +446,7 @@ function homeVisualStates(): HomeVisualState[] {
       name: 'home-loading',
       path: '/home',
       before: async (page) => {
-        await signInFresh(page, (uid) => seedHomeBoard(uid, VISUAL_TODAY));
+        await signInFresh(page, (uid) => seedLegacyHomeBoard(uid, VISUAL_TODAY));
         // The query never gets an answer, so the board stays on its skeletons.
         await page.route(FIRESTORE_LISTEN_CHANNEL, () => {});
       },
@@ -371,13 +457,13 @@ function homeVisualStates(): HomeVisualState[] {
     {
       name: 'home-tasks',
       path: '/home',
-      before: (page) => signInFresh(page, (uid) => seedHomeBoard(uid, VISUAL_TODAY)),
+      before: (page) => signInFresh(page, (uid) => seedLegacyHomeBoard(uid, VISUAL_TODAY)),
       ready: boardReady,
     },
     {
       name: 'home-editing',
       path: '/home',
-      before: (page) => signInFresh(page, (uid) => seedHomeBoard(uid, VISUAL_TODAY)),
+      before: (page) => signInFresh(page, (uid) => seedLegacyHomeBoard(uid, VISUAL_TODAY)),
       ready: boardReady,
       act: async (page) => {
         await cardByTitle(page, 'Buy milk').getByRole('button', { name: 'Edit task' }).click();
@@ -388,11 +474,16 @@ function homeVisualStates(): HomeVisualState[] {
       name: 'home-load-error',
       path: '/home',
       before: async (page) => {
-        await signInFresh(page, (uid) => seedHomeBoard(uid, VISUAL_TODAY));
+        await signInFresh(page, (uid) => seedLegacyHomeBoard(uid, VISUAL_TODAY));
         await setFirestoreRules(DENY_ALL_RULES);
       },
       ready: async (page) => {
         await expect(page.getByTestId('load-error')).toBeVisible();
+        // Fully shown, not mid-transition: the capture is taken as soon as this resolves.
+        await expect(page.getByTestId('load-error').locator('.v-snackbar__wrapper')).toHaveCSS(
+          'opacity',
+          '1',
+        );
       },
       after: restoreFirestoreRules,
     },
@@ -400,7 +491,14 @@ function homeVisualStates(): HomeVisualState[] {
       name: 'home-hi',
       path: '/home',
       locale: 'hi',
-      before: (page) => signInFresh(page, (uid) => seedHomeBoard(uid, VISUAL_TODAY)),
+      before: (page) => signInFresh(page, (uid) => seedLegacyHomeBoard(uid, VISUAL_TODAY)),
+      ready: boardReady,
+    },
+    {
+      name: 'home-dark',
+      path: '/home',
+      theme: 'dark',
+      before: (page) => signInFresh(page, (uid) => seedLegacyHomeBoard(uid, VISUAL_TODAY)),
       ready: boardReady,
     },
   ];
@@ -463,7 +561,7 @@ test.describe('home visual states', () => {
   test.skip(!canCompareVisuals(), VISUAL_SKIP_REASON);
   test.describe.configure({ timeout: 600_000 });
 
-  test('home-empty, home-loading, home-tasks, home-editing, home-load-error and home-hi match their references at 390 and 1280', async ({
+  test('home-empty, home-loading, home-tasks, home-editing, home-load-error, home-hi and home-dark match their references at 390 and 1280', async ({
     browser,
     baseURL,
   }) => {

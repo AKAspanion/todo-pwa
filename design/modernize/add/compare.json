@@ -26,6 +26,12 @@
       "design": "../reference.html?screen=add&side=refs&state=add-hi",
       "app": "reference.html?screen=add&side=app&state=add-hi",
       "fullPage": true
+    },
+    {
+      "name": "add-dark",
+      "design": "../reference.html?screen=add&side=refs&state=add-dark",
+      "app": "reference.html?screen=add&side=app&state=add-dark",
+      "fullPage": true
     }
   ]
 }

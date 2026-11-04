@@ -86,7 +86,8 @@ test.describe('app shell routes', () => {
   test('the sign-in screen shows no bottom nav', async ({ page }) => {
     await page.goto('/signin');
 
-    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+    // The old app's sign-in heading: the app's name (auth.signIn.title).
+    await expect(page.getByRole('heading', { name: 'Task Manager' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Main navigation' })).toHaveCount(0);
   });
 

@@ -1,5 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
-import { createUser, resetEmulators, seedDoc, signInAs, type TestUser } from './support/emulator';
+import {
+  createUser,
+  resetEmulators,
+  seedDoc,
+  setPhotoUrl,
+  signInAs,
+  type TestUser,
+} from './support/emulator';
 import {
   VISUAL_SKIP_REASON,
   canCompareVisuals,
@@ -81,7 +88,7 @@ test.describe('profile', () => {
     await expect(nameHeading(page)).toHaveText('Ankit P');
   });
 
-  test('a failed rename keeps the typed name and shows the Hindi error, not a raw key (D18)', async ({
+  test('a failed rename keeps the typed name and shows the old error, not a raw key (D18)', async ({
     page,
   }) => {
     await openProfile(page, user, 'hi');
@@ -92,7 +99,7 @@ test.describe('profile', () => {
     await field.fill('Ankit P');
     await page.getByRole('button', { name: 'नाम सहेजें' }).click();
 
-    const error = page.getByText('आपका नाम अपडेट नहीं हो सका। फिर से कोशिश करें।');
+    const error = page.getByText('Error updating name');
     await expect(error).toBeVisible();
     await expect(field).toBeVisible();
     await expect(field).toHaveValue('Ankit P');
@@ -153,10 +160,33 @@ test.describe('profile', () => {
 
     // Init scripts run in the order they were added, so the saved language is now Hindi.
     await openProfile(page, nameless, 'hi');
-    await expect(page.getByRole('heading', { name: 'लेबल' })).toBeVisible();
-    await expect(nameHeading(page)).toHaveText('उपलब्ध नहीं');
+    // The old app wrote both in English in every language.
+    await expect(page.getByRole('heading', { name: 'LABELS' })).toBeVisible();
+    await expect(nameHeading(page)).toHaveText('NA');
     await expect(page.getByRole('button', { name: 'नाम बदलें' })).toBeVisible();
     await expect(page.locator('body')).not.toContainText('profile.');
+  });
+
+  test('the avatar shows mdi-face-man without a name or photo, and the photo for an https one', async ({
+    page,
+  }) => {
+    const nameless = await createUser('plain@example.info', PASSWORD);
+    await openProfile(page, nameless);
+    const avatar = page.getByRole('main').locator('.v-avatar');
+    await expect(avatar.locator('.mdi-face-man')).toHaveCount(1);
+    await expect(avatar.locator('img')).toHaveCount(0);
+
+    await page.route('https://photos.example/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.alloc(0) }),
+    );
+    await setPhotoUrl(nameless.email, nameless.password, 'https://photos.example/me.png');
+    // The app reads the photo when it signs in, so sign in again.
+    await page.reload();
+    await signInAs(page, nameless.email, nameless.password);
+    await page.goto('/profile');
+
+    await expect(avatar.locator('img')).toHaveAttribute('src', 'https://photos.example/me.png');
+    await expect(avatar.locator('.mdi-face-man')).toHaveCount(0);
   });
 });
 
@@ -203,6 +233,7 @@ test.describe('profile visual', () => {
       },
     },
     { name: 'profile-hi', path: '/profile', locale: 'hi', before: signIn, act: labelsShown },
+    { name: 'profile-dark', path: '/profile', theme: 'dark', before: signIn, act: labelsShown },
   ];
 
   test('matches the approved references at 390 and 1280', async ({ browser, baseURL }) => {
