@@ -20,7 +20,8 @@ verified: human:panditankit1995@gmail.com
 - Old notifications carry `timestamp` as India-time `toLocaleString()` text instead of `createdAt`; it is
   parsed, and one that can't be is shown with no time.
 - Editing an old task writes the new shape and deletes its `type` and `id` fields (`updateTask` in
-  `src/services/tasks.ts`); the rules allow removing those fields, never setting them.
+  `src/services/tasks.ts`). The old app, live again since 2026-11-04, sets them; the rules accept both
+  ([data/task](../data/task.md)).
 - The one-off migration, `functions/scripts/migrate-legacy.ts`, adds the missing `timeZone`, `remindAt` and
   `reminded` to tasks and a `createdAt` to notifications, and changes nothing else. It doesn't copy the old
   push tokens (`fcm/{uid}`): they belong to the old FCM worker, which the site now removes, and one browser's
@@ -28,8 +29,13 @@ verified: human:panditankit1995@gmail.com
 
 ## Where it is enforced
 
-`src/services/legacy.ts` (reads), `src/services/tasks.ts` (writes), `firestore.rules` (`legacyTaskFields`),
+`src/services/legacy.ts` (reads), `src/services/tasks.ts` (writes), `firestore.rules` (`legacyTaskFields`, `validLegacyTaskFields`),
 and `functions/scripts/migrate-legacy.ts`.
+
+## History
+
+- 2026-11-04: was "the rules allow removing `type` and `id`, never setting them"; now the old app may set them,
+  because hosting was rolled back to the old app.
 
 ## Sources
 
