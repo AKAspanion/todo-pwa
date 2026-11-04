@@ -75,6 +75,16 @@ function longDate(ymd: string): string {
   return `${part({ weekday: 'long' })}, ${d} ${part({ month: 'long' })} ${y}`;
 }
 
+/** 'Tuesday, November 3rd, 2026': the add screen's date field, in the old app's format. */
+function addFieldDate(ymd: string): string {
+  const [y, m, d] = ymdParts(ymd);
+  const day = new Date(Date.UTC(y, m - 1, d));
+  const part = (options: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat('en-US', { ...options, timeZone: 'UTC' }).format(day);
+  const suffix = d % 100 >= 11 && d % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][d % 10] ?? 'th');
+  return `${part({ weekday: 'long' })}, ${part({ month: 'long' })} ${d}${suffix}, ${y}`;
+}
+
 /** Every task document's status, past the security rules, from the Firestore emulator. */
 async function storedStatuses(): Promise<string[]> {
   const url = `http://${FIRESTORE_EMULATOR_HOST}/v1/projects/${PROJECT_ID}/databases/(default)/documents/tasks`;
@@ -155,7 +165,7 @@ test.describe('smoke', () => {
       await pickDate(page, tomorrow);
       await pickTime(page, '09', '00');
       await expect(page.getByLabel(FIELDS.date.label, { exact: true })).toHaveValue(
-        longDate(tomorrow),
+        addFieldDate(tomorrow),
       );
       await page.getByRole('button', { name: ADD.submit, exact: true }).click();
       await expect(page).toHaveURL(/\/home$/);
