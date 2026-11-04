@@ -1,7 +1,7 @@
 name: Deploy
 
-# Every push to master runs the full CI suite, then deploys the Firestore rules and indexes, then
-# hosting: the app always goes live with the rules it was built and tested against.
+# Every push to master runs the full CI suite, then deploys hosting. The Firestore rules and indexes
+# are deployed by hand, before a push that needs them (README.md > Deploy & CI setup).
 # The Cloud Functions deploy only when started by hand (Actions > Deploy > Run workflow) with
 # "deploy_functions" ticked.
 # Setup (repository variables, the FIREBASE_SERVICE_ACCOUNT secret): README.md > Deploy & CI setup.
@@ -96,20 +96,9 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_functions }}
         run: npm --prefix functions ci --ignore-scripts
       - run: npm run build
-      # The rules and functions steps use the project's own firebase-tools (npm ci above), signed
-      # in with the service account key written to a temporary file that is removed afterwards.
-      # The key is in these deploy steps' environment only, never in an install step's.
-      # On every run, before hosting: the new app needs the new rules (review I4).
-      - name: Deploy Firestore rules and indexes
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
-        run: |
-          creds="$RUNNER_TEMP/sa.json"
-          trap 'rm -f "$creds"' EXIT
-          (umask 077; printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$creds")
-          GOOGLE_APPLICATION_CREDENTIALS="$creds" npx firebase deploy \
-            --only firestore:rules,firestore:indexes --project "$PROJECT_ID" --non-interactive
+      # The functions step uses the project's own firebase-tools (npm ci above), signed in with the
+      # service account key written to a temporary file that is removed afterwards. The key is in
+      # that step's environment only, never in an install step's.
       # Functions need the Blaze (pay as you go) plan. The first functions deploy deletes the legacy
       # functions testFunction (public, leaked data) and testSchedule (the old hourly reminder),
       # which the code no longer has: --force lets the non-interactive deploy delete them.
@@ -129,7 +118,7 @@ jobs:
           (umask 077; printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$creds")
           GOOGLE_APPLICATION_CREDENTIALS="$creds" npx firebase deploy \
             --only functions --project "$PROJECT_ID" --non-interactive --force
-      # Last, so new rules, indexes and functions are live before the app that needs them.
+      # Last, so new functions are live before the app that needs them.
       - name: Deploy hosting
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
         env:
