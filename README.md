@@ -233,13 +233,14 @@ What runs, and when:
 
 - **Every pull request** runs CI (`.github/workflows/ci.yml`) and CodeQL.
 - **Every push to `master`** runs the Deploy workflow (`.github/workflows/deploy.yml`): it runs the
-  same CI suite first and, only if that passes, builds the app with the live config, deploys the
-  **Firestore rules and indexes**, then **hosting** (the `live` channel), so the app never goes
-  live without the rules it was tested against (CI's rules tests gate a rules change). One deploy
-  at a time; a running deploy is never cancelled.
+  same CI suite first and, only if that passes, builds the app with the live config and deploys
+  **hosting** (the `live` channel). One deploy at a time; a running deploy is never cancelled.
+- **The Firestore rules and indexes** deploy by hand, not from Actions. When a change needs new
+  rules or indexes, deploy them before merging it, so the app never goes live without them:
+  `npx firebase deploy --project spanion-todo --only firestore:rules,firestore:indexes`.
 - **The Cloud Functions** deploy only by hand: Actions > Deploy > Run workflow, on `master`, with
-  **deploy_functions** ticked (off by default). A manual run deploys the rules first and hosting
-  last, as a push does.
+  **deploy_functions** ticked (off by default). A manual run deploys the functions first and
+  hosting last.
 
 All settings are **repository-level**: Settings > Secrets and variables > Actions, not an
 environment. The deploy job runs in a GitHub environment called `production`, which GitHub
@@ -294,7 +295,7 @@ the account only the roles for what you deploy from Actions:
 
 | Deploys | Roles |
 |---|---|
-| Rules, indexes and hosting (every push) | Firebase Rules Admin (`roles/firebaserules.admin`), Cloud Datastore Index Admin (`roles/datastore.indexAdmin`), Firebase Hosting Admin (`roles/firebasehosting.admin`), API Keys Viewer (`roles/serviceusage.apiKeysViewer`) |
+| Hosting (every push) | Firebase Hosting Admin (`roles/firebasehosting.admin`), API Keys Viewer (`roles/serviceusage.apiKeysViewer`) |
 | Functions (`deploy_functions`) | add Cloud Functions Developer (`roles/cloudfunctions.developer`), Service Account User (`roles/iam.serviceAccountUser`), Cloud Scheduler Admin (`roles/cloudscheduler.admin`, for the scheduled reminder) |
 
 Run once, as a project owner, with `gcloud` and the GitHub CLI (`gh`):
@@ -306,9 +307,8 @@ SA="github-deploy@$PROJECT_ID.iam.gserviceaccount.com"
 gcloud iam service-accounts create github-deploy \
   --project "$PROJECT_ID" --display-name "GitHub Actions deploy"
 
-# Rules, indexes and hosting (every push):
-roles=(roles/firebaserules.admin roles/datastore.indexAdmin
-  roles/firebasehosting.admin roles/serviceusage.apiKeysViewer)
+# Hosting (every push):
+roles=(roles/firebasehosting.admin roles/serviceusage.apiKeysViewer)
 # To deploy the functions from Actions as well:
 roles+=(roles/cloudfunctions.developer roles/iam.serviceAccountUser roles/cloudscheduler.admin)
 
@@ -369,8 +369,8 @@ Workload Identity Federation is the keyless alternative (short-lived tokens, no 
      Google sign-in on those domains fails with `redirect_uri_mismatch`.
    - Restrict the browser API key's referrers to the app's domains
      ([docs/SECURITY.md](docs/SECURITY.md), item 1).
-4. **Deploy:** the push that brings this workflow to `master` deploys the rules and indexes, then
-   hosting. Hosting carries the kill switches (`public/service-worker.js` and
+4. **Deploy:** deploy the rules and indexes by hand (Deploy & CI setup, above); then the push that
+   brings this workflow to `master` deploys hosting. Hosting carries the kill switches (`public/service-worker.js` and
    `public/firebase-messaging-sw.js`) that take installed copies of the old app off its old
    service workers, so the old app stops writing against the new rules. Then deploy the
    functions: Actions > Deploy > Run workflow on `master`, with **deploy_functions** ticked.
