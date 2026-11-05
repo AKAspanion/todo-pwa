@@ -228,6 +228,22 @@ describe('deleteUserData trigger (D6)', () => {
     expect(loggedText()).not.toContain('alice');
   });
 
+  // Ruling: an invalid uid can never succeed, so it is logged once and not retried.
+  it('logs an invalid uid by its code alone and resolves, deleting nothing', async () => {
+    await seedUser('alice', ALICE);
+    vi.mocked(getFirestore).mockReturnValueOnce(db);
+
+    await expect(deleteUserData.run(deletedUser('alice/devices/x'), {})).resolves.toBeUndefined();
+
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith('deleteUserData: failed', {
+      code: 'user/invalid-uid',
+    });
+    expect(loggedText()).not.toContain('alice');
+    expect(loggedText()).not.toContain('not a valid document id');
+    expect(await countDocuments('alice')).toBe(ALICE_TOTAL);
+  });
+
   it('logs a failed commit by its code alone, and rejects so the platform retries', async () => {
     await seedUser('alice', { tasks: 1, types: 0, notifications: 0, devices: 0 });
     const error = firestoreError('unavailable');

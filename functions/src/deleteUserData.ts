@@ -23,6 +23,9 @@ export const DELETE_BATCH = 500;
 /** The collections whose documents carry their owner in a `uid` field. */
 const OWNED_COLLECTIONS = ['tasks', 'types', 'notifications'] as const;
 
+/** The code a uid that can't be a document id rejects with; no retry can fix it. */
+const INVALID_UID = 'user/invalid-uid';
+
 /**
  * A Firebase Auth uid usable as a document id: at most 128 characters, no `/`, not reserved. A uid
  * with a `/` would name a path, `users/{uid}` reaching into someone else's documents.
@@ -79,7 +82,7 @@ async function deleteExisting(db: Firestore, refs: DocumentReference[]): Promise
 export async function deleteUserDocuments(db: Firestore, uid: string): Promise<number> {
   if (!isOwnerId(uid)) {
     throw Object.assign(new Error('The uid is not a valid document id.'), {
-      code: 'user/invalid-uid',
+      code: INVALID_UID,
     });
   }
   const user = db.collection('users').doc(uid);
@@ -95,7 +98,8 @@ export async function deleteUserDocuments(db: Firestore, uid: string): Promise<n
 /**
  * D6: Firebase Auth user-deletion trigger, firebase-functions/v1 (v2 has no Auth deletion event),
  * runWith({ failurePolicy: true }) so the platform retries a failure. It takes the uid only from
- * the event, and logs a failure by its code, never its message or the uid.
+ * the event, and logs a failure by its code, never its message or the uid. An invalid uid can never
+ * succeed, so it is logged and the handler resolves, which the platform doesn't retry.
  */
 export const deleteUserData: CloudFunction<UserRecord> = runWith({ failurePolicy: true })
   .auth.user()
@@ -104,7 +108,10 @@ export const deleteUserData: CloudFunction<UserRecord> = runWith({ failurePolicy
       const deleted = await deleteUserDocuments(getFirestore(), user.uid);
       logger.info('deleteUserData: deleted', { deleted });
     } catch (err) {
-      logger.error('deleteUserData: failed', { code: errorCode(err) });
+      const code = errorCode(err);
+      logger.error('deleteUserData: failed', { code });
+      // Only an error a retry could fix leaves as a rejection: an invalid uid never will.
+      if (code === INVALID_UID) return;
       throw err;
     }
   });
