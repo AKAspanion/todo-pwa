@@ -1,8 +1,8 @@
 /**
  * Test data in the Firebase Emulator Suite, for project `demo-todo` only: never a real project.
  *
- * The emulator ports have one source, firebase.json (this project uses its own ports, auth 9199
- * and firestore 8180, so it can run beside other projects on the default ones).
+ * The emulator ports have one source, firebase.json (this project uses its own ports in the 2120
+ * block, auth 2122 and firestore 2123, so it can run beside other projects on the default ones).
  * `firebase emulators:exec` (the `e2e` and `test` npm scripts) also sets the hosts in the
  * environment, from the same file.
  */

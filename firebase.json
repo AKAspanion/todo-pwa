@@ -88,17 +88,28 @@
   },
   "emulators": {
     "singleProjectMode": true,
+    "hub": {
+      "port": 2121
+    },
     "auth": {
-      "port": 9199
+      "port": 2122
     },
     "firestore": {
-      "port": 8180
+      "port": 2123,
+      "websocketPort": 2124
     },
     "functions": {
-      "port": 5101
+      "port": 2125
+    },
+    "logging": {
+      "port": 2126
     },
     "ui": {
-      "enabled": false
+      "enabled": true,
+      "port": 2127
+    },
+    "hosting": {
+      "port": 2128
     }
   }
 }

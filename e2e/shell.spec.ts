@@ -308,8 +308,8 @@ test.describe('emulator ports', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'checks settings, not a browser');
 
   test("are this project's own, not the defaults another project may hold", () => {
-    expect(AUTH_EMULATOR_HOST).toMatch(/:9199$/);
-    expect(FIRESTORE_EMULATOR_HOST).toMatch(/:8180$/);
+    expect(AUTH_EMULATOR_HOST).toMatch(/:2122$/);
+    expect(FIRESTORE_EMULATOR_HOST).toMatch(/:2123$/);
   });
 });
 

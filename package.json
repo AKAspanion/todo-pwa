@@ -7,7 +7,8 @@
     "node": ">=24.12.0"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "firebase emulators:exec --project demo-todo --only auth,firestore --ui --import=./.emulator-data --export-on-exit=./.emulator-data \"vite --mode emulators\"",
+    "dev:app": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc -b --noEmit",
