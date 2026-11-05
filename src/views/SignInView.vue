@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import type { VForm } from 'vuetify/components';
 import { vFocusOnMount } from '@/directives/focusOnMount';
+import AppLogo from '@/components/layout/AppLogo.vue';
 import { authErrorCode, authErrorKey } from '@/lib/authForm';
 import { safeRedirect } from '@/router/guard';
 import { consumeRedirectResult, signInEmail, signInWithGoogle } from '@/services/auth';
@@ -106,6 +107,7 @@ onMounted(async () => {
     <div class="auth-layout px-7">
       <v-card variant="outlined" class="auth-card mt-2 pb-8 px-8">
         <div class="d-flex flex-column align-center pt-4">
+          <AppLogo :size="72" class="mt-4" />
           <h1 class="pt-4 auth-title">{{ t('auth.signIn.title') }}</h1>
           <div class="pa-2 text-caption font-weight-light">{{ t('auth.signIn.subtitle') }}</div>
         </div>

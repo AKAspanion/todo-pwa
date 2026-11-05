@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import type { VForm } from 'vuetify/components';
+import AppLogo from '@/components/layout/AppLogo.vue';
 import { authErrorCode, authErrorKey, isStrongPassword } from '@/lib/authForm';
 import { safeRedirect } from '@/router/guard';
 import { signInWithGoogle, signUpEmail } from '@/services/auth';
@@ -104,6 +105,7 @@ async function signUpGoogle(): Promise<void> {
     <div class="auth-layout px-7">
       <v-card variant="outlined" class="auth-card mt-2 pb-8 px-8">
         <div class="d-flex flex-column align-center pt-4">
+          <AppLogo :size="72" class="mt-4" />
           <h1 class="pt-4 auth-title">{{ t('auth.signUp.title') }}</h1>
           <div class="pa-2 text-caption font-weight-light">{{ t('auth.signUp.subtitle') }}</div>
         </div>
@@ -111,7 +113,7 @@ async function signUpGoogle(): Promise<void> {
         <v-card-text class="auth-form">
           <v-form ref="form" validate-on="submit" @submit.prevent="submitEmail">
             <v-card-text class="px-0 pb-0">
-              <v-row>
+              <v-row class="gr-1">
                 <v-col cols="12" class="py-0">
                   <v-text-field
                     v-model="email"
