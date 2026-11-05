@@ -105,11 +105,51 @@ describe('authGuard', () => {
     },
   );
 
-  it.each(['/signin', '/signup'])('lets a signed-out visitor open %s', async (path) => {
-    signedOut();
+  it.each(['/signin', '/signup', '/forgot-password'])(
+    'lets a signed-out visitor open %s',
+    async (path) => {
+      signedOut();
 
-    expect(await authGuard(to(path))).toBe(true);
+      expect(await authGuard(to(path))).toBe(true);
+    },
+  );
+
+  it('routes /forgot-password to its own screen, with no menu and no bottom bar', () => {
+    const location = to('/forgot-password');
+
+    expect(location.name).toBe('forgot-password');
+    expect(location.meta.requireAuth).toBeUndefined();
+    expect(location.meta.nav).toBeUndefined();
   });
+
+  it('routes /reset-password to its own screen, with no menu and no bottom bar', () => {
+    const location = to('/reset-password?mode=resetPassword&oobCode=abc');
+
+    expect(location.name).toBe('reset-password');
+    expect(location.meta.requireAuth).toBeUndefined();
+    expect(location.meta.nav).toBeUndefined();
+  });
+
+  it.each([
+    ['signed out', signedOut],
+    ['signed in', signedIn],
+  ])(
+    'lets a %s visit to /reset-password through, so the link works on any device',
+    async (_, as) => {
+      as();
+
+      expect(await authGuard(to('/reset-password?mode=resetPassword&oobCode=abc'))).toBe(true);
+    },
+  );
+
+  it.each(['/forgot-password', '/forgot-password?redirect=%2Fcalendar'])(
+    'lets a signed-in visit to %s through, so a used reset link can ask for a new one',
+    async (path) => {
+      signedIn();
+
+      expect(await authGuard(to(path))).toBe(true);
+    },
+  );
 
   it.each(['/signin', '/signup'])('sends a signed-in visit to %s to /home', async (path) => {
     signedIn();
@@ -229,6 +269,7 @@ describe('safeRedirect', () => {
     'calendar',
     '/signin',
     '/signup?redirect=/home',
+    '/forgot-password',
     `/${'a'.repeat(2048)}`,
   ])('gives /home, and logs it, for an unsafe redirect (%j)', (value) => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});

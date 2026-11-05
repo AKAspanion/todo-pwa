@@ -3,8 +3,13 @@ import { waitForAuthReady } from '@/services/auth';
 import { errorCode, useSessionStore } from '@/stores/session';
 
 const HOME = '/home';
-/** The screens only a signed-out visitor needs: never a place to return to after signing in. */
-const SIGNED_OUT_PATHS = new Set(['/signin', '/signup']);
+/** The signed-out screens: never a place to return to after signing in. */
+const NEVER_REDIRECT_TO = new Set(['/signin', '/signup', '/forgot-password']);
+/**
+ * The screens a signed-in visit is sent away from. Forgot-password isn't one: a reset link opened
+ * on a signed-in device, and found used, offers a new link there.
+ */
+const SIGNED_IN_LEAVES = new Set(['/signin', '/signup']);
 /** A dummy origin to resolve a redirect against: anything that leaves it leaves the app. */
 const IN_APP_ORIGIN = 'http://app.invalid';
 /** Longer than any path the app has; a longer `redirect` is someone else's. */
@@ -13,7 +18,7 @@ const MAX_REDIRECT_LENGTH = 2048;
 /**
  * Where to go after signing in, from the untrusted `redirect` query: an in-app path (with its
  * query and hash), normalised, or `/home` when it is missing, points off the app, or points back
- * at sign-in or sign-up.
+ * at a signed-out screen (sign-in, sign-up, forgot-password).
  */
 export function safeRedirect(value: unknown): string {
   if (typeof value !== 'string' || value === '') return HOME;
@@ -26,7 +31,7 @@ export function safeRedirect(value: unknown): string {
     }
   }
   // `//host`, `/\host` and paths with tabs or newlines resolve to another origin: rejected here.
-  if (!url || url.origin !== IN_APP_ORIGIN || SIGNED_OUT_PATHS.has(url.pathname)) {
+  if (!url || url.origin !== IN_APP_ORIGIN || NEVER_REDIRECT_TO.has(url.pathname)) {
     console.warn('[auth] ignored an unsafe redirect');
     return HOME;
   }
@@ -54,6 +59,6 @@ export async function authGuard(to: RouteLocationNormalized): Promise<true | Rou
   if (to.meta.requireAuth) {
     return signedIn ? true : { path: '/signin', query: { redirect: to.fullPath } };
   }
-  if (signedIn && SIGNED_OUT_PATHS.has(to.path)) return safeRedirect(to.query.redirect);
+  if (signedIn && SIGNED_IN_LEAVES.has(to.path)) return safeRedirect(to.query.redirect);
   return true;
 }

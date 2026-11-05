@@ -5,16 +5,20 @@
  */
 import {
   GoogleAuthProvider,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   getRedirectResult,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithRedirect,
   signOut,
   updateProfile,
+  verifyPasswordResetCode,
   type Unsubscribe,
   type User,
 } from 'firebase/auth';
+import { authErrorCode } from '@/lib/authForm';
 import { auth } from '@/lib/firebase';
 
 /** What a redirect back from Google did: signed in, re-confirmed the user (D4), or linked. */
@@ -66,6 +70,33 @@ export async function consumeRedirectResult(): Promise<RedirectOutcome | null> {
 
 export function signOutUser(): Promise<void> {
   return signOut(auth);
+}
+
+/**
+ * Sends Firebase's reset email to the trimmed address. Resolves alike whether or not it has an
+ * account, so the screen can't be used to learn who has one (decisions/password-reset): an
+ * unknown address is swallowed without a log, since a log line would tell the two apart. Any
+ * other failure, such as `auth/too-many-requests` or `auth/network-request-failed`, rejects.
+ */
+export async function requestPasswordReset(email: string): Promise<void> {
+  try {
+    await sendPasswordResetEmail(auth, email.trim());
+  } catch (error) {
+    if (authErrorCode(error) !== 'auth/user-not-found') throw error;
+  }
+}
+
+/**
+ * The email of the account the reset code belongs to. Rejects with the Firebase error, e.g.
+ * `auth/expired-action-code`.
+ */
+export function checkResetCode(code: string): Promise<string> {
+  return verifyPasswordResetCode(auth, code);
+}
+
+/** Sets the new password for the code's account, exactly as typed. Rejects with the Firebase error. */
+export function resetPassword(code: string, newPassword: string): Promise<void> {
+  return confirmPasswordReset(auth, code, newPassword);
 }
 
 /** Saves the signed-in user's display name, trimmed. */

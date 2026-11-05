@@ -36,6 +36,8 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   phone the buttons are 240 px and a long label such as "Sign in with Google" wraps onto two lines rather than
   sticking out of the card. `.auth-btn`'s `max-width: none` in `src/assets/style.css` doesn't stop the cap, which
   Vuetify sets inline.
+- The email form links "Forgot password?" to `/forgot-password`, carrying the typed email in history state
+  ([features/password-reset](password-reset.md)).
 - The language can be switched on both screens; the menu and bottom navigation are hidden on them.
 
 ## Rules
@@ -67,6 +69,7 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 
 ## History
 
+- 2026-11-05: an email user who forgot their password had no way back in; now the email form links to a forgot-password screen, because of [decisions/password-reset](../decisions/password-reset.md).
 - 2026-11-05: only sign-up's button was capped at the card's width, and sign-in's two buttons stuck 40 px out of the card on a 360 px phone; now sign-in's buttons are capped too, because the Play Store app opens on phones that narrow.
 - 2026-11-05: Google opened a popup and redirected only where popups failed; now it always redirects, both screens pick the result up on load and reset a busy button on a back-forward cache restore, and both link to `/privacy`, because the Play app's Trusted Web Activity can't show a popup. See [decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md).
 - 2026-11-05: messages were centred and fields sat 4 px below the message above; now messages are left-aligned and fields sit 12 px apart, with sign-up's button capped at the fields' width, because the form looked congested with errors showing.

@@ -20,7 +20,7 @@ values aren't copied here and weren't read while writing it.
 - `README.md`, line 172
 - `e2e/fixtures/home.ts`, line 18
 - `e2e/support/emulator.ts`, line 28
-- `src/i18n/locales/en/auth.json`, line 22
+- `src/i18n/locales/en/auth.json`, line 40 (moved from 22 by the password-reset keys)
 - `src/lib/firebase.ts`, line 15
 
 ## Evidence

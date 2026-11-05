@@ -48,10 +48,9 @@ let wrapper: VueWrapper | null = null;
 async function mountAt(path: string): Promise<Router> {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/signin', '/signup', '/home', '/calendar', '/privacy'].map((p) => ({
-      path: p,
-      component: Blank,
-    })),
+    routes: ['/signin', '/signup', '/home', '/calendar', '/privacy', '/forgot-password'].map(
+      (p) => ({ path: p, component: Blank }),
+    ),
   });
   await router.push(path);
   await router.isReady();
@@ -83,6 +82,17 @@ function emailButton() {
     .find((b) => b.text().includes('Sign in with Email'));
   if (!button) throw new Error('no "Sign in with Email" button');
   return button;
+}
+
+function forgotLink() {
+  return mounted()
+    .findAll('a')
+    .find((a) => a.text() === 'Forgot password?');
+}
+
+async function openEmailForm(): Promise<void> {
+  await emailButton().trigger('click');
+  await flushPromises();
 }
 
 beforeEach(() => {
@@ -174,6 +184,38 @@ describe('SignInView', () => {
       'auth/network-request-failed',
     );
     expect(googleButton().classes()).not.toContain('v-btn--loading');
+  });
+
+  it('shows no "Forgot password?" link while the email form is closed', async () => {
+    await mountAt('/signin');
+
+    expect(forgotLink()).toBeUndefined();
+  });
+
+  it('"Forgot password?" opens /forgot-password with the typed email in history state, not the URL', async () => {
+    const router = await mountAt('/signin');
+    await openEmailForm();
+    await mounted().get('input[name="email"]').setValue('ann@example.com');
+    const link = forgotLink();
+    expect(link?.attributes('href')).toBe('/forgot-password');
+
+    await link!.trigger('click');
+    await flushPromises();
+
+    expect(router.currentRoute.value.fullPath).toBe('/forgot-password');
+    expect(router.options.history.state.email).toBe('ann@example.com');
+    expect(router.options.history.location).not.toContain('ann');
+  });
+
+  it('"Forgot password?" keeps the page to return to', async () => {
+    const router = await mountAt('/signin?redirect=/calendar');
+    await openEmailForm();
+
+    await forgotLink()!.trigger('click');
+    await flushPromises();
+
+    expect(router.currentRoute.value.path).toBe('/forgot-password');
+    expect(router.currentRoute.value.query.redirect).toBe('/calendar');
   });
 
   it('links "Privacy policy" to /privacy (W2)', async () => {

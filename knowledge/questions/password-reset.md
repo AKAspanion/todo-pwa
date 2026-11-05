@@ -1,7 +1,7 @@
 ---
 type: Open Question
 title: Should email users be able to reset a forgotten password?
-description: The app has no "forgot password" flow, so an email user who forgets their password can't sign in, nor reach Delete account; it is outside the agreed usability roadmap.
+description: Whether to add a "forgot password" flow, since an email user who forgot their password couldn't sign in, nor reach Delete account; answered yes, in the app.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-03T07:02:55Z
@@ -21,7 +21,7 @@ Raised on 2026-11-03 while reviewing `docs/specs/2026-11-03-data-and-account.md`
 
 ## Status
 
-Open
+Answered: yes, in the app: a "Forgot password?" link on sign-in, one neutral answer for every email, and an in-app screen that sets the new password under sign-up's rule. See [decisions/password-reset](../decisions/password-reset.md).
 
 ## Sources
 
