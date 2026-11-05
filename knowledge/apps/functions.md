@@ -22,7 +22,9 @@ app's data ([domain/legacy-documents](../domain/legacy-documents.md)).
 
 TypeScript compiled to `functions/lib/`, firebase-functions (v2 API, except `deleteUserData`, which uses `firebase-functions/v1` because only v1 has an Auth user-deletion trigger) and firebase-admin, on the runtime set in
 `firebase.json` (`functions.runtime`) and `functions/package.json` (`engines.node`). Tests use Vitest against
-the Firestore emulator (`functions/vitest.config.ts`).
+the Firestore emulator (`functions/vitest.config.ts`). `@google-cloud/functions-framework` is a dependency though no
+code imports it: Google's Cloud Build refuses a pnpm functions package without it ("This project is using pnpm but you
+have not included the Functions Framework"), which the first deploy after the switch to pnpm hit on 2026-11-05.
 
 ## Entry points
 
