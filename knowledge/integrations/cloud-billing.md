@@ -19,7 +19,7 @@ never set it off; only spend already incurred does.
 
 ## Configuration
 
-- It runs as the `budget-kill-switch@` service account, which holds Project Billing Manager and nothing else.
+- It runs as the `billing-kill-switch@` service account, which holds Project Billing Manager and nothing else.
 - The budget must be connected to the topic in the console; any budget connected to it can turn billing off.
   The one-time setup, the safe test message and how to turn billing back on are in `README.md`,
   "Budget kill-switch".

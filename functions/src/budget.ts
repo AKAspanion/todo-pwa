@@ -17,7 +17,7 @@ import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 export const BUDGET_TOPIC = 'billing-budget-alerts';
 
 /** The account the function runs as; it holds Project Billing Manager and nothing else. */
-const KILL_SWITCH_SERVICE_ACCOUNT = 'budget-kill-switch@';
+const KILL_SWITCH_SERVICE_ACCOUNT = 'billing-kill-switch@';
 
 const BILLING_API = 'https://cloudbilling.googleapis.com/v1';
 
