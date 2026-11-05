@@ -1,8 +1,19 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch, type ComponentPublicInstance } from 'vue';
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+  type ComponentPublicInstance,
+} from 'vue';
 import { useI18n } from 'vue-i18n';
+import AccountSection from '@/components/profile/AccountSection.vue';
 import { vFocusOnMount } from '@/directives/focusOnMount';
-import { updateDisplayName } from '@/services/auth';
+import { authErrorCode, authErrorKey } from '@/lib/authForm';
+import { consumeRedirectResult, updateDisplayName } from '@/services/auth';
 import { httpsPhotoUrl } from '@/lib/photo';
 import { LABEL_NAME_MAX } from '@/services/labels';
 import { useLabelsStore } from '@/stores/labels';
@@ -165,6 +176,30 @@ watch(
   },
   { immediate: true },
 );
+
+// Back from Google's re-confirmation (D4)
+
+const accountSection = useTemplateRef<InstanceType<typeof AccountSection>>('accountSection');
+
+/**
+ * D4: a load that Google's redirect brought back. A re-authentication of the signed-in user opens
+ * the delete dialog confirmed; a refusal opens it unconfirmed with the reason. A sign-in, or a
+ * result for another user, opens nothing. The result is read once, so a later load finds none.
+ */
+onMounted(async () => {
+  try {
+    const outcome = await consumeRedirectResult();
+    const uid = session.user?.uid;
+    if (outcome?.operation === 'reauthenticate' && uid && outcome.user.uid === uid) {
+      accountSection.value?.openDialog(true, null);
+    }
+  } catch (error) {
+    const code = authErrorCode(error);
+    console.warn('[profile] Google re-confirmation failed:', code || 'unknown');
+    const key = code === 'auth/user-mismatch' ? 'profile.delete.userMismatch' : authErrorKey(error);
+    if (key) accountSection.value?.openDialog(false, key);
+  }
+});
 </script>
 
 <template>
@@ -339,6 +374,11 @@ watch(
                 </v-list>
               </v-card>
             </div>
+          </div>
+
+          <!-- D1: the Account card, below the labels, as wide as they are. -->
+          <div class="d-flex justify-center">
+            <AccountSection ref="accountSection" class="profile__labels pt-0" />
           </div>
         </div>
       </div>

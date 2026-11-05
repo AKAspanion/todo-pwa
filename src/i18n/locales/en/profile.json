@@ -18,5 +18,27 @@
     "error": "Error creating label",
     "loadError": "Couldn't load your data. Try again.",
     "retry": "Retry"
+  },
+  "account": {
+    "title": "Account",
+    "privacy": "Privacy policy"
+  },
+  "delete": {
+    "button": "Delete account",
+    "title": "Delete your account?",
+    "body": "Every task, label, reminder and push device of this account will be deleted. This can't be undone.",
+    "howItWorks": "How deletion works",
+    "password": "Password",
+    "confirmPassword": "Confirm",
+    "google": "Continue with Google",
+    "confirmed": "Confirmed. Now type DELETE.",
+    "type": "Type DELETE to confirm",
+    "confirm": "Delete account",
+    "cancel": "Cancel",
+    "wrongPassword": "That password is wrong.",
+    "userMismatch": "That Google account isn't the one you're signed in with.",
+    "again": "Please confirm it's you again.",
+    "failed": "Couldn't delete your account. Try again.",
+    "done": "Your account was deleted."
   }
 }
