@@ -1,7 +1,7 @@
 ---
 type: Integration
 title: Firebase (Auth, Firestore, Hosting, emulators)
-description: The whole backend — Auth for sign-in, Firestore for data, Hosting for the site — with the Emulator Suite on the project's own ports for development and tests.
+description: The whole backend — Auth for sign-in, Firestore for data, Hosting for the site — with the Emulator Suite on the project's own ports and its UI for development and tests.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-02T19:14:37Z
@@ -27,7 +27,10 @@ verified: human:panditankit1995@gmail.com
   `demo-todo`, never a real one. The emulator ports are set only in `firebase.json` (`emulators`); `vite.config.ts`
   reads them at build time, and `FIREBASE_AUTH_EMULATOR_HOST` / `FIRESTORE_EMULATOR_HOST` win when
   `firebase emulators:exec` sets them. Why the ports aren't Firebase's defaults:
-  [decisions/non-default-emulator-ports](../decisions/non-default-emulator-ports.md).
+  [decisions/non-default-emulator-ports](../decisions/non-default-emulator-ports.md), and where the whole port block
+  sits: [decisions/local-port-block](../decisions/local-port-block.md).
+- The Emulator UI is on (`firebase.json`, `emulators.ui`). `pnpm dev` keeps the emulator data between runs; the test
+  scripts start their own empty emulators ([decisions/dev-starts-emulators](../decisions/dev-starts-emulators.md)).
 
 ## Failure modes
 
@@ -37,6 +40,10 @@ verified: human:panditankit1995@gmail.com
   ([project/conventions](../project/conventions.md)).
 - If billing is unlinked by the kill-switch, Firestore and Hosting fall to the no-cost limits
   ([integrations/cloud-billing](cloud-billing.md)).
+
+## History
+
+- 2026-11-05: was no Emulator UI and emulators empty each run; now the UI is on and `pnpm dev` keeps data, because the developer asked for browsable, persistent local data.
 
 ## Sources
 
