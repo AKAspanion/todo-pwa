@@ -62,6 +62,7 @@ verified: human:panditankit1995@gmail.com
 
 ## Sources
 
+- `functions/src/deleteUserData.ts`
 - `./eslint.config.js`
 - `./.prettierrc.json`
 - `./.prettierignore`
