@@ -117,6 +117,35 @@ describe('authGuard', () => {
     expect(await authGuard(to(path))).toBe('/home');
   });
 
+  it.each([
+    ['/privacy', 'privacy'],
+    ['/delete-account', 'delete-account'],
+  ])('routes %s to its own public page, with no menu and no bottom bar (W1)', (path, name) => {
+    const location = to(path);
+
+    expect(location.name).toBe(name);
+    expect(location.meta.requireAuth).toBeUndefined();
+    expect(location.meta.nav).toBeUndefined();
+  });
+
+  it.each(['/privacy', '/delete-account'])(
+    'lets a signed-out visit to %s through (W1)',
+    async (path) => {
+      signedOut();
+
+      expect(await authGuard(to(path))).toBe(true);
+    },
+  );
+
+  it.each(['/privacy', '/delete-account'])(
+    'lets a signed-in visit to %s through, with no redirect (W1)',
+    async (path) => {
+      signedIn();
+
+      expect(await authGuard(to(path))).toBe(true);
+    },
+  );
+
   it('sends a signed-in visit to /signin?redirect=/calendar on to /calendar', async () => {
     signedIn();
 

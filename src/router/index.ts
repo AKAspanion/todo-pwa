@@ -48,6 +48,13 @@ export const routes: RouteRecordRaw[] = [
   },
   { path: '/signin', name: 'signin', component: () => import('@/views/SignInView.vue') },
   { path: '/signup', name: 'signup', component: () => import('@/views/SignUpView.vue') },
+  // W1: public to anyone, signed in or not; no meta, so neither the menu nor the bottom bar shows.
+  { path: '/privacy', name: 'privacy', component: () => import('@/views/PrivacyView.vue') },
+  {
+    path: '/delete-account',
+    name: 'delete-account',
+    component: () => import('@/views/DeleteAccountInfoView.vue'),
+  },
   { path: '/:pathMatch(.*)*', redirect: '/home' },
 ];
 
