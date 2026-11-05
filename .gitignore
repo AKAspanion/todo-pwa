@@ -43,17 +43,18 @@ firebase-debug.log
 *.sln
 *.sw?
 
+# Android (TWA, spec A3): the signing keystore and the built, signed packages never enter git;
+# only twa-manifest.json and the project Bubblewrap generates from it are tracked
+*.keystore
+*.jks
+signing-key-info.txt
 *.apk
 *.aab
-signing-key-info.txt
-*.keystore
-
-# Android (TWA) build outputs and Gradle caches: the source and its Readme stay tracked
-packages/android/source/.gradle/
-packages/android/source/build/
-packages/android/source/app/build/
-packages/android/source/local.properties
 *.idsig
+packages/android/app/build/
+packages/android/build/
+packages/android/.gradle/
+packages/android/local.properties
 
 # Local tooling: Claude Code worktrees and the ga run workspace
 .claude/worktrees/
