@@ -59,7 +59,6 @@ describe('twa-manifest.json (A2)', () => {
     ['orientation', 'default'],
     ['fallbackType', 'customtabs'],
     ['enableNotifications', true],
-    ['signingKey', { path: './android.keystore', alias: 'android' }],
     ['appVersionCode', 1],
     ['appVersionName', '1.0.0'],
     // Bubblewrap reads the version name from appVersion, and writes both.
@@ -67,8 +66,17 @@ describe('twa-manifest.json (A2)', () => {
     ['fullScopeUrl', 'https://todo.spanion.in/'],
     ['generatorApp', 'bubblewrap-cli'],
     ['shortcuts', []],
+    ['minSdkVersion', 24],
+    ['splashScreenFadeOutDuration', 300],
   ])('sets %s', (field, value) => {
     expect(manifest[field]).toEqual(value);
+  });
+
+  // The key's absolute path: Bubblewrap doesn't expand a ~. The alias is the developer's, so it isn't pinned.
+  it('signs with the upload key kept outside the repository', () => {
+    const key = manifest.signingKey as { path: string; alias: string };
+    expect(key.path).toBe('/Users/ankitkumarpandit/keys/task-manager/signing.keystore');
+    expect(typeof key.alias).toBe('string');
   });
 
   it('never falls back to a WebView, where Google refuses sign-in', () => {
@@ -94,6 +102,20 @@ describe('the generated project (A1, A2)', () => {
     expect(gradle).toContain("fallbackType: 'customtabs'");
   });
 
+  // androidbrowserhelper 2.7.4 declares minSdk 24; Bubblewrap's default of 21 fails the manifest merge.
+  it('supports no Android older than the TWA library does, and compiles against API 36', () => {
+    const sdk = (key: string) => Number(new RegExp(`${key}\\s+(\\d+)`).exec(gradle)?.[1]);
+    expect(sdk('minSdkVersion')).toBeGreaterThanOrEqual(24);
+    expect(sdk('targetSdkVersion')).toBeGreaterThanOrEqual(36);
+    expect(sdk('compileSdkVersion')).toBeGreaterThanOrEqual(36);
+  });
+
+  // Bubblewrap writes an empty value for a field it wasn't given, and Gradle then fails to compile.
+  it('has no value Bubblewrap left empty', () => {
+    expect(gradle).not.toMatch(/:\s*,/);
+    expect(gradle).toMatch(/versionName "\d+\.\d+\.\d+"/);
+  });
+
   it('leaves nothing of the PWABuilder project', () => {
     expect(existsSync(join(android, 'source'))).toBe(false);
     expect(existsSync(join(android, 'Readme.html'))).toBe(false);
@@ -101,6 +123,65 @@ describe('the generated project (A1, A2)', () => {
       .filter((path) => read(path).includes(OLD_PACKAGE) || path.includes('spanion_todo'))
       .map((path) => relative(root, path));
     expect(naming).toEqual([]);
+  });
+});
+
+// Chrome 152+ checks that the sender holds a grant on the splash URI; the library never grants it to itself
+// (GoogleChrome/android-browser-helper#623), so LauncherActivity does it before the launch starts.
+describe('LauncherActivity.java', () => {
+  const java = read(
+    join(
+      android,
+      'app',
+      'src',
+      'main',
+      'java',
+      'in',
+      'spanion',
+      'todo',
+      'pwa',
+      'LauncherActivity.java',
+    ),
+  );
+  const grantBody =
+    /private void grantSplashUriPermission\(\)\s*\{([\s\S]*?)\n    \}\n/.exec(java)?.[1] ?? '';
+
+  it('grants the splash URI before super.onCreate(', () => {
+    const grantCall = java.indexOf('grantSplashUriPermission();');
+    expect(grantCall).toBeGreaterThan(-1);
+    expect(grantCall).toBeLessThan(java.indexOf('super.onCreate('));
+  });
+
+  it('grants the app itself read and persistable access', () => {
+    expect(grantBody).toContain('grantUriPermission(');
+    expect(grantBody).toContain('getPackageName()');
+    expect(grantBody).toContain('Intent.FLAG_GRANT_READ_URI_PERMISSION');
+    expect(grantBody).toContain('Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION');
+  });
+
+  it('builds the URI from the provider authority and the splash file under getFilesDir()', () => {
+    expect(grantBody).toContain('FileProvider.getUriForFile');
+    expect(grantBody).toContain('getString(R.string.providerAuthority)');
+    expect(grantBody).toContain('getFilesDir()');
+    expect(grantBody).toContain('twa_splash/splash_image.png');
+  });
+
+  it('logs a failure with Log.w and lets the launch go on', () => {
+    expect(grantBody).toMatch(/try\s*\{[\s\S]*\}\s*catch\s*\(Exception \w+\)\s*\{[\s\S]*Log\.w\(/);
+  });
+});
+
+describe('root package.json scripts', () => {
+  const scripts = (readJson(join(root, 'package.json')) as { scripts: Record<string, string> })
+    .scripts;
+
+  it('regenerates and builds the project with Bubblewrap 1.27.0 from packages/android', () => {
+    expect(scripts['twa:update']).toBe(
+      'cd packages/android && npx --yes @bubblewrap/cli@1.27.0 update --skipVersionUpgrade',
+    );
+    expect(scripts['twa:build']).toBe(
+      'cd packages/android && npx --yes @bubblewrap/cli@1.27.0 build',
+    );
   });
 });
 

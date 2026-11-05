@@ -17,7 +17,7 @@
   "maskableIconUrl": "https://todo.spanion.in/img/icons/maskable-icon-512x512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
-    "path": "./android.keystore",
+    "path": "/Users/ankitkumarpandit/keys/task-manager/signing.keystore",
     "alias": "android"
   },
   "appVersionName": "1.0.0",
@@ -34,7 +34,7 @@
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://todo.spanion.in/",
-  "minSdkVersion": 21,
+  "minSdkVersion": 24,
   "orientation": "default",
   "fingerprints": [],
   "additionalTrustedOrigins": [],
