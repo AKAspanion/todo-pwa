@@ -1,6 +1,7 @@
 import type { User } from 'firebase/auth';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { deleteCurrentUser } from '@/services/account';
 import { onUserChanged, signOutUser } from '@/services/auth';
 import type { SessionUser } from '@/types/models';
 import { useLabelsStore } from './labels';
@@ -33,8 +34,9 @@ export function requireUid(): string {
 }
 
 /**
- * The signed-in user, and sign-out. Signing out, or Firebase reporting another user (or none),
- * clears every per-user store, so the next account never sees the last one's data (D13).
+ * The signed-in user, sign-out and account deletion. Signing out, deleting the account, or
+ * Firebase reporting another user (or none), clears every per-user store, so the next account
+ * never sees the last one's data (D13).
  */
 export const useSessionStore = defineStore('session', () => {
   const user = ref<SessionUser | null>(null);
@@ -67,11 +69,9 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   /**
-   * Runs each sign-out hook in turn (a failing hook is logged and doesn't stop sign-out), signs
-   * out, then clears all per-user state. If signing out itself fails, nothing is cleared and the
-   * error reaches the caller.
+   * Runs every sign-out hook in turn; a failing hook is logged by code and doesn't stop the rest.
    */
-  async function signOut(): Promise<void> {
+  async function runSignOutHooks(): Promise<void> {
     for (const hook of signOutHooks) {
       try {
         await hook();
@@ -79,10 +79,30 @@ export const useSessionStore = defineStore('session', () => {
         console.warn('[session] a sign-out hook failed:', errorCode(error));
       }
     }
+  }
+
+  /**
+   * Runs the sign-out hooks, signs out, then clears all per-user state. If signing out itself
+   * fails, nothing is cleared and the error reaches the caller.
+   */
+  async function signOut(): Promise<void> {
+    await runSignOutHooks();
     await signOutUser();
     clearPerUserState();
     user.value = null;
   }
 
-  return { user, ready, start, signOut, onSignOut };
+  /**
+   * D5: runs the sign-out hooks while still signed in (they turn push off for this browser),
+   * deletes the Firebase Auth user, then clears every per-user store and the user. If the delete
+   * fails (`auth/requires-recent-login`, say), nothing is cleared and the error reaches the caller.
+   */
+  async function deleteAccount(): Promise<void> {
+    await runSignOutHooks();
+    await deleteCurrentUser();
+    clearPerUserState();
+    user.value = null;
+  }
+
+  return { user, ready, start, signOut, onSignOut, runSignOutHooks, deleteAccount };
 });

@@ -1,6 +1,7 @@
 import type { User } from 'firebase/auth';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { deleteCurrentUser } from '@/services/account';
 import { onUserChanged, signOutUser } from '@/services/auth';
 import { useLabelsStore } from './labels';
 import { useNotificationsStore } from './notifications';
@@ -13,6 +14,7 @@ vi.mock('@/services/auth', () => ({
   onUserChanged: vi.fn(),
   signOutUser: vi.fn(),
 }));
+vi.mock('@/services/account', () => ({ deleteCurrentUser: vi.fn() }));
 vi.mock('@/services/tasks', () => ({
   listTasks: vi.fn(),
   createTask: vi.fn(),
@@ -77,6 +79,8 @@ describe('session store', () => {
     vi.mocked(onUserChanged).mockReset();
     vi.mocked(signOutUser).mockReset();
     vi.mocked(signOutUser).mockResolvedValue();
+    vi.mocked(deleteCurrentUser).mockReset();
+    vi.mocked(deleteCurrentUser).mockResolvedValue();
   });
 
   it('subscribes once, and becomes ready with the user Firebase reports', () => {
@@ -150,5 +154,93 @@ describe('session store', () => {
     listener({ ...alice, uid: 'bob' } as unknown as User);
 
     expectPerUserStateCleared();
+  });
+
+  it('runSignOutHooks runs every hook in turn, logging a failing one by its code only', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const order: string[] = [];
+    const session = useSessionStore();
+    session.onSignOut(() => {
+      order.push('hook 1');
+      throw Object.assign(new Error('secret-ish detail'), {
+        code: 'messaging/token-unsubscribe-failed',
+      });
+    });
+    session.onSignOut(() => {
+      order.push('hook 2');
+    });
+
+    await session.runSignOutHooks();
+
+    expect(order).toEqual(['hook 1', 'hook 2']);
+    expect(warn).toHaveBeenCalledWith(
+      '[session] a sign-out hook failed:',
+      'messaging/token-unsubscribe-failed',
+    );
+    expect(signOutUser).not.toHaveBeenCalled();
+  });
+
+  describe('deleteAccount (D5)', () => {
+    it('runs every hook, then deleteCurrentUser, then clears all per-user state and the user', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const order: string[] = [];
+      const session = useSessionStore();
+      session.onSignOut(async () => {
+        await Promise.resolve();
+        order.push('hook 1');
+      });
+      session.onSignOut(() => {
+        order.push('hook 2');
+      });
+      vi.mocked(deleteCurrentUser).mockImplementation(async () => {
+        order.push('deleteCurrentUser');
+        expect(useTasksStore().tasks).toEqual([task]);
+      });
+
+      await session.deleteAccount();
+
+      expect(order).toEqual(['hook 1', 'hook 2', 'deleteCurrentUser']);
+      expectPerUserStateCleared();
+      expect(session.user).toBeNull();
+      expect(signOutUser).not.toHaveBeenCalled();
+    });
+
+    it('still deletes when a hook throws, and logs the hook’s failure by code', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const session = useSessionStore();
+      session.onSignOut(() => {
+        throw new TypeError('token delete failed');
+      });
+
+      await session.deleteAccount();
+
+      expect(deleteCurrentUser).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'TypeError');
+      expectPerUserStateCleared();
+      expect(session.user).toBeNull();
+    });
+
+    it('rejects with auth/requires-recent-login and clears nothing when the delete fails', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      vi.mocked(deleteCurrentUser).mockRejectedValue(
+        Object.assign(new Error('recent login needed'), { code: 'auth/requires-recent-login' }),
+      );
+      const session = useSessionStore();
+
+      await expect(session.deleteAccount()).rejects.toMatchObject({
+        code: 'auth/requires-recent-login',
+      });
+
+      expect(useTasksStore().tasks).toEqual([task]);
+      expect(useUiStore().snack).not.toBeNull();
+      expect(session.user).toEqual(alice);
+    });
   });
 });

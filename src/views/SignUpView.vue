@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
@@ -7,7 +7,7 @@ import type { VForm } from 'vuetify/components';
 import AppLogo from '@/components/layout/AppLogo.vue';
 import { authErrorCode, authErrorKey, isEmailAddress, isStrongPassword } from '@/lib/authForm';
 import { safeRedirect } from '@/router/guard';
-import { signInWithGoogle, signUpEmail } from '@/services/auth';
+import { consumeRedirectResult, signInWithGoogle, signUpEmail } from '@/services/auth';
 import { useUiStore, type Locale } from '@/stores/ui';
 
 const { t } = useI18n();
@@ -88,19 +88,28 @@ async function submitEmail(): Promise<void> {
   }
 }
 
+/** G1: the page leaves for Google, so the button stays busy unless the redirect can't start. */
 async function signUpGoogle(): Promise<void> {
   if (busy.value) return;
   busy.value = 'google';
   errorKey.value = null;
   try {
-    // null: popups are unavailable and the page is leaving for Google's redirect.
-    if (await signInWithGoogle()) await finish();
+    await signInWithGoogle();
   } catch (error) {
     fail('Google sign-up', error);
-  } finally {
     busy.value = null;
   }
 }
+
+onMounted(async () => {
+  // G2: back from Google's redirect, a sign-in goes where sign-in goes; an error is shown here.
+  try {
+    const outcome = await consumeRedirectResult();
+    if (outcome?.operation === 'signIn') await finish();
+  } catch (error) {
+    fail('Google redirect sign-up', error);
+  }
+});
 </script>
 
 <template>
@@ -231,6 +240,11 @@ async function signUpGoogle(): Promise<void> {
           <router-link class="auth-link text-caption" :to="signInLink">{{
             t('auth.signUp.signInLink')
           }}</router-link>
+          <div class="pt-2">
+            <router-link class="auth-link text-caption" to="/privacy">{{
+              t('auth.privacyLink')
+            }}</router-link>
+          </div>
         </v-card-text>
 
         <v-btn-toggle
