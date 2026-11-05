@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import type { VForm } from 'vuetify/components';
 import AppLogo from '@/components/layout/AppLogo.vue';
-import { authErrorCode, authErrorKey, isStrongPassword } from '@/lib/authForm';
+import { authErrorCode, authErrorKey, isEmailAddress, isStrongPassword } from '@/lib/authForm';
 import { safeRedirect } from '@/router/guard';
 import { signInWithGoogle, signUpEmail } from '@/services/auth';
 import { useUiStore, type Locale } from '@/stores/ui';
@@ -37,7 +37,10 @@ const density = computed(() => (xs.value ? 'compact' : 'default'));
 
 /** Any address Firebase accepts is accepted: Firebase itself judges the format (D14). */
 const rules = {
-  email: [(v: string) => v.trim() !== '' || t('auth.rules.emailRequired')],
+  email: [
+    (v: string) => v.trim() !== '' || t('auth.rules.emailRequired'),
+    (v: string) => isEmailAddress(v.trim()) || t('auth.rules.emailInvalid'),
+  ],
   password: [
     (v: string) => v !== '' || t('auth.rules.passwordEnter'),
     (v: string) => isStrongPassword(v) || t('auth.rules.passwordStrength'),
@@ -111,7 +114,7 @@ async function signUpGoogle(): Promise<void> {
         </div>
 
         <v-card-text class="auth-form">
-          <v-form ref="form" validate-on="submit" @submit.prevent="submitEmail">
+          <v-form ref="form" validate-on="invalid-input" @submit.prevent="submitEmail">
             <v-card-text class="px-0 pb-0">
               <v-row class="gr-1">
                 <v-col cols="12" class="py-0">
@@ -188,19 +191,18 @@ async function signUpGoogle(): Promise<void> {
                 </v-col>
               </v-row>
             </v-card-text>
-            <v-card-actions class="px-0 py-4">
+            <div>
               <v-btn
                 type="submit"
+                width="280"
                 size="large"
-                block
-                color="primary"
                 class="auth-btn"
                 :loading="busy === 'email'"
                 :disabled="busy === 'google'"
               >
                 {{ t('auth.signUp.submit') }}
               </v-btn>
-            </v-card-actions>
+            </div>
           </v-form>
         </v-card-text>
 
@@ -209,7 +211,7 @@ async function signUpGoogle(): Promise<void> {
           <div>
             <span class="pa-1">
               <v-btn
-                size="large"
+                size="small"
                 icon
                 variant="text"
                 :aria-label="t('auth.signUp.google')"

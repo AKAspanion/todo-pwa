@@ -10,7 +10,7 @@ import heartIcon from '@/assets/heart-icon.png';
 import { useSessionStore } from '@/stores/session';
 import { useUiStore, type Locale } from '@/stores/ui';
 
-const AUTHOR_URL = 'https://www.spanion.xyz';
+const AUTHOR_URL = 'https://spanion.in';
 
 const { t } = useI18n();
 const { smAndUp } = useDisplay();

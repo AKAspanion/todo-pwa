@@ -47,3 +47,12 @@ export function isStrongPassword(password: string): boolean {
     /\p{Nd}/u.test(password)
   );
 }
+
+/**
+ * An email shaped `name@site.tld`: no whitespace, one `@`, something before it, and a domain with a dot
+ * that is neither its first nor last character. Stricter than Firebase on one point, a domain with no dot
+ * (decisions/email-format-check); otherwise any characters and any top-level domain length (D14).
+ */
+export function isEmailAddress(email: string): boolean {
+  return /^[^\s@]+@[^\s@.][^\s@]*\.[^\s@]*[^\s@.]$/u.test(email);
+}

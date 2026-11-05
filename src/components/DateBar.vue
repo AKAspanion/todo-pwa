@@ -145,7 +145,6 @@ function onPick(value: unknown): void {
 }
 .date-bar__day {
   flex: 0 0 auto;
-  color: rgba(0, 0, 0, 0.87);
   text-transform: none;
   letter-spacing: normal;
   font-size: 0.75rem;

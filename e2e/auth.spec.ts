@@ -417,7 +417,7 @@ test.describe('app menu', () => {
     await openMenu(page);
     const author = page.getByRole('link', { name: EN.menu.author });
 
-    await expect(author).toHaveAttribute('href', 'https://www.spanion.xyz');
+    await expect(author).toHaveAttribute('href', 'https://spanion.in');
     await expect(author).toHaveAttribute('target', '_blank');
     await expect(author).toHaveAttribute('rel', 'noopener noreferrer');
   });

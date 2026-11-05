@@ -27,13 +27,17 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   rewrite's, kept in the old style.
 - Both cards show the app logo at the top, above the "Task Manager" title, an exception to the old look
   ([decisions/app-logo](../decisions/app-logo.md)). The sign-up fields have a 4 px row gap (`gr-1`), so they sit
-  as far apart as sign-in's, not further.
+  as far apart as sign-in's, not further. Sign-up's submit button is drawn like sign-in's "Sign in with Email" button
+  (elevated primary, `width="280"`, `size="large"`) without its icon, and sits outside `v-card-actions`, whose
+  defaults would turn it into a text button.
 - The language can be switched on both screens; the menu and bottom navigation are hidden on them.
 
 ## Rules
 
-- Sign-up accepts any email address Firebase accepts, and a password of at least `PASSWORD_MIN_LENGTH`
-  characters with a letter and a digit (`isStrongPassword` in `src/lib/authForm.ts`, spec D14).
+- Sign-in and sign-up accept an email shaped `name@site.tld` (`isEmailAddress` in `src/lib/authForm.ts`), and
+  sign-up a password of at least `PASSWORD_MIN_LENGTH` characters with a letter and a digit (`isStrongPassword`,
+  spec D14). Each field's error shows under it once the field loses focus, then updates as the user types
+  ([decisions/email-format-check](../decisions/email-format-check.md)).
 - Google opens a popup; where popups are blocked or unsupported (some installed PWAs) it redirects instead,
   and the sign-in screen picks the result up when the page comes back (`signInWithGoogle` and
   `consumeRedirectResult` in `src/services/auth.ts`).
@@ -51,6 +55,7 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 
 ## History
 
+- 2026-11-05: sign-up accepted any email Firebase accepts and both forms showed errors only on submit, a malformed email only in a snackbar; now both forms require `name@site.tld` and show each error under its field as the user goes, because the developer asked for inline validation. See [decisions/email-format-check](../decisions/email-format-check.md).
 - 2026-11-05: the cards had no logo and the sign-up fields sat 46 px apart; now both cards show the logo above the title and sign-up's fields sit 26 px apart like sign-in's, because the developer asked. See [decisions/app-logo](../decisions/app-logo.md).
 - 2026-11-05: the account menu showed the email twice and opened under the app bar, and long validation messages widened the sign-up card; now the email shows once, the menu opens above the bar and messages wrap in the field, because of the visual fixes on `fix/auth-visuals`.
 - 2026-11-04: was the rewrite's layout and text; now the old Signin's and Signup's, with the show-password eye kept, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).

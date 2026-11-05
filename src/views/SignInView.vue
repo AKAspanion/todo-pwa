@@ -6,7 +6,7 @@ import { useDisplay } from 'vuetify';
 import type { VForm } from 'vuetify/components';
 import { vFocusOnMount } from '@/directives/focusOnMount';
 import AppLogo from '@/components/layout/AppLogo.vue';
-import { authErrorCode, authErrorKey } from '@/lib/authForm';
+import { authErrorCode, authErrorKey, isEmailAddress } from '@/lib/authForm';
 import { safeRedirect } from '@/router/guard';
 import { consumeRedirectResult, signInEmail, signInWithGoogle } from '@/services/auth';
 import { useUiStore, type Locale } from '@/stores/ui';
@@ -37,7 +37,10 @@ const errorShown = computed({
 const density = computed(() => (xs.value ? 'compact' : 'default'));
 
 const rules = {
-  email: [(v: string) => v.trim() !== '' || t('auth.rules.emailRequired')],
+  email: [
+    (v: string) => v.trim() !== '' || t('auth.rules.emailRequired'),
+    (v: string) => isEmailAddress(v.trim()) || t('auth.rules.emailInvalid'),
+  ],
   password: [(v: string) => v !== '' || t('auth.rules.passwordRequired')],
 };
 
@@ -131,10 +134,10 @@ onMounted(async () => {
             </v-btn>
           </div>
           <div>
-            <v-divider class="my-1" />
             <v-expand-transition>
               <div v-if="emailOpen">
-                <v-form ref="form" validate-on="submit" @submit.prevent="submitEmail">
+                <v-divider class="my-1 mb-4" />
+                <v-form ref="form" validate-on="invalid-input" @submit.prevent="submitEmail">
                   <div class="auth-fields px-0 pb-3">
                     <v-text-field
                       v-model="email"

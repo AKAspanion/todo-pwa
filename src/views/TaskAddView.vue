@@ -180,7 +180,7 @@ onBeforeUnmount(() => {
               :aria-label="t('add.labels.loading')"
             />
             <template v-else-if="labels.error && labels.labels.length === 0">
-              <span class="text-body-2 text-error">{{ t('add.labels.loadFailed') }}</span>
+              <span class="text-body-medium text-error">{{ t('add.labels.loadFailed') }}</span>
               <v-btn size="small" variant="text" color="primary" @click="labels.load()">
                 {{ t('add.labels.retry') }}
               </v-btn>

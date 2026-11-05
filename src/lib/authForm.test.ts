@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import en from '@/i18n/locales/en/auth.json';
-import { authErrorKey, isStrongPassword } from './authForm';
+import { authErrorKey, isEmailAddress, isStrongPassword } from './authForm';
 
 const firebaseError = (code: string) => Object.assign(new Error(`Firebase: (${code}).`), { code });
 
@@ -83,4 +83,27 @@ describe('isStrongPassword (D14)', () => {
       expect(isStrongPassword(password)).toBe(false);
     },
   );
+});
+
+describe('isEmailAddress (name@site.tld)', () => {
+  it.each(['a@b.co', 'name+tag@site.info', 'first.last@sub.example.org', 'ankit@gmail.com'])(
+    'accepts %j',
+    (email) => {
+      expect(isEmailAddress(email)).toBe(true);
+    },
+  );
+
+  it.each([
+    '',
+    'ankit@gmail',
+    'ankit.gmail.com',
+    'a@@b.co',
+    'a@b@c.co',
+    'a b@c.co',
+    '@site.com',
+    'name@.com',
+    'name@site.',
+  ])('rejects %j', (email) => {
+    expect(isEmailAddress(email)).toBe(false);
+  });
 });
