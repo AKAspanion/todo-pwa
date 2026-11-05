@@ -15,8 +15,13 @@ generated:
 The steps live in `packages/android/README.md`, which is the runbook; this concept only says where each part is,
 so the two don't drift:
 
-- **Build and signing:** Bubblewrap `1.27.0` from `packages/android/twa-manifest.json`, with an upload keystore the
-  developer creates and keeps outside the repository.
+- **Build and signing:** the same pattern as the developer's flashcards app. The upload keystore, its password file
+  and the signed release files live outside the repository in `~/keys/task-manager/`; `twa-manifest.json`'s
+  `signingKey.path` names the keystore by absolute path, since Bubblewrap doesn't expand `~`. `npm run twa:update`
+  regenerates the project. A release is built either with `npm run twa:build`, or with Gradle (`bundleRelease
+  assembleRelease`) then signed by `jarsigner` and `apksigner` reading the password from its file, and saved as
+  `~/keys/task-manager/app-release-<version>-<code>.aab` and `.apk`. The Gradle route is the one that works here:
+  Bubblewrap's build refuses the Android Studio SDK at `~/Library/Android/sdk`, which has no `tools/` or `bin/`.
 - **Fingerprints:** the SHA-256 of the upload key and of Play's app-signing key go into `public/.well-known/assetlinks.json`
   and `twa-manifest.json`; until they are there the app shows a URL bar.
 - **Play Console answers:** the README lists them (privacy policy `/privacy`, account deletion `/delete-account`,
@@ -27,8 +32,16 @@ so the two don't drift:
   push to `master` and functions only by a manual run: [decisions/delete-function-deployed-by-hand-first](../decisions/delete-function-deployed-by-hand-first.md).
   See also [operations/deploy](deploy.md).
 
+## History
+
+- 2026-11-05: the developer was to create a new upload key and build with `bubblewrap build`; now the existing key in
+  `~/keys/task-manager/` is reused and releases follow the flashcards pattern (Gradle, then `jarsigner` and
+  `apksigner` with a password file), because the developer asked for that pattern and Bubblewrap's SDK check fails
+  on this machine.
+
 ## Sources
 
+- `package.json`
 - `packages/android/README.md`
 - `packages/android/twa-manifest.json`
 - `public/.well-known/assetlinks.json`

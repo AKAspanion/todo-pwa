@@ -1,14 +1,14 @@
 ---
 type: Decision
-title: The Android app is in.spanion.todo.pwa, generated with Bubblewrap
-description: The Play Store app is a Trusted Web Activity with package in.spanion.todo.pwa, made and rebuilt with the Bubblewrap CLI, opening todo.spanion.in; the never-published PWABuilder project app.web.spanion_todo.twa is removed.
+title: The Android app is in.spanion.todo.twa, generated with Bubblewrap
+description: The Play Store app is a Trusted Web Activity with package in.spanion.todo.twa, made and rebuilt with the Bubblewrap CLI, opening todo.spanion.in; the never-published PWABuilder project app.web.spanion_todo.twa is removed.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T09:20:07Z
 ---
 
-# The Android app is in.spanion.todo.pwa, generated with Bubblewrap
+# The Android app is in.spanion.todo.twa, generated with Bubblewrap
 
 ## Context
 
@@ -21,7 +21,8 @@ tool they can rerun.
 
 The developer decided on 2026-11-04:
 
-- The package name is `in.spanion.todo.pwa`.
+- The package name is `in.spanion.todo.twa` (renamed from `in.spanion.todo.pwa` on 2026-11-05, before any build was
+  uploaded, at the developer's request).
 - The project is generated and updated with the Bubblewrap CLI from a committed `twa-manifest.json`, so changing
   the app means editing that file and rerunning Bubblewrap, not hand-editing the Gradle project.
 - It opens `todo.spanion.in`, the primary address.
@@ -34,6 +35,10 @@ The developer decided on 2026-11-04:
 - A new Play listing; nothing migrates from the old package.
 - Play's rules for the listing (target API level, Digital Asset Links, account deletion, privacy policy, a 13+
   audience) are part of the same work: `docs/specs/2026-11-04-play-store-twa.md`.
+
+## History
+
+- 2026-11-05: the package name was `in.spanion.todo.pwa`; now `in.spanion.todo.twa`, because the developer asked for it before the first upload, when a package name can still change.
 
 ## Sources
 
