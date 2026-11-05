@@ -71,6 +71,10 @@ still fails on any HTTP or callable export.
 ([operations/deploy](../../knowledge/operations/deploy.md)) before the web change that shows Delete account, so no
 account is ever deleted without its data.
 
+> **2026-11-05:** the manual run deploys only from `master`, and merging deploys hosting, so for this first release
+> the developer deploys `deleteUserData` by hand from the branch before merging:
+> [decisions/delete-function-deployed-by-hand-first](../../knowledge/decisions/delete-function-deployed-by-hand-first.md).
+
 ### Public pages (English only)
 
 **W1 Routes.** `/privacy` (`PrivacyView.vue`) and `/delete-account` (`DeleteAccountInfoView.vue`) open for anyone,
