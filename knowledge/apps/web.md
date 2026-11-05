@@ -26,6 +26,8 @@ and vite-plugin-pwa (Workbox). Versions are in `package.json`; the Node version 
 
 The screens are drawn like the old Vue 2 app, on Vuetify's md2 blueprint
 ([decisions/restore-original-design](../decisions/restore-original-design.md), [design-system/tokens](../design-system/tokens.md)).
+The exception is the logo: the browser-tab favicon and the loading screen in `index.html` show the blue double tick
+([decisions/app-logo](../decisions/app-logo.md)).
 
 ## Entry points
 
@@ -48,12 +50,17 @@ bottom-navigation tab it marks. The screens are described per feature in [featur
 - [integrations/fcm](../integrations/fcm.md): push.
 - The configuration in [operations/environment](../operations/environment.md).
 
+## History
+
+- 2026-11-05: the tab icon was an up arrow and the loading screen a plain spinner; now both show the blue double tick, because the developer chose it as the logo everywhere. See [decisions/app-logo](../decisions/app-logo.md).
+
 ## Sources
 
 - `package.json`
 - `.nvmrc`
 - `.browserslistrc`
 - `index.html`
+- `public/favicon.ico`
 - `src/main.ts`
 - `src/App.vue`
 - `src/pwa/index.ts`

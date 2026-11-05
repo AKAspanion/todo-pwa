@@ -19,7 +19,7 @@ Everything else is a Vuetify component, auto-imported by `vite-plugin-vuetify` (
 - `src/components/layout/`: `AppMenu.vue` (the old ContainerMenu and top bar: home's bar, and on every other
   route a plain bar with a back arrow to `/home` and a title chip from `common.bar.*`), `AppNav.vue` (the old
   BarNav, from each route's `meta.nav`; the profile tab shows the user's photo, else `mdi-face-man`, with an
-  https-only check in `src/lib/photo.ts`), `AppSnackbar.vue` (the one snackbar, driven by `src/stores/ui.ts`).
+  https-only check in `src/lib/photo.ts`), `AppSnackbar.vue` (the one snackbar, driven by `src/stores/ui.ts`), `AppLogo.vue` (the blue double tick as a decorative inline SVG, prop `size`; an exception to the old look, see [decisions/app-logo](../decisions/app-logo.md)).
 - `src/components/tasks/`: the board, after the old TaskCard and TaskCardGrid — `TaskBoard.vue`,
   `TaskColumn.vue` (drag and drop with `vue-draggable-plus`), `TaskCard.vue`, `TaskEditForm.vue`,
   `LabelChips.vue`, and `labels.ts` helpers.
@@ -33,6 +33,7 @@ Everything else is a Vuetify component, auto-imported by `vite-plugin-vuetify` (
 
 ## History
 
+- 2026-11-05: had no logo component; now `AppLogo.vue` draws the blue double tick, because the developer chose the tick as the logo everywhere. See [decisions/app-logo](../decisions/app-logo.md).
 - 2026-11-04: was the rewrite's Material Design 3 look; now each component follows its old Vue 2 counterpart, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources
@@ -40,6 +41,7 @@ Everything else is a Vuetify component, auto-imported by `vite-plugin-vuetify` (
 - `src/components/layout/AppMenu.vue`
 - `src/components/layout/AppNav.vue`
 - `src/components/layout/AppSnackbar.vue`
+- `src/components/layout/AppLogo.vue`
 - `src/components/tasks/TaskBoard.vue`
 - `src/components/tasks/TaskColumn.vue`
 - `src/components/tasks/TaskCard.vue`

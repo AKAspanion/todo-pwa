@@ -14,8 +14,8 @@ generated:
 
 The blue double tick has been the app's icon since the 2019 "Icons changed" commit (`dbddf1c`), which replaced the
 Vue CLI starter icons. That commit gave every PWA, Apple and Windows icon the tick, but left `public/favicon.ico`,
-the browser-tab icon `index.html` links, as a blue up arrow. It also added `src/assets/logo-white.svg`, a white
-arrow, that nothing used, and left the starter `src/assets/logo.png` (the Vue logo) behind. The app's own screens
+the browser-tab icon `index.html` links, as a blue up arrow. It also added src/assets/logo-white.svg, a white
+arrow, that nothing used, and left the starter src/assets/logo.png (the Vue logo) behind. The app's own screens
 showed no logo at all, in the old app as in the rewrite.
 
 ## Decision
@@ -23,7 +23,7 @@ showed no logo at all, in the old app as in the rewrite.
 The developer chose, on 2026-11-05, to use the tick everywhere:
 
 - `public/favicon.ico` becomes the tick, so the browser tab matches the installed icon.
-- `src/assets/logo.png` and `src/assets/logo-white.svg` are deleted rather than redrawn: nothing uses them.
+- src/assets/logo.png and src/assets/logo-white.svg are deleted rather than redrawn: nothing uses them.
 - Inside the app the tick is drawn as an inline SVG component, `src/components/layout/AppLogo.vue`, so it stays
   sharp at any size. It keeps the icons' own blue, `#2196F3`, in light and dark: that is the dark theme's primary,
   and it reads on both backgrounds, while the light primary (`#1976D2`) would make it a different blue from the

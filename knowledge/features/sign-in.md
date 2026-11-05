@@ -25,6 +25,9 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 - Both screens are drawn and worded like the old Signin and Signup; failures show in a snackbar. The
   show-password eye and the password hint (which names the letter-and-digit rule the app applies) are the
   rewrite's, kept in the old style.
+- Both cards show the app logo at the top, above the "Task Manager" title, an exception to the old look
+  ([decisions/app-logo](../decisions/app-logo.md)). The sign-up fields have a 4 px row gap (`gr-1`), so they sit
+  as far apart as sign-in's, not further.
 - The language can be switched on both screens; the menu and bottom navigation are hidden on them.
 
 ## Rules
@@ -48,6 +51,7 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 
 ## History
 
+- 2026-11-05: the cards had no logo and the sign-up fields sat 46 px apart; now both cards show the logo above the title and sign-up's fields sit 26 px apart like sign-in's, because the developer asked. See [decisions/app-logo](../decisions/app-logo.md).
 - 2026-11-05: the account menu showed the email twice and opened under the app bar, and long validation messages widened the sign-up card; now the email shows once, the menu opens above the bar and messages wrap in the field, because of the visual fixes on `fix/auth-visuals`.
 - 2026-11-04: was the rewrite's layout and text; now the old Signin's and Signup's, with the show-password eye kept, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
