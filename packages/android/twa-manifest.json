@@ -18,7 +18,7 @@
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "/Users/ankitkumarpandit/keys/task-manager/signing.keystore",
-    "alias": "android"
+    "alias": "my-key-alias"
   },
   "appVersionName": "1.0.0",
   "appVersionCode": 1,
