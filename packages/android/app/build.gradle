@@ -21,7 +21,7 @@ plugins {
 }
 
 def twaManifest = [
-    applicationId: 'in.spanion.todo.pwa',
+    applicationId: 'in.spanion.todo.twa',
     hostName: 'todo.spanion.in', // The domain being opened in the TWA.
     launchUrl: '/home', // The start path for the TWA. Must be relative to the domain.
     name: 'Task Manager', // The application name.
@@ -52,9 +52,9 @@ def twaManifest = [
 
 android {
     compileSdkVersion 36
-    namespace "in.spanion.todo.pwa"
+    namespace "in.spanion.todo.twa"
     defaultConfig {
-        applicationId "in.spanion.todo.pwa"
+        applicationId "in.spanion.todo.twa"
         minSdkVersion 24
         targetSdkVersion 36
         versionCode 1

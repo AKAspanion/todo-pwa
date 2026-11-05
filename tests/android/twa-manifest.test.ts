@@ -9,7 +9,8 @@ import { describe, expect, it } from 'vitest';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const android = join(root, 'packages', 'android');
-const PACKAGE_ID = 'in.spanion.todo.pwa';
+const PACKAGE_ID = 'in.spanion.todo.twa';
+const PWA_PACKAGE = 'in.spanion.todo.pwa';
 const OLD_PACKAGE = 'app.web.spanion_todo';
 /** The developer's upload key (public certificate fingerprint; the keystore stays outside the repository). */
 const UPLOAD_KEY_FINGERPRINT =
@@ -91,7 +92,7 @@ describe('the generated project (A1, A2)', () => {
     expect(gradle).toMatch(/^\s*targetSdkVersion 36$/m);
   });
 
-  it('is the app in.spanion.todo.pwa opening todo.spanion.in', () => {
+  it('is the app in.spanion.todo.twa opening todo.spanion.in', () => {
     expect(gradle).toContain(`applicationId "${PACKAGE_ID}"`);
     expect(gradle).toContain("hostName: 'todo.spanion.in'");
   });
@@ -124,6 +125,13 @@ describe('the generated project (A1, A2)', () => {
       .map((path) => relative(root, path));
     expect(naming).toEqual([]);
   });
+
+  it('names no file under packages/android or public/.well-known by the old package', () => {
+    const naming = [...filesUnder(android), ...filesUnder(join(root, 'public', '.well-known'))]
+      .filter((path) => read(path).includes(PWA_PACKAGE) || path.includes('todo/pwa'))
+      .map((path) => relative(root, path));
+    expect(naming).toEqual([]);
+  });
 });
 
 // Chrome 152+ checks that the sender holds a grant on the splash URI; the library never grants it to itself
@@ -139,7 +147,7 @@ describe('LauncherActivity.java', () => {
       'in',
       'spanion',
       'todo',
-      'pwa',
+      'twa',
       'LauncherActivity.java',
     ),
   );
@@ -188,7 +196,7 @@ describe('root package.json scripts', () => {
 describe('assetlinks.json (A4)', () => {
   const statements = readJson(join(root, 'public', '.well-known', 'assetlinks.json'));
 
-  it('holds exactly one statement, delegating to in.spanion.todo.pwa', () => {
+  it('holds exactly one statement, delegating to in.spanion.todo.twa', () => {
     expect(statements).toEqual([
       {
         relation: ['delegate_permission/common.handle_all_urls'],

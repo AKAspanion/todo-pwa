@@ -1,6 +1,6 @@
 # Task Manager for Android
 
-The Play Store app `in.spanion.todo.pwa` is a Trusted Web Activity: it opens
+The Play Store app `in.spanion.todo.twa` is a Trusted Web Activity: it opens
 `https://todo.spanion.in/home` full-screen in the user's browser. The Bubblewrap CLI `1.27.0` generates this
 Gradle project from [`twa-manifest.json`](twa-manifest.json), and the project targets API `36`, which Play
 requires of new apps from 31 August 2026.
@@ -61,7 +61,7 @@ The password is read from a file by the signing tools, never typed into a comman
 
 The app opens full-screen, without a browser address bar, only when
 [`public/.well-known/assetlinks.json`](../../public/.well-known/assetlinks.json) lists the SHA-256
-fingerprint of the key that signed the installed app. It lists `in.spanion.todo.pwa` only; fingerprints are
+fingerprint of the key that signed the installed app. It lists `in.spanion.todo.twa` only; fingerprints are
 public, so they are committed, and nothing reads the keystore to get them.
 
 1. Read the upload key's fingerprint, the `SHA256:` line of:
@@ -73,7 +73,7 @@ public, so they are committed, and nothing reads the keystore to get them.
 2. Add it to `sha256_cert_fingerprints` in `assetlinks.json`.
 3. After the first upload, Play signs the app with its own app-signing key: in Play Console, App integrity,
    App signing, copy the app-signing key certificate's SHA-256 fingerprint and add it beside the first.
-4. Deploy the site, then check `https://todo.spanion.in` with `in.spanion.todo.pwa` and each fingerprint in
+4. Deploy the site, then check `https://todo.spanion.in` with `in.spanion.todo.twa` and each fingerprint in
    Google's [Statement List Generator and Tester](https://developers.google.com/digital-asset-links/tools/generator).
    Hosting serves the file as `application/json` (`firebase.json`).
 
