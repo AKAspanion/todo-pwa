@@ -63,9 +63,18 @@ public, so they are committed, and nothing reads the keystore to get them.
 
 ## Before the first release: deploy order
 
-Deploy the functions, with `deleteUserData`, by the manual functions run
-([knowledge/operations/deploy](../../knowledge/operations/deploy.md)) before the first hosting deploy of this
-branch, which shows Delete account (D8): no account is ever deleted without its data.
+Hosting deploys on every push to master and shows Delete account (D8), so `deleteUserData` must already be
+deployed: no account is ever deleted without its data. The manual functions run only works from master, so for
+this first release the function is deployed by hand, once, before the merge
+([decision](../../knowledge/decisions/delete-function-deployed-by-hand-first.md)):
+
+1. Before merging this branch, from a checkout of it, signed in to Firebase with your own account, run
+   `pnpm exec firebase deploy --only functions:deleteUserData --project spanion-todo`.
+2. Check `deleteUserData` is listed on the Functions page of the Firebase console.
+3. Then merge; hosting deploys on the push to master.
+
+This is a one-time step for the first release. Later function changes use the manual functions run as before
+([knowledge/operations/deploy](../../knowledge/operations/deploy.md)).
 
 ## Each release
 

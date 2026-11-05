@@ -184,7 +184,11 @@ describe('packages/android/README.md (A5)', () => {
     expect(readme).toMatch(/at least 12\s+testers\s+for\s+14\s+days/);
   });
 
-  it('deploys the functions by the manual run before the first hosting deploy (D8)', () => {
-    expect(readme).toMatch(/manual functions run[\s\S]{0,120}before the first hosting deploy/);
+  it('deploys deleteUserData by hand from the branch before merging (D8)', () => {
+    expect(readme).toContain(
+      'pnpm exec firebase deploy --only functions:deleteUserData --project spanion-todo',
+    );
+    expect(readme).toMatch(/Before merging this branch[\s\S]{0,400}pnpm exec firebase deploy/);
+    expect(readme).toContain('delete-function-deployed-by-hand-first.md');
   });
 });
