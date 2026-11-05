@@ -589,6 +589,40 @@ test.describe('accessibility and layout', () => {
     expect(await overflowing()).toEqual([]);
     expect(await pageWidth()).toBeLessThanOrEqual(390);
   });
+
+  for (const locale of ['en', 'hi'] as const) {
+    test(`at 360 px every ${locale} sign-in and sign-up button stays inside its card`, async ({
+      page,
+    }) => {
+      // 360 px is the narrowest common Android width, where the Play Store app opens.
+      await page.setViewportSize({ width: 360, height: 800 });
+      await page.addInitScript((lang) => localStorage.setItem('lang', lang), locale);
+      const s = STRINGS[locale];
+
+      /** The text of each button whose box reaches past the card's left or right edge. */
+      const outsideCard = () =>
+        page.locator('.auth-card').evaluate((card) => {
+          const box = card.getBoundingClientRect();
+          return [...card.querySelectorAll('.v-btn')]
+            .filter((b) => {
+              const r = b.getBoundingClientRect();
+              return r.width > 0 && (r.left < box.left - 0.5 || r.right > box.right + 0.5);
+            })
+            .map((b) => (b.textContent ?? '').trim());
+        });
+
+      await page.goto('/signin');
+      await expect(page.getByRole('heading', { name: s.signIn.title })).toBeVisible();
+      expect(await outsideCard()).toEqual([]);
+
+      await openEmailForm(page, s);
+      expect(await outsideCard()).toEqual([]);
+
+      await page.goto('/signup');
+      await expect(page.getByRole('heading', { name: s.signUp.title })).toBeVisible();
+      expect(await outsideCard()).toEqual([]);
+    });
+  }
 });
 
 /** The auth screen's states, in English and Hindi: the harness captures each at 390 and 1280. */
