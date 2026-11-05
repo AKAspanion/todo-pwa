@@ -21,6 +21,7 @@ interface AuthStrings {
   signIn: { title: string; google: string; email: string; submit: string; signUpLink: string };
   signUp: { title: string; google: string; submit: string };
   fields: { email: string; password: string; confirmPassword: string; showPassword: string };
+  rules: { passwordsMatch: string };
   language: { label: string; en: string; hi: string };
   menu: { label: string; open: string; darkMode: string; author: string; signOut: string };
 }
@@ -448,6 +449,40 @@ test.describe('app menu', () => {
     await expect(avatar.locator('img')).toHaveAttribute('src', 'https://photos.example/ada.png');
   });
 
+  test('an email user with no display name sees their email once in the menu', async ({ page }) => {
+    await createUser('nameless@user.info', PASSWORD);
+    await page.goto('/signin');
+    await signInWithForm(page, 'nameless@user.info', PASSWORD);
+    await expect(page).toHaveURL(/\/home$/);
+    await openMenu(page);
+
+    const firstRow = page
+      .getByRole('list', { name: EN.menu.label })
+      .locator('.v-list-item')
+      .first();
+    await expect(firstRow).toContainText('nameless@user.info');
+    const text = (await firstRow.textContent()) ?? '';
+    expect(text.split('nameless@user.info').length - 1).toBe(1);
+  });
+
+  test('the open menu sits above the app bar: nothing covers its first row', async ({ page }) => {
+    await createUser('ada@user.info', PASSWORD, 'Ada');
+    await page.goto('/signin');
+    await signInWithForm(page, 'ada@user.info', PASSWORD);
+    await expect(page).toHaveURL(/\/home$/);
+    await openMenu(page);
+
+    const avatar = page.getByRole('list', { name: EN.menu.label }).locator('.v-avatar').first();
+    await expect(avatar).toBeVisible();
+    // The avatar's top edge is where the app bar overlapped the menu.
+    const covered = await avatar.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.left + box.width / 2, box.top + 1);
+      return hit === null || !el.contains(hit);
+    });
+    expect(covered).toBe(false);
+  });
+
   test('the menu is not shown on the sign-in screen', async ({ page }) => {
     await page.goto('/signin');
 
@@ -502,6 +537,23 @@ test.describe('accessibility and layout', () => {
     await openMenu(page);
     expect(await nameViolations(page)).toEqual([]);
     expect(await unlabelledIconButtons(page)).toEqual([]);
+  });
+
+  test('the sign-up card keeps its width when a field shows its message', async ({ page }) => {
+    // Wide enough for the card to grow: at 390 px it already fills the page, and can't.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/signup');
+    const card = page.locator('.auth-card');
+    await expect(card).toBeVisible();
+    const before = (await card.boundingBox())?.width;
+
+    await page.getByLabel(EN.fields.email, { exact: true }).fill('new@user.info');
+    await page.getByLabel(EN.fields.password, { exact: true }).fill(PASSWORD);
+    await page.getByLabel(EN.fields.confirmPassword, { exact: true }).fill('not-the-same-1');
+    await page.getByRole('button', { name: EN.signUp.submit, exact: true }).click();
+    await expect(page.getByText(EN.rules.passwordsMatch)).toBeVisible();
+
+    expect((await card.boundingBox())?.width).toBe(before);
   });
 
   test("Hindi buttons don't overflow at 390 px (Review Focus 5)", async ({ page }) => {

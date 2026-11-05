@@ -32,6 +32,10 @@ function goHome(): void {
   void router.push('/home');
 }
 const name = computed(() => session.user?.displayName || session.user?.email || '');
+/** The email under the name, only when there is a name: with none, the name already is the email. */
+const subtitle = computed(() =>
+  session.user?.displayName ? (session.user.email ?? undefined) : undefined,
+);
 const initial = computed(() => [...name.value.trim()][0]?.toUpperCase() ?? '?');
 /** The profile photo, only over https (src/lib/photo.ts). */
 const photo = computed(() => httpsPhotoUrl(session.user?.photoURL));
@@ -108,7 +112,6 @@ watch(
         origin="top right"
         transition="scale-transition"
         min-width="348"
-        z-index="999"
         :close-on-content-click="false"
       >
         <template #activator="{ props: activator }">
@@ -122,7 +125,7 @@ watch(
         </template>
 
         <v-list :aria-label="t('auth.menu.label')">
-          <v-list-item :title="name" :subtitle="session.user?.email ?? undefined" class="text-left">
+          <v-list-item :title="name" :subtitle="subtitle" class="text-left">
             <template #prepend>
               <v-avatar size="40" color="primary">
                 <v-img v-if="photo" :src="photo" alt="" />

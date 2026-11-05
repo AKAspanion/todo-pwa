@@ -36,10 +36,19 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   `consumeRedirectResult` in `src/services/auth.ts`).
 - After signing in, the app goes to the `redirect` query only when it is an in-app path that isn't sign-in or
   sign-up; anything else goes to `/home` (`safeRedirect` in `src/router/guard.ts`).
-- Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`).
+- Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`). Whether
+  wrong-password and unknown-user should share one message is open
+  ([questions/sign-in-error-enumeration](../questions/sign-in-error-enumeration.md)); so is popup versus redirect
+  for Google ([questions/google-sign-in-popup-or-redirect](../questions/google-sign-in-popup-or-redirect.md)).
+- The account menu shows the email once: as the title when there is no display name, as the subtitle under the
+  name when there is one (`subtitle` in `src/components/layout/AppMenu.vue`). It keeps Vuetify's default menu
+  z-index so it opens above the app bar; a fixed high value sat under the bar and clipped the top row.
+- A field's validation message wraps inside the field rather than widening the card (the
+  `.auth-page .v-input__details` rule in `src/assets/style.css`).
 
 ## History
 
+- 2026-11-05: the account menu showed the email twice and opened under the app bar, and long validation messages widened the sign-up card; now the email shows once, the menu opens above the bar and messages wrap in the field, because of the visual fixes on `fix/auth-visuals`.
 - 2026-11-04: was the rewrite's layout and text; now the old Signin's and Signup's, with the show-password eye kept, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources
@@ -50,4 +59,5 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 - `src/services/auth.ts`
 - `src/lib/authForm.ts`
 - `src/router/guard.ts`
+- `src/assets/style.css`
 - `src/stores/session.ts`
