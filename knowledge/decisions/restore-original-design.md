@@ -38,12 +38,17 @@ wording too, chosen the same day with the second plan. The look-only part of mod
 
 - [design-system/tokens](../design-system/tokens.md) and [design-system/components](../design-system/components.md)
   change as each part is restyled.
-- The visual harness's references under `design/modernize/<screen>/refs/` become captures of the old app.
+- The visual harness's references under `design/modernize/<screen>/refs/` become captures of the old app, except
+  `design/modernize/auth/refs/`, which are captures of the new app since the logo was added to the sign-in and
+  sign-up cards ([The blue double tick is the logo everywhere](app-logo.md)).
 - The Deploy workflow stays off until the restyle is done and the developer turns it back on.
 - The specs written on 2026-11-03 for features not built yet are drawn in the old style when built (the spec's §6).
 
 ## History
 
+- 2026-11-05: every screen's references were captures of the old app; now the sign-in and sign-up ones are the
+  new app's, because the developer added the logo to those cards and tightened sign-up's fields.
+  See [app-logo](app-logo.md).
 - 2026-11-04: the old wording was the home screen's only; now every screen uses it, because the developer
   approved the second plan with it.
 - 2026-11-04: copy stayed the rewrite's on every screen; now the home screen uses the old app's wording and
