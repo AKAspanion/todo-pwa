@@ -7,7 +7,7 @@
  * `message` is a locale key, so it follows a change of language. Escape, a click outside and
  * Cancel emit `close`, except while deleting.
  */
-import { computed, ref, useId, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useId, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { authErrorCode, authErrorKey } from '@/lib/authForm';
@@ -108,6 +108,17 @@ async function confirmGoogle(): Promise<void> {
     busy.value = null;
   }
 }
+
+/**
+ * Back from Google without finishing, the browser may restore this page from its back-forward
+ * cache with the Google button still busy: it is usable again.
+ */
+function onPageShow(event: PageTransitionEvent): void {
+  if (event.persisted && busy.value === 'google') busy.value = null;
+}
+
+onMounted(() => window.addEventListener('pageshow', onPageShow));
+onUnmounted(() => window.removeEventListener('pageshow', onPageShow));
 
 /**
  * D5: deletes through the session store, then goes to /signin and says so. A stale sign-in

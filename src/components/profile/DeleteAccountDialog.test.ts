@@ -264,6 +264,22 @@ describe('DeleteAccountDialog: confirming who it is (D2, D3, D4)', () => {
     expect(button('Continue with Google').classList).toContain('v-btn--loading');
   });
 
+  it('back from Google without finishing, a page restored from the cache is usable again (I4)', async () => {
+    vi.mocked(accountProviders).mockReturnValue(['password', 'google.com']);
+    vi.mocked(confirmWithGoogle).mockResolvedValue();
+    await mountDialog();
+    await click(button('Continue with Google'));
+    expect(button('Confirm').disabled).toBe(true);
+
+    window.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }));
+    await flushPromises();
+
+    expect(button('Continue with Google').classList).not.toContain('v-btn--loading');
+    expect(button('Continue with Google').disabled).toBe(false);
+    expect(button('Confirm').disabled).toBe(false);
+    expect(button('Cancel').disabled).toBe(false);
+  });
+
   it('a Google redirect that cannot start shows its translated message and logs its code', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.mocked(accountProviders).mockReturnValue(['google.com']);

@@ -70,6 +70,10 @@ function googleButton() {
   return wrapper!.get('button[aria-label="Continue with Google"]');
 }
 
+function submitButton() {
+  return wrapper!.get('button[type="submit"]');
+}
+
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', ResizeObserverStub);
   vi.stubGlobal('visualViewport', visualViewportStub);
@@ -143,6 +147,21 @@ describe('SignUpView', () => {
     expect(signInWithGoogle).toHaveBeenCalledTimes(1);
     expect(router.currentRoute.value.fullPath).toBe('/signup?redirect=/calendar');
     expect(googleButton().classes()).toContain('v-btn--loading');
+  });
+
+  it('back from Google without finishing, a page restored from the cache is usable again (I4)', async () => {
+    vi.mocked(signInWithGoogle).mockResolvedValue();
+    await mountAt('/signup');
+    await googleButton().trigger('click');
+    await flushPromises();
+    expect(submitButton().attributes('disabled')).toBeDefined();
+
+    window.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }));
+    await flushPromises();
+
+    expect(googleButton().classes()).not.toContain('v-btn--loading');
+    expect(googleButton().attributes('disabled')).toBeUndefined();
+    expect(submitButton().attributes('disabled')).toBeUndefined();
   });
 
   it('links "Privacy policy" to /privacy (W2)', async () => {

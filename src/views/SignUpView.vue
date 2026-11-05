@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
@@ -100,6 +100,17 @@ async function signUpGoogle(): Promise<void> {
     busy.value = null;
   }
 }
+
+/**
+ * Back from Google without finishing, the browser may restore this page from its back-forward
+ * cache with the Google button still busy: it is usable again.
+ */
+function onPageShow(event: PageTransitionEvent): void {
+  if (event.persisted && busy.value === 'google') busy.value = null;
+}
+
+onMounted(() => window.addEventListener('pageshow', onPageShow));
+onUnmounted(() => window.removeEventListener('pageshow', onPageShow));
 
 onMounted(async () => {
   // G2: back from Google's redirect, a sign-in goes where sign-in goes; an error is shown here.

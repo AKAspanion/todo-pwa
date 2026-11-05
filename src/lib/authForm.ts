@@ -19,9 +19,6 @@ const ERROR_KEYS: ReadonlyMap<string, string> = new Map([
   ['auth/network-request-failed', 'auth.errors.network'],
 ]);
 
-/** The user closed or replaced the Google window: nothing went wrong, so nothing is shown. */
-const CANCELLED = new Set(['auth/popup-closed-by-user', 'auth/cancelled-popup-request']);
-
 const UNKNOWN_KEY = 'auth.errors.unknown';
 
 /** A Firebase error's `code`, or an empty string for anything else. */
@@ -30,11 +27,12 @@ export function authErrorCode(error: unknown): string {
   return typeof error.code === 'string' ? error.code : '';
 }
 
-/** The locale key that explains an auth error, or null when the user just cancelled. */
-export function authErrorKey(error: unknown): string | null {
-  const code = authErrorCode(error);
-  if (CANCELLED.has(code)) return null;
-  return ERROR_KEYS.get(code) ?? UNKNOWN_KEY;
+/**
+ * The locale key that explains an auth error. Google is only ever reached by redirect (G1), so
+ * there is no popup to close and no cancellation to keep quiet about.
+ */
+export function authErrorKey(error: unknown): string {
+  return ERROR_KEYS.get(authErrorCode(error)) ?? UNKNOWN_KEY;
 }
 
 export const PASSWORD_MIN_LENGTH = 8;

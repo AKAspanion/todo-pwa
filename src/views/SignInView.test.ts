@@ -77,6 +77,14 @@ function googleButton() {
   return button;
 }
 
+function emailButton() {
+  const button = mounted()
+    .findAll('button')
+    .find((b) => b.text().includes('Sign in with Email'));
+  if (!button) throw new Error('no "Sign in with Email" button');
+  return button;
+}
+
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', ResizeObserverStub);
   vi.stubGlobal('visualViewport', visualViewportStub);
@@ -133,6 +141,21 @@ describe('SignInView', () => {
     expect(signInWithGoogle).toHaveBeenCalledTimes(1);
     expect(router.currentRoute.value.fullPath).toBe('/signin?redirect=/calendar');
     expect(googleButton().classes()).toContain('v-btn--loading');
+  });
+
+  it('back from Google without finishing, a page restored from the cache is usable again (I4)', async () => {
+    vi.mocked(signInWithGoogle).mockResolvedValue();
+    await mountAt('/signin');
+    await googleButton().trigger('click');
+    await flushPromises();
+    expect(emailButton().attributes('disabled')).toBeDefined();
+
+    window.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }));
+    await flushPromises();
+
+    expect(googleButton().classes()).not.toContain('v-btn--loading');
+    expect(googleButton().attributes('disabled')).toBeUndefined();
+    expect(emailButton().attributes('disabled')).toBeUndefined();
   });
 
   it('shows a failed Google redirect’s translated error', async () => {
