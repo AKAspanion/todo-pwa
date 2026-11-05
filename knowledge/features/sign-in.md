@@ -47,8 +47,11 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   sign-up; anything else goes to `/home` (`safeRedirect` in `src/router/guard.ts`).
 - Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`). Whether
   wrong-password and unknown-user should share one message is open
-  ([questions/sign-in-error-enumeration](../questions/sign-in-error-enumeration.md)); so is popup versus redirect
-  for Google ([questions/google-sign-in-popup-or-redirect](../questions/google-sign-in-popup-or-redirect.md)).
+  ([questions/sign-in-error-enumeration](../questions/sign-in-error-enumeration.md)).
+- Popup versus redirect for Google was decided: redirect only, everywhere
+  ([decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md)). Task 1 of
+  `docs/plans/2026-11-04-play-store-twa.md` changes `signInWithGoogle` to it; until then the popup above is what
+  the code does.
 - The account menu shows the email once: as the title when there is no display name, as the subtitle under the
   name when there is one (`subtitle` in `src/components/layout/AppMenu.vue`). It keeps Vuetify's default menu
   z-index so it opens above the app bar; a fixed high value sat under the bar and clipped the top row.

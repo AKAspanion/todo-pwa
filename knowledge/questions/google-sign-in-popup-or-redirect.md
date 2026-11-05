@@ -21,7 +21,7 @@ Neither the decision nor the code was edited; this records the conflict. The dev
 
 ## Status
 
-Open
+Answered: redirect only; the code changes to the decision, not the other way round (the developer, 2026-11-05: Google sign-in still opening a popup is the gap to close). See [decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md).
 
 ## Sources
 
