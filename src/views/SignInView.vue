@@ -130,6 +130,7 @@ onMounted(async () => {
           <div class="py-3">
             <v-btn
               width="280"
+              max-width="100%"
               size="large"
               color="#179c52"
               class="auth-btn"
@@ -203,6 +204,7 @@ onMounted(async () => {
             <v-btn
               v-if="!emailOpen"
               width="280"
+              max-width="100%"
               size="large"
               class="auth-btn"
               :disabled="busy !== null"
@@ -217,6 +219,7 @@ onMounted(async () => {
             <v-btn
               v-else
               width="280"
+              max-width="100%"
               size="large"
               color="primary"
               class="auth-btn"
