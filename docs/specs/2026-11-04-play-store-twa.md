@@ -57,6 +57,11 @@ document and token); (2) deletes the Firebase Auth user (`deleteUser`); (3) clea
 the dialog returns to unconfirmed and says "Please confirm it's you again."; any other failure says "Couldn't
 delete your account. Try again." and nothing more happens.
 
+> **2026-11-05:** the order is now delete first: (1) deletes the Auth user; only then (2) runs the sign-out hooks
+> best-effort, never blocking or changing the outcome; (3) as above. Hooks first hung offline and turned reminders
+> off on a failed delete:
+> [decisions/delete-account-deletes-user-first](../../knowledge/decisions/delete-account-deletes-user-first.md).
+
 **D6 The function.** As part 8 D3: `deleteUserData`, on Firebase Auth's user-deletion event
 (`firebase-functions/v1` `auth.user().onDelete`; not HTTP, not callable), deletes with the Admin SDK every document
 whose `uid` is the deleted user's in `tasks`, `types` and `notifications`, every document under
