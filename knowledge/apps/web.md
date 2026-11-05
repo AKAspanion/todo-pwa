@@ -41,7 +41,8 @@ The exception is the logo: the browser-tab favicon and the loading screen in `in
 
 The routes are declared in `src/router/index.ts`: `/home`, `/calendar`, `/add`, `/notification` and `/profile`
 need a signed-in user (`meta.requireAuth`, enforced by `authGuard` in `src/router/guard.ts`); `/signin` and
-`/signup` don't. `/`, `/index` and any unknown path redirect to `/home`. Each route's `meta.nav` names the
+`/signup` don't, and neither do the public `/privacy` and `/delete-account` pages, which also show no menu or
+bottom bar ([features/legal-pages](../features/legal-pages.md)). `/`, `/index` and any unknown path redirect to `/home`. Each route's `meta.nav` names the
 bottom-navigation tab it marks. The screens are described per feature in [features](../features/index.md).
 
 ## Depends on

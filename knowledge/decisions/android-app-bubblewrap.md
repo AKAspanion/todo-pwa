@@ -37,6 +37,7 @@ The developer decided on 2026-11-04:
 
 ## Sources
 
-- `packages/android/source/app/build.gradle`
+- `packages/android/twa-manifest.json`
+- `packages/android/README.md`
 - `public/.well-known/assetlinks.json`
 - `docs/specs/2026-11-04-play-store-twa.md`

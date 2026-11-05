@@ -31,7 +31,7 @@ screen. When reminders are sent is [domain/reminder-schedule](../domain/reminder
   is disabled with a message (spec P1).
 - One foreground `onMessage` handler per page session, however often users sign in and out (spec P2).
 - Each device is one document, `users/{uid}/devices/{token}` (spec P3). It is deleted when the toggle goes
-  off, before sign-out, and when the browser's permission is found revoked. If another account's token is
+  off, before sign-out, with the account (by `deleteUserData`, not the client), and when the browser's permission is found revoked. If another account's token is
   still on this browser, it is revoked so FCM reports it dead and the server deletes it. Which user a token was
   saved for is kept in local storage under `DEVICE_STORAGE_KEY`.
 - The list is sorted on the client, not by the query, so old notifications without `createdAt` still appear
@@ -41,6 +41,7 @@ screen. When reminders are sent is [domain/reminder-schedule](../domain/reminder
 
 ## History
 
+- 2026-11-05: sign-out removed the device document and then the push token, and a failed delete stopped the token's removal; now the token is removed whatever the delete does, even offline, and after an account deletion the hook runs best-effort, because a token left behind would send reminders to the next user of the browser. See [decisions/delete-account-deletes-user-first](../decisions/delete-account-deletes-user-first.md).
 - 2026-11-04: was the rewrite's layout and text; now the old Notification's, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 
 ## Sources

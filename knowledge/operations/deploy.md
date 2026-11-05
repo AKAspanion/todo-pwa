@@ -27,6 +27,11 @@ verified: human:panditankit1995@gmail.com
 - The deploy key is written to a temporary file only inside the functions step; every `pnpm install` runs
   earlier, without it and with `--frozen-lockfile --ignore-scripts`, so no install script runs while the key is on the runner.
 
+- **`deleteUserData`'s first deploy** is by hand, from the Play Store branch, before it merges, because hosting ships
+  Delete account on the merge but functions deploy only from a manual run:
+  [decisions/delete-function-deployed-by-hand-first](../decisions/delete-function-deployed-by-hand-first.md),
+  [operations/play-store-release](play-store-release.md).
+
 ## Before the first deploy
 
 The one-time steps are in `README.md`, "Deploy & CI setup", section 3: delete the old public `testFunction`
@@ -36,6 +41,8 @@ run the data migration once ([domain/legacy-documents](../domain/legacy-document
 [integrations/cloud-billing](../integrations/cloud-billing.md).
 
 ## History
+
+- 2026-11-05: the functions deployed only from a manual run on master; now `deleteUserData` is deployed by hand once, before the Play Store branch merges, because merging would otherwise ship Delete account before the function exists. See [decisions/delete-function-deployed-by-hand-first](../decisions/delete-function-deployed-by-hand-first.md).
 
 - 2026-11-04: was every install an `npm ci`; now `pnpm install --frozen-lockfile --ignore-scripts`, because the
   project moved to pnpm; the rule that installs run before the key is unchanged.

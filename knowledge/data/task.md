@@ -10,6 +10,8 @@ verified: human:panditankit1995@gmail.com
 
 # Task
 
+A task is deleted with its owner's account (`deleteUserData`, [data/model](model.md)).
+
 ## Fields
 
 `Task` in `src/types/models.ts`; the stored set is `taskFields()` in `firestore.rules`.

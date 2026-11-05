@@ -29,7 +29,7 @@ verified: human:panditankit1995@gmail.com
 
 ## Error handling
 
-- A log names an error by its code or class name only, never its message: `errorCode` in `src/stores/session.ts` (and its twin in `functions/src/reminders.ts`).
+- A log names an error by its code or class name only, never its message: `errorCode` in `src/stores/session.ts` (and its twins in `functions/src/reminders.ts` and `functions/src/deleteUserData.ts`, which differ on numeric codes: [findings/functions-helpers-duplicated](../findings/functions-helpers-duplicated.md)).
 - A failed load keeps what is already shown and sets the store's `error` to `'load-failed'`; the screen offers Retry (`src/stores/tasks.ts`).
 - A result that arrives after the user changed is dropped: stores compare `currentUid()` before and after the call (`src/stores/tasks.ts`).
 - Saves never time out and are never retried: [decisions/saves-never-time-out](../decisions/saves-never-time-out.md).
