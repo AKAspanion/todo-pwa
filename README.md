@@ -205,8 +205,8 @@ Set it up once, before the first functions deploy that includes it:
    billing and nothing else, and turn on the Cloud Billing API:
 
    ```bash
-   gcloud iam service-accounts create budget-kill-switch --project spanion-todo --display-name "Budget kill-switch"
-   gcloud projects add-iam-policy-binding spanion-todo --member serviceAccount:budget-kill-switch@spanion-todo.iam.gserviceaccount.com --role roles/billing.projectManager
+   gcloud iam service-accounts create billing-kill-switch --project spanion-todo --display-name "Billing kill-switch"
+   gcloud projects add-iam-policy-binding spanion-todo --member serviceAccount:billing-kill-switch@spanion-todo.iam.gserviceaccount.com --role roles/billing.projectManager
    gcloud services enable cloudbilling.googleapis.com --project spanion-todo
    ```
 
@@ -214,7 +214,7 @@ Set it up once, before the first functions deploy that includes it:
    permission to deploy a function that runs as that account:
 
    ```bash
-   gcloud iam service-accounts add-iam-policy-binding budget-kill-switch@spanion-todo.iam.gserviceaccount.com --project spanion-todo --member serviceAccount:DEPLOYER_EMAIL --role roles/iam.serviceAccountUser
+   gcloud iam service-accounts add-iam-policy-binding billing-kill-switch@spanion-todo.iam.gserviceaccount.com --project spanion-todo --member serviceAccount:DEPLOYER_EMAIL --role roles/iam.serviceAccountUser
    ```
 
 3. Deploy the functions (above). The deploy creates the `billing-budget-alerts` topic.

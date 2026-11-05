@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "deploy:functions": "firebase deploy --only functions",
     "test": "sh -c 'firebase emulators:exec --project demo-todo --only auth,firestore \"vitest run $*\"' --",
     "twa:update": "cd packages/android && npx --yes @bubblewrap/cli@1.27.0 update --skipVersionUpgrade",
     "twa:build": "cd packages/android && npx --yes @bubblewrap/cli@1.27.0 build",
