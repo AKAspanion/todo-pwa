@@ -82,6 +82,23 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   /**
+   * Starts every sign-out hook without waiting for any to finish: a hook that rejects is logged by
+   * code, and one that never settles holds nothing up.
+   */
+  function startSignOutHooks(): void {
+    const logFailure = (error: unknown): void => {
+      console.warn('[session] a sign-out hook failed:', errorCode(error));
+    };
+    for (const hook of signOutHooks) {
+      try {
+        Promise.resolve(hook()).catch(logFailure);
+      } catch (error) {
+        logFailure(error);
+      }
+    }
+  }
+
+  /**
    * Runs the sign-out hooks, signs out, then clears all per-user state. If signing out itself
    * fails, nothing is cleared and the error reaches the caller.
    */
@@ -93,13 +110,15 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   /**
-   * D5: runs the sign-out hooks while still signed in (they turn push off for this browser),
-   * deletes the Firebase Auth user, then clears every per-user store and the user. If the delete
-   * fails (`auth/requires-recent-login`, say), nothing is cleared and the error reaches the caller.
+   * D5 (decisions/delete-account-deletes-user-first): deletes the Firebase Auth user first. If
+   * that fails (`auth/requires-recent-login`, a network error), no hook runs, nothing is cleared
+   * and the error reaches the caller. Once it succeeds, the sign-out hooks are started best-effort
+   * (they turn push off for this browser; `deleteUserData` erases the device document anyway) and
+   * not waited for, then every per-user store and the user are cleared.
    */
   async function deleteAccount(): Promise<void> {
-    await runSignOutHooks();
     await deleteCurrentUser();
+    startSignOutHooks();
     clearPerUserState();
     user.value = null;
   }

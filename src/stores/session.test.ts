@@ -1,4 +1,5 @@
 import type { User } from 'firebase/auth';
+import { flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { deleteCurrentUser } from '@/services/account';
@@ -180,18 +181,21 @@ describe('session store', () => {
     expect(signOutUser).not.toHaveBeenCalled();
   });
 
-  describe('deleteAccount (D5)', () => {
-    it('runs every hook, then deleteCurrentUser, then clears all per-user state and the user', async () => {
+  describe('deleteAccount (D5, decisions/delete-account-deletes-user-first)', () => {
+    function networkError(): Error {
+      return Object.assign(new Error('offline'), { code: 'auth/network-request-failed' });
+    }
+
+    it('calls deleteCurrentUser before any hook, then clears all per-user state and the user', async () => {
       const listener = startSession();
       listener(alice as unknown as User);
       fillPerUserState();
       const order: string[] = [];
       const session = useSessionStore();
-      session.onSignOut(async () => {
-        await Promise.resolve();
+      session.onSignOut(() => {
         order.push('hook 1');
       });
-      session.onSignOut(() => {
+      session.onSignOut(async () => {
         order.push('hook 2');
       });
       vi.mocked(deleteCurrentUser).mockImplementation(async () => {
@@ -201,46 +205,97 @@ describe('session store', () => {
 
       await session.deleteAccount();
 
-      expect(order).toEqual(['hook 1', 'hook 2', 'deleteCurrentUser']);
+      expect(order).toEqual(['deleteCurrentUser', 'hook 1', 'hook 2']);
       expectPerUserStateCleared();
       expect(session.user).toBeNull();
       expect(signOutUser).not.toHaveBeenCalled();
     });
 
-    it('still deletes when a hook throws, and logs the hook’s failure by code', async () => {
+    it('rejects with auth/network-request-failed, runs no hook and changes nothing', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const hook = vi.fn();
+      const session = useSessionStore();
+      session.onSignOut(hook);
+      vi.mocked(deleteCurrentUser).mockRejectedValue(networkError());
+
+      await expect(session.deleteAccount()).rejects.toMatchObject({
+        code: 'auth/network-request-failed',
+      });
+      await flushPromises();
+
+      expect(hook).not.toHaveBeenCalled();
+      expect(useTasksStore().tasks).toEqual([task]);
+      expect(useLabelsStore().labels).toHaveLength(1);
+      expect(useNotificationsStore().items).toHaveLength(1);
+      expect(useUiStore().snack).not.toBeNull();
+      expect(session.user).toEqual(alice);
+    });
+
+    it('rejects with auth/requires-recent-login, runs no hook and clears nothing', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const hook = vi.fn();
+      vi.mocked(deleteCurrentUser).mockRejectedValue(
+        Object.assign(new Error('recent login needed'), { code: 'auth/requires-recent-login' }),
+      );
+      const session = useSessionStore();
+      session.onSignOut(hook);
+
+      await expect(session.deleteAccount()).rejects.toMatchObject({
+        code: 'auth/requires-recent-login',
+      });
+      await flushPromises();
+
+      expect(hook).not.toHaveBeenCalled();
+      expect(useTasksStore().tasks).toEqual([task]);
+      expect(useUiStore().snack).not.toBeNull();
+      expect(session.user).toEqual(alice);
+    });
+
+    it('resolves and clears state even when a hook never settles', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const session = useSessionStore();
+      const pending = vi.fn(() => new Promise<void>(() => {}));
+      const after = vi.fn();
+      session.onSignOut(pending);
+      session.onSignOut(after);
+
+      await session.deleteAccount();
+
+      expect(pending).toHaveBeenCalledTimes(1);
+      expect(after).toHaveBeenCalledTimes(1);
+      expectPerUserStateCleared();
+      expect(session.user).toBeNull();
+    });
+
+    it('logs a rejecting or throwing hook by its code only, and still clears state', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const listener = startSession();
       listener(alice as unknown as User);
       fillPerUserState();
       const session = useSessionStore();
+      session.onSignOut(async () => {
+        throw Object.assign(new Error('secret-ish detail'), {
+          code: 'permission-denied',
+        });
+      });
       session.onSignOut(() => {
         throw new TypeError('token delete failed');
       });
 
       await session.deleteAccount();
 
-      expect(deleteCurrentUser).toHaveBeenCalledTimes(1);
-      expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'TypeError');
       expectPerUserStateCleared();
       expect(session.user).toBeNull();
-    });
-
-    it('rejects with auth/requires-recent-login and clears nothing when the delete fails', async () => {
-      const listener = startSession();
-      listener(alice as unknown as User);
-      fillPerUserState();
-      vi.mocked(deleteCurrentUser).mockRejectedValue(
-        Object.assign(new Error('recent login needed'), { code: 'auth/requires-recent-login' }),
-      );
-      const session = useSessionStore();
-
-      await expect(session.deleteAccount()).rejects.toMatchObject({
-        code: 'auth/requires-recent-login',
-      });
-
-      expect(useTasksStore().tasks).toEqual([task]);
-      expect(useUiStore().snack).not.toBeNull();
-      expect(session.user).toEqual(alice);
+      await vi.waitFor(() => expect(warn).toHaveBeenCalledTimes(2));
+      expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'permission-denied');
+      expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'TypeError');
+      expect(JSON.stringify(warn.mock.calls)).not.toContain('secret-ish detail');
     });
   });
 });

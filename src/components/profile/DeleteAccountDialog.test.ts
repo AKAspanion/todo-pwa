@@ -10,7 +10,12 @@ import { h } from 'vue';
 import { createMemoryHistory, createRouter, type Router } from 'vue-router';
 import { i18n } from '@/plugins/i18n';
 import { vuetify } from '@/plugins/vuetify';
-import { accountProviders, confirmWithGoogle, confirmWithPassword } from '@/services/account';
+import {
+  accountProviders,
+  confirmWithGoogle,
+  confirmWithPassword,
+  deleteCurrentUser,
+} from '@/services/account';
 import { useSessionStore } from '@/stores/session';
 import { useUiStore } from '@/stores/ui';
 import DeleteAccountDialog from './DeleteAccountDialog.vue';
@@ -145,6 +150,7 @@ beforeEach(() => {
   vi.mocked(accountProviders).mockReset().mockReturnValue(['password']);
   vi.mocked(confirmWithPassword).mockReset();
   vi.mocked(confirmWithGoogle).mockReset();
+  vi.mocked(deleteCurrentUser).mockReset();
 });
 
 afterEach(() => {
@@ -352,8 +358,32 @@ describe('DeleteAccountDialog: deleting (D5)', () => {
     expect(dialog().textContent).toContain('Confirmed. Now type DELETE.');
     expect(input('Type DELETE to confirm').disabled).toBe(false);
     expect(button('Delete account').disabled).toBe(false);
+    expect(button('Cancel').disabled).toBe(false);
     expect(router.currentRoute.value.path).toBe('/profile');
     expect(useUiStore().snack).toBeNull();
+    expect(warn).toHaveBeenCalledWith(
+      '[profile] account deletion failed:',
+      'auth/network-request-failed',
+    );
+  });
+
+  it('offline, with push on, a failed delete says so at once and leaves Delete and Cancel usable (I2)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await readyToDelete();
+    // The real store: the device-document delete would never settle offline.
+    const pushHook = vi.fn(() => new Promise<void>(() => {}));
+    useSessionStore().onSignOut(pushHook);
+    vi.mocked(deleteCurrentUser).mockRejectedValue(firebaseError('auth/network-request-failed'));
+
+    await click(button('Delete account'));
+
+    expect(dialog().textContent).toContain("Couldn't delete your account. Try again.");
+    expect(dialog().textContent).toContain('Confirmed. Now type DELETE.');
+    expect(button('Delete account').disabled).toBe(false);
+    expect(button('Delete account').classList).not.toContain('v-btn--loading');
+    expect(button('Cancel').disabled).toBe(false);
+    expect(pushHook).not.toHaveBeenCalled();
+    expect(router.currentRoute.value.path).toBe('/profile');
     expect(warn).toHaveBeenCalledWith(
       '[profile] account deletion failed:',
       'auth/network-request-failed',
