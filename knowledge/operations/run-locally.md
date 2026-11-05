@@ -26,6 +26,12 @@ verified: human:panditankit1995@gmail.com
    `.emulator-data/` keeps the emulator data between runs; delete it to reset
    ([decisions/dev-starts-emulators](../decisions/dev-starts-emulators.md)). The ports are in `firebase.json` and
    `vite.config.ts` ([decisions/local-port-block](../decisions/local-port-block.md)).
+   The Firebase CLI runs with `NODE_OPTIONS=--no-deprecation`, and Vite with it cleared: on Node 24 the Auth
+   emulator's own dependency (`exegesis` → `@apidevtools/json-schema-ref-parser@9`) calls `url.parse()`, which
+   prints `DEP0169` with a stack trace on every start. No release fixes it yet. `--disable-warning=DEP0169` is
+   not enough, because the CLI prints every warning itself (a `process.on("warning")` handler in its own
+   entry script, lib/bin/firebase.js in the firebase-tools package). Vite and the app keep their deprecation
+   warnings.
 4. `pnpm dev:app` runs Vite alone with `.env.local`, for a real project or emulators started separately. The
    app's other scripts are in `package.json` and explained in `README.md` ("Scripts"). `test`, `test:rules` and
    `e2e` start and stop their own emulators on the same ports, so they can't run while `pnpm dev` is up.
