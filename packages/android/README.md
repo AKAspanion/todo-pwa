@@ -28,6 +28,11 @@ Create the upload key where `twa-manifest.json`'s `signingKey` expects it (`./an
 keytool -genkeypair -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000
 ```
 
+**Or reuse the existing upload key.** The developer already has one, kept outside the repository with its
+passwords and alias; its fingerprint (`05:FF:05:24:…:A0:80`) is the one `assetlinks.json` lists. Copy that
+keystore here as `android.keystore`, and set `signingKey.alias` in `twa-manifest.json` to its alias, rather than
+creating a new key.
+
 The keystore and its passwords never enter the repository or a tool's output: `.gitignore` keeps out
 `*.keystore` and `*.jks`, the built `*.apk`, `*.aab` and `*.idsig`, Gradle's build output and
 `local.properties`. Keep a copy of the keystore, and its passwords, somewhere safe outside the repository.

@@ -28,8 +28,9 @@ browser. Building, signing and publishing are in [operations/play-store-release]
   signing-key fingerprints.
 - `packages/android/app/src/main/java/in/spanion/todo/pwa/LauncherActivity.java`.
 - The site proves it owns the app through `public/.well-known/assetlinks.json`, served as `application/json` by
-  `firebase.json`. It names only the new package; its fingerprint list is empty until the developer adds the
-  upload and Play signing keys' SHA-256 fingerprints. Without them the TWA shows a URL bar (spec W1).
+  `firebase.json`. It names only the new package, with the developer's existing upload key's SHA-256 fingerprint
+  (the key PWABuilder made in 2024, reused). Play's app-signing key fingerprint is added after the first upload;
+  until then a Play-installed app, which Play signs, shows a URL bar (spec W1).
 
 ## Screens and routes
 

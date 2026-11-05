@@ -11,6 +11,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const android = join(root, 'packages', 'android');
 const PACKAGE_ID = 'in.spanion.todo.pwa';
 const OLD_PACKAGE = 'app.web.spanion_todo';
+/** The developer's upload key (public certificate fingerprint; the keystore stays outside the repository). */
+const UPLOAD_KEY_FINGERPRINT =
+  '05:FF:05:24:25:81:9B:BA:C2:A8:85:AF:0B:A2:33:B1:19:E9:C1:A0:22:EF:24:D1:B8:6A:79:19:AF:BA:A0:80';
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -119,6 +122,11 @@ describe('assetlinks.json (A4)', () => {
 
   it('no longer names the old package', () => {
     expect(JSON.stringify(statements)).not.toContain(OLD_PACKAGE);
+  });
+
+  it("lists the upload key's fingerprint (A4)", () => {
+    const [statement] = statements as { target: { sha256_cert_fingerprints: string[] } }[];
+    expect(statement?.target.sha256_cert_fingerprints).toContain(UPLOAD_KEY_FINGERPRINT);
   });
 
   it('lists only SHA-256 fingerprints', () => {
