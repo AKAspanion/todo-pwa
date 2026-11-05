@@ -26,9 +26,11 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   show-password eye and the password hint (which names the letter-and-digit rule the app applies) are the
   rewrite's, kept in the old style.
 - Both cards show the app logo at the top, above the "Task Manager" title, an exception to the old look
-  ([decisions/app-logo](../decisions/app-logo.md)). The sign-up fields have a 4 px row gap (`gr-1`), so they sit
-  as far apart as sign-in's, not further. Sign-up's submit button is drawn like sign-in's "Sign in with Email" button
-  (elevated primary, `width="280"`, `size="large"`) without its icon, and sits outside `v-card-actions`, whose
+  ([decisions/app-logo](../decisions/app-logo.md)). Fields on both forms sit 12 px below the
+  message line of the field above (`gr-3` on sign-up's row, `mb-3` on sign-in's fields), so a form full of errors
+  doesn't look cramped. Sign-up's submit button is drawn like sign-in's "Sign in with Email" button (elevated
+  primary, `width="280"`, `size="large"`) without its icon, capped at the fields' width (`max-width="100%"`) so it
+  can't overflow a phone-width card, 12 px below the last field (`mt-3`), and outside `v-card-actions`, whose
   defaults would turn it into a text button.
 - The language can be switched on both screens; the menu and bottom navigation are hidden on them.
 
@@ -50,10 +52,13 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 - The account menu shows the email once: as the title when there is no display name, as the subtitle under the
   name when there is one (`subtitle` in `src/components/layout/AppMenu.vue`). It keeps Vuetify's default menu
   z-index so it opens above the app bar; a fixed high value sat under the bar and clipped the top row.
-- A field's validation message wraps inside the field rather than widening the card (the
-  `.auth-page .v-input__details` rule in `src/assets/style.css`).
+- A field's validation message wraps inside the field rather than widening the card, and is aligned to the
+  field's start rather than centred like the rest of the card (the `.auth-page .v-input__details` rule in
+  `src/assets/style.css`).
 
 ## History
+
+- 2026-11-05: messages were centred and fields sat 4 px below the message above; now messages are left-aligned and fields sit 12 px apart, with sign-up's button capped at the fields' width, because the form looked congested with errors showing.
 
 - 2026-11-05: sign-up accepted any email Firebase accepts and both forms showed errors only on submit, a malformed email only in a snackbar; now both forms require `name@site.tld` and show each error under its field as the user goes, because the developer asked for inline validation. See [decisions/email-format-check](../decisions/email-format-check.md).
 - 2026-11-05: the cards had no logo and the sign-up fields sat 46 px apart; now both cards show the logo above the title and sign-up's fields sit 26 px apart like sign-in's, because the developer asked. See [decisions/app-logo](../decisions/app-logo.md).

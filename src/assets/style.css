@@ -157,9 +157,11 @@
   border-color: rgba(var(--v-border-color), var(--v-border-opacity));
 }
 /* The card is as wide as its content, so a field's message must not add to that width: it wraps
-   inside the field instead of widening the card when it appears. */
+   inside the field instead of widening the card when it appears. It sits under the field's start,
+   not centred like the rest of the card. */
 .auth-page .v-input__details {
   contain: inline-size;
+  text-align: start;
 }
 .auth-page .auth-title {
   margin: 0;

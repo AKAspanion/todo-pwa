@@ -116,7 +116,7 @@ async function signUpGoogle(): Promise<void> {
         <v-card-text class="auth-form">
           <v-form ref="form" validate-on="invalid-input" @submit.prevent="submitEmail">
             <v-card-text class="px-0 pb-0">
-              <v-row class="gr-1">
+              <v-row class="gr-3">
                 <v-col cols="12" class="py-0">
                   <v-text-field
                     v-model="email"
@@ -191,10 +191,11 @@ async function signUpGoogle(): Promise<void> {
                 </v-col>
               </v-row>
             </v-card-text>
-            <div>
+            <div class="mt-3">
               <v-btn
                 type="submit"
                 width="280"
+                max-width="100%"
                 size="large"
                 class="auth-btn"
                 :loading="busy === 'email'"
