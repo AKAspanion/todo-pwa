@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** complete
+
 **Goal:** Put every local port in the 2120–2130 block, and make `pnpm dev` start the Auth and Firestore emulators, the Emulator UI and Vite together, with data kept between runs.
 
 **Architecture:** Configuration only. The emulator ports stay in `firebase.json`, which the app, the tests and the scripts already read. The Vite ports go in `vite.config.ts` and `playwright.config.ts`. The `dev` script wraps Vite in `firebase emulators:exec`.
@@ -62,21 +64,21 @@ None (`run.checkpoints: none`).
 - Given `vite.config.ts`, then `server.port` is `2120` and `preview.port` is `2129`, both with `strictPort: true`; and `playwright.config.ts` defaults `E2E_PORT` to `2130`.
 - Given `.emulator-data/` exists, then `git status` doesn't list it and `pnpm run format:check` doesn't read it.
 
-- [ ] **Step 1: Write the failing test**: in `e2e/shell.spec.ts`, the `emulator ports` test expects `/:2122$/` and `/:2123$/`
+- [x] **Step 1: Write the failing test**: in `e2e/shell.spec.ts`, the `emulator ports` test expects `/:2122$/` and `/:2123$/`
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npm run e2e -- e2e/shell.spec.ts -g "emulator ports" --project chromium`
 Expected: FAIL, received `127.0.0.1:9199`
 
-- [ ] **Step 3: Write the configuration**: `firebase.json`, `vite.config.ts`, `playwright.config.ts`, `package.json`, `.gitignore`, `.prettierignore`, the comment in `e2e/support/emulator.ts` and `README.md`, to the Global Constraints and the Interfaces
+- [x] **Step 3: Write the configuration**: `firebase.json`, `vite.config.ts`, `playwright.config.ts`, `package.json`, `.gitignore`, `.prettierignore`, the comment in `e2e/support/emulator.ts` and `README.md`, to the Global Constraints and the Interfaces
 
-- [ ] **Step 4: Run it to verify it passes**
+- [x] **Step 4: Run it to verify it passes**
 
 Run: `npm run e2e -- e2e/shell.spec.ts -g "emulator ports" --project chromium`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add firebase.json vite.config.ts playwright.config.ts package.json .gitignore .prettierignore e2e/support/emulator.ts e2e/shell.spec.ts README.md
