@@ -1,6 +1,8 @@
 # Play Store TWA Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Status:** complete, commits 84ab4ee..9ab6a87, 2026-11-05; record: `docs/plans/2026-11-04-play-store-twa.record.md`
+
+> **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Put the app on Google Play as `in.spanion.todo.pwa`, a Bubblewrap-built TWA, with redirect-only Google sign-in, account deletion in the app and on the web, and a public privacy policy.
 
@@ -19,10 +21,20 @@
 - §2 A1: Bubblewrap CLI `1.27.0`, run as `npx @bubblewrap/cli@1.27.0`; it is not added to any `package.json`.
 - New strings go in `src/i18n/locales/en/<namespace>.json` and `src/i18n/locales/hi/<namespace>.json` with the same keys. The text of `/privacy` and `/delete-account` is English only and lives in their components, not in the locale files ([decisions/legal-pages-english-only](../../knowledge/decisions/legal-pages-english-only.md)).
 - Comments cite this spec's ids (`G1`, `D5`, `W3`, `A2`).
+- New screens and dialogs use the restored old app's look ([decisions/restore-original-design](../../knowledge/decisions/restore-original-design.md), `knowledge/design-system/components.md`, `knowledge/design-system/tokens.md`): its cards, buttons and type, and no new colours or sizes.
+- Each `screen` task adds an end-to-end test of its flow in `e2e/`, with `resetEmulators`, `createUser` and `signInAs` from `e2e/support/emulator.ts`, so the merge request's video has the flow to record.
 
 ## Checkpoints
 
 None (`run.checkpoints: none`). The run stops only where the developer names a stop.
+
+## Review Focus
+
+- A hostile `redirect` query that survives a Google round trip (`/signin?redirect=//evil.example`): the user lands on `/home`, never off the app (Task 1).
+- A Google re-confirmation that comes back stale, or a Profile reloaded after the pickup: Delete asks to confirm again (`auth/requires-recent-login`), and a second load opens nothing; nothing is deleted silently (Task 3).
+- The network failing during Delete: "Couldn't delete your account. Try again.", the account and its data untouched, the dialog still open (Task 3).
+- `deleteUserData` failing part-way through a large account: the platform's retry deletes the rest, and a finished retry deletes nothing more (Task 4).
+- A visitor whose app language is Hindi opening `/privacy` or `/delete-account`: the English text, marked `lang="en"` (Task 2).
 
 ---
 
@@ -102,22 +114,24 @@ New key in `auth.json`:
 - `signOut` still runs the hooks, then signs out, then clears (the existing session tests pass unchanged).
 - `/signup` reads the redirect result on load: a `signIn` outcome sends the user to `safeRedirect` of the `redirect` query, as `/signin` does; a rejected result shows its translated error.
 - `/signin` and `/signup` each show a "Privacy policy" link to `/privacy`.
+- Back from Google on `/signin?redirect=//evil.example`, a `signIn` outcome goes to `/home`.
+- `/signup` loaded with no redirect result (`null`) stays on sign-up and shows no error.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `src/services/auth.test.ts`, `src/services/account.test.ts` and `src/stores/session.test.ts`. Create `src/services/account.ts` and the new store functions with their real signatures first.
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `src/services/auth.test.ts`, `src/services/account.test.ts` and `src/stores/session.test.ts`. Create `src/services/account.ts` and the new store functions with their real signatures first.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm test -- src/services/auth.test.ts src/services/account.test.ts src/stores/session.test.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Write the minimal implementation** to the Interfaces: remove the popup path and `POPUP_UNAVAILABLE` from `auth.ts`; update `SignInView.vue` and `SignUpView.vue` to the new return types, add the result pickup to `SignUpView.vue`, and add the privacy link and its strings
+- [x] **Step 3: Write the minimal implementation** to the Interfaces: remove the popup path and `POPUP_UNAVAILABLE` from `auth.ts`; update `SignInView.vue` and `SignUpView.vue` to the new return types, add the result pickup to `SignUpView.vue`, and add the privacy link and its strings
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `npm test -- src/services/auth.test.ts src/services/account.test.ts src/stores/session.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/services/auth.ts src/services/auth.test.ts src/services/account.ts src/services/account.test.ts src/stores/session.ts src/stores/session.test.ts src/views/SignInView.vue src/views/SignUpView.vue src/i18n/locales/en/auth.json src/i18n/locales/hi/auth.json
@@ -134,6 +148,7 @@ git commit -m "feat(auth): redirect-only Google sign-in and account deletion ser
 - Create: `src/views/DeleteAccountInfoView.test.ts`
 - Modify: `src/router/index.ts`
 - Modify: `src/router/guard.test.ts`
+- Create: `e2e/legal.spec.ts`
 
 **Interfaces:**
 - Consumes: existing `authGuard`; nothing from other tasks.
@@ -170,25 +185,26 @@ defineProps<{ title: string }>(); // default slot: the page's text
 - `DeleteAccountInfoView` renders the `<h1>` "Delete your Task Manager account", the words "Task Manager by Ankit Kumar Pandit", the in-app steps ending in typing `DELETE`, a "Go to Profile" link to `/profile`, the `mailto:` link above with its subject, "within 30 days", what is deleted (account, tasks, labels, reminders, push devices) and what is kept; its root has `lang="en"`.
 - With Hindi as the app language, both pages still render the English text.
 - The back button goes to `/home` when there is no previous page.
+- `e2e/legal.spec.ts`, signed out: from `/signin`, the "Privacy policy" link opens `/privacy` with no menu and no bottom bar, its "delete" link opens `/delete-account`, and "Go to Profile" leads to sign-in and, after `signInAs`, to `/profile`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `src/router/guard.test.ts`, `src/views/PrivacyView.test.ts` and `src/views/DeleteAccountInfoView.test.ts`. Create the two views and `LegalPage.vue` as empty components with their real props first.
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `src/router/guard.test.ts`, `src/views/PrivacyView.test.ts`, `src/views/DeleteAccountInfoView.test.ts` and `e2e/legal.spec.ts`. Create the two views and `LegalPage.vue` as empty components with their real props first.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
-Run: `npm test -- src/router/guard.test.ts src/views/PrivacyView.test.ts src/views/DeleteAccountInfoView.test.ts`
+Run: `npm test -- src/router/guard.test.ts src/views/PrivacyView.test.ts src/views/DeleteAccountInfoView.test.ts` and `npm run e2e -- e2e/legal.spec.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Write the minimal implementation**: the routes, `LegalPage.vue`, and the two pages' text from W3 and W4
+- [x] **Step 3: Write the minimal implementation**: the routes, `LegalPage.vue`, and the two pages' text from W3 and W4
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
-Run: `npm test -- src/router/guard.test.ts src/views/PrivacyView.test.ts src/views/DeleteAccountInfoView.test.ts`
+Run: `npm test -- src/router/guard.test.ts src/views/PrivacyView.test.ts src/views/DeleteAccountInfoView.test.ts` and `npm run e2e -- e2e/legal.spec.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add src/components/layout/LegalPage.vue src/views/PrivacyView.vue src/views/PrivacyView.test.ts src/views/DeleteAccountInfoView.vue src/views/DeleteAccountInfoView.test.ts src/router/index.ts src/router/guard.test.ts
+git add src/components/layout/LegalPage.vue src/views/PrivacyView.vue src/views/PrivacyView.test.ts src/views/DeleteAccountInfoView.vue src/views/DeleteAccountInfoView.test.ts src/router/index.ts src/router/guard.test.ts e2e/legal.spec.ts
 git commit -m "feat(legal): public privacy policy and account deletion pages"
 ```
 
@@ -200,6 +216,7 @@ git commit -m "feat(legal): public privacy policy and account deletion pages"
 - Create: `src/components/profile/DeleteAccountDialog.test.ts`
 - Create: `src/views/ProfileView.test.ts`
 - Modify: `src/views/ProfileView.vue`
+- Create: `e2e/delete-account.spec.ts`
 - Modify: `src/i18n/locales/en/profile.json`
 - Modify: `src/i18n/locales/hi/profile.json`
 
@@ -269,25 +286,27 @@ New keys in `profile.json`:
 - `deleteAccount` rejecting with `auth/requires-recent-login` returns the dialog to unconfirmed with "Please confirm it's you again."; rejecting with anything else shows "Couldn't delete your account. Try again." and the dialog stays, still confirmed.
 - While deleting, Delete shows its loading state and a second click does nothing.
 - "How deletion works" links to `/delete-account`.
+- A second Profile load after a pickup (the redirect result is now `null`) opens no dialog.
+- `e2e/delete-account.spec.ts`: a user made with `createUser` and signed in with `signInAs` opens Profile, chooses Delete account, enters the wrong password and sees "That password is wrong.", enters the right one, types `DELETE`, deletes, and lands on `/signin` with "Your account was deleted."; signing in again with that email and password fails.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `src/components/profile/DeleteAccountDialog.test.ts` and `src/views/ProfileView.test.ts`, with `@/services/auth` and `@/services/account` mocked. Create both components with their real props first.
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `src/components/profile/DeleteAccountDialog.test.ts`, `src/views/ProfileView.test.ts` and `e2e/delete-account.spec.ts`, with `@/services/auth` and `@/services/account` mocked. Create both components with their real props first.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
-Run: `npm test -- src/components/profile/DeleteAccountDialog.test.ts src/views/ProfileView.test.ts`
+Run: `npm test -- src/components/profile/DeleteAccountDialog.test.ts src/views/ProfileView.test.ts` and `npm run e2e -- e2e/delete-account.spec.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Write the minimal implementation**: the two components, the pickup in `ProfileView.vue`'s mount, and the strings
+- [x] **Step 3: Write the minimal implementation**: the two components, the pickup in `ProfileView.vue`'s mount, and the strings
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
-Run: `npm test -- src/components/profile/DeleteAccountDialog.test.ts src/views/ProfileView.test.ts`
+Run: `npm test -- src/components/profile/DeleteAccountDialog.test.ts src/views/ProfileView.test.ts` and `npm run e2e -- e2e/delete-account.spec.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add src/components/profile/AccountSection.vue src/components/profile/DeleteAccountDialog.vue src/components/profile/DeleteAccountDialog.test.ts src/views/ProfileView.test.ts src/views/ProfileView.vue src/i18n/locales/en/profile.json src/i18n/locales/hi/profile.json
+git add src/components/profile/AccountSection.vue src/components/profile/DeleteAccountDialog.vue src/components/profile/DeleteAccountDialog.test.ts src/views/ProfileView.test.ts src/views/ProfileView.vue e2e/delete-account.spec.ts src/i18n/locales/en/profile.json src/i18n/locales/hi/profile.json
 git commit -m "feat(profile): delete account with re-confirmation"
 ```
 
@@ -328,24 +347,25 @@ The trigger takes the uid only from the event's `UserRecord`, logs a failure by 
 - Against the Firestore emulator: user `alice` has 501 tasks, 2 `types`, 2 `notifications`, 2 documents under `users/alice/devices`, `users/alice` and `fcm/alice`; user `bob` has 3 tasks, 1 type, 1 notification, 1 device, `users/bob` and `fcm/bob`. `deleteUserDocuments(db, 'alice')` returns `510`; afterwards none of alice's documents exist and every one of bob's still does.
 - A second `deleteUserDocuments(db, 'alice')` resolves to `0`.
 - `deleteUserDocuments` for a uid with no documents resolves to `0`.
+- A run stopped after its first batch (a faked commit failure on the second) leaves the rest; a second run deletes the rest, and alice has no documents left.
 - When a batch commit rejects (a faked `Firestore` whose batch commit rejects with code `unavailable`), the trigger's handler logs `unavailable` and nothing of the error's message, and rejects.
 - The entry-point test lists `sendReminders`, `stopBillingOnBudget` and `deleteUserData`, and still fails when any export is an HTTP or callable function.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/deleteUserData.test.ts` and the entry-point test in `functions/src/reminders.test.ts`. Create `deleteUserData.ts` with its real exports first.
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/deleteUserData.test.ts` and the entry-point test in `functions/src/reminders.test.ts`. Create `deleteUserData.ts` with its real exports first.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npm --prefix functions run test -- src/deleteUserData.test.ts src/reminders.test.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Write the minimal implementation** to the Interfaces, and export `deleteUserData` from `functions/src/index.ts` (update its doc comment to say three functions)
+- [x] **Step 3: Write the minimal implementation** to the Interfaces, and export `deleteUserData` from `functions/src/index.ts` (update its doc comment to say three functions)
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `npm --prefix functions run test -- src/deleteUserData.test.ts src/reminders.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add functions/src/deleteUserData.ts functions/src/deleteUserData.test.ts functions/src/index.ts functions/src/reminders.test.ts
@@ -414,25 +434,25 @@ git commit -m "feat(functions): delete a user's data when their account is delet
 - `packages/android/README.md` names Ankit Kumar Pandit, panditankit1995@gmail.com, `https://todo.spanion.in/privacy`, `https://todo.spanion.in/delete-account`, `npx @bubblewrap/cli@1.27.0`, the target audience 13–15, 16–17 and 18+, and the 12 testers for 14 days rule, and says to deploy the functions (with `deleteUserData`) by the manual run before the first hosting deploy of this branch (D8).
 - No keystore file exists in the repository or was created by this task.
 
-- [ ] **Step 1: Write the failing test** for the Acceptance cases in `tests/android/twa-manifest.test.ts`
+- [x] **Step 1: Write the failing test** for the Acceptance cases in `tests/android/twa-manifest.test.ts`
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npm test -- tests/android/twa-manifest.test.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Remove the old project and write `twa-manifest.json`**: `git rm -r -q packages/android/source packages/android/Readme.html`, then the manifest with the A2 values
+- [x] **Step 3: Remove the old project and write `twa-manifest.json`**: `git rm -r -q packages/android/source packages/android/Readme.html`, then the manifest with the A2 values
 
-- [ ] **Step 4: Generate the project** in `packages/android`: `npx @bubblewrap/cli@1.27.0 update --skipVersionUpgrade --directory packages/android`. If Bubblewrap stops to ask a question, stop and report it; never answer a keystore or password prompt
+- [x] **Step 4: Generate the project** in `packages/android`: `npx @bubblewrap/cli@1.27.0 update --skipVersionUpgrade --directory packages/android`. If Bubblewrap stops to ask a question, stop and report it; never answer a keystore or password prompt
 
-- [ ] **Step 5: Write `assetlinks.json`, `.gitignore` and `packages/android/README.md`** as the Interfaces and A5 say
+- [x] **Step 5: Write `assetlinks.json`, `.gitignore` and `packages/android/README.md`** as the Interfaces and A5 say
 
-- [ ] **Step 6: Run it to verify it passes**
+- [x] **Step 6: Run it to verify it passes**
 
 Run: `npm test -- tests/android/twa-manifest.test.ts`
 Expected: PASS
 
-- [ ] **Step 7: Commit**: stage `packages/android/twa-manifest.json`, `tests/android/twa-manifest.test.ts`, `packages/android/README.md`, `public/.well-known/assetlinks.json`, `.gitignore`, and each file Bubblewrap wrote that `git status --short --untracked-files=all packages/android` lists, by name; the removals are already staged by `git rm`
+- [x] **Step 7: Commit**: stage `packages/android/twa-manifest.json`, `tests/android/twa-manifest.test.ts`, `packages/android/README.md`, `public/.well-known/assetlinks.json`, `.gitignore`, and each file Bubblewrap wrote that `git status --short --untracked-files=all packages/android` lists, by name; the removals are already staged by `git rm`
 
 ```bash
 git commit -m "feat(android): Bubblewrap TWA in.spanion.todo.pwa"

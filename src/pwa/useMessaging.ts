@@ -7,9 +7,10 @@
  * - The app registers exactly one foreground `onMessage` handler per page session (P2), however
  *   often `useMessaging()` is called or users sign in and out.
  * - Each device is one document, `users/{uid}/devices/{token}` (P3). It is deleted when the toggle
- *   is switched off, before sign-out (a session sign-out hook), and when the browser's permission
- *   is found revoked. When another account's token is still on this browser (it never signed out
- *   here), the token is revoked, so FCM reports it invalid and the server deletes that device.
+ *   is switched off, before sign-out and after an account deletion (a session sign-out hook), and
+ *   when the browser's permission is found revoked. When another account's token is still on this
+ *   browser (it never signed out here), the token is revoked, so FCM reports it invalid and the
+ *   server deletes that device.
  */
 import {
   deleteToken,
@@ -273,18 +274,23 @@ async function disable(): Promise<void> {
 }
 
 /**
- * The sign-out hook: runs while still signed in, before the auth sign-out. The token is revoked
- * even when the delete fails, so the next user of this browser never gets this user's reminders.
+ * The sign-out hook: on sign-out it runs while still signed in, before the auth sign-out; after
+ * an account deletion it runs with the user already gone, when the rules refuse the delete
+ * (`deleteUserData` erases the document instead). The token is revoked whatever the delete does,
+ * even if it never settles (offline), so the next user of this browser never gets this user's
+ * reminders. The delete's failure still reaches the caller once the token is revoked.
  */
 async function forgetThisDevice(): Promise<void> {
   const record = device.value;
   if (!record) return;
   setDevice(null);
-  try {
-    await removeDevice(record.uid, record.token);
-  } finally {
-    await revokeToken();
-  }
+  const removal = removeDevice(record.uid, record.token).then(
+    () => null,
+    (error: unknown) => ({ error }),
+  );
+  await revokeToken();
+  const failed = await removal;
+  if (failed) throw failed.error;
 }
 
 /** The app's push state, shared by every caller. The first call starts it (setupPwa does that). */

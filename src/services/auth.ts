@@ -1,6 +1,7 @@
 /**
  * Sign-in, sign-up and the signed-in user. Email and password, and Google: the only providers
- * (§11.1). Errors reach the caller as Firebase errors, whose `code` the screens translate.
+ * (§11.1). Google always leaves by redirect, never a popup (G1). Errors reach the caller as
+ * Firebase errors, whose `code` the screens translate.
  */
 import {
   GoogleAuthProvider,
@@ -8,7 +9,6 @@ import {
   getRedirectResult,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signInWithRedirect,
   signOut,
   updateProfile,
@@ -17,16 +17,11 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
-/** Popup failures that mean "this browser can't do popups", so a redirect is tried instead. */
-const POPUP_UNAVAILABLE = new Set([
-  'auth/popup-blocked',
-  'auth/operation-not-supported-in-this-environment',
-]);
-
-function errorCode(error: unknown): string {
-  return typeof error === 'object' && error !== null && 'code' in error
-    ? String(error.code)
-    : 'unknown';
+/** What a redirect back from Google did: signed in, re-confirmed the user (D4), or linked. */
+export type RedirectOperation = 'signIn' | 'reauthenticate' | 'link';
+export interface RedirectOutcome {
+  user: User;
+  operation: RedirectOperation;
 }
 
 /** The user restored from the last session, or null, once Firebase knows which. */
@@ -50,28 +45,23 @@ export async function signUpEmail(email: string, password: string): Promise<User
 }
 
 /**
- * Signs in with a Google popup. Where popups are blocked or unsupported (some installed PWAs), it
- * starts a redirect instead and resolves null: the page then leaves, and `consumeRedirectResult`
- * picks the user up when it comes back.
+ * Leaves for Google by redirect (G1): no popup, and no popup fallback, since a Trusted Web
+ * Activity and some installed PWAs can't show one. The page keeps its URL, `redirect` query
+ * included, so Google brings the user back to the same screen, where `consumeRedirectResult`
+ * picks them up.
  */
-export async function signInWithGoogle(): Promise<User | null> {
-  const provider = new GoogleAuthProvider();
-  try {
-    const credential = await signInWithPopup(auth, provider);
-    return credential.user;
-  } catch (error) {
-    const code = errorCode(error);
-    if (!POPUP_UNAVAILABLE.has(code)) throw error;
-    console.warn('[auth] Google popup unavailable, redirecting:', code);
-    await signInWithRedirect(auth, provider);
-    return null;
-  }
+export async function signInWithGoogle(): Promise<void> {
+  await signInWithRedirect(auth, new GoogleAuthProvider());
 }
 
-/** The user a Google redirect brought back, or null when this page load wasn't one. */
-export async function consumeRedirectResult(): Promise<User | null> {
+/**
+ * The redirect that brought this page load back from Google, and what it did (G2, D4), or null
+ * when this load wasn't one. Rejects with the redirect's Firebase error, such as
+ * `auth/user-mismatch` when Google re-confirmed a different account.
+ */
+export async function consumeRedirectResult(): Promise<RedirectOutcome | null> {
   const result = await getRedirectResult(auth);
-  return result?.user ?? null;
+  return result ? { user: result.user, operation: result.operationType } : null;
 }
 
 export function signOutUser(): Promise<void> {

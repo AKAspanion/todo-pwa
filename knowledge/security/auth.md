@@ -14,7 +14,11 @@ verified: human:panditankit1995@gmail.com
 
 - Firebase Auth, with exactly two providers: email and password, and Google (`src/services/auth.ts`). What
   the screens do is [features/sign-in](../features/sign-in.md).
-- Google uses a popup and falls back to a redirect where popups are unavailable. A redirect's result is kept in
+- Google always uses a redirect: there is no popup anywhere ([decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md)).
+  Re-authentication before an account is deleted is by password (`reauthenticateWithCredential`) or a Google
+  redirect (`reauthenticateWithRedirect`) in `src/services/account.ts`, through the same-origin handler below;
+  `consumeRedirectResult` reports which operation came back (`signIn`, `reauthenticate` or `link`), so a
+  re-confirmation is never taken for a sign-in. A redirect's result is kept in
   the auth handler's storage at `https://<authDomain>/__/auth/handler`; browsers that block third-party storage
   drop it when that origin differs from the page's. So on each of the app's Hosting domains the app uses its
   own host as the auth domain (`pickAuthDomain` in `src/lib/authDomain.ts`, from
@@ -36,9 +40,14 @@ verified: human:panditankit1995@gmail.com
   account never sees the last one's data (`src/stores/session.ts`, spec D13). Sign-out runs its hooks first,
   such as deleting this device's push registration.
 
+## History
+
+- 2026-11-05: Google used a popup and fell back to a redirect; now it is a redirect only, and re-authentication before deleting an account is by password or Google redirect, because the Play app's Trusted Web Activity can't show a popup. See [decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md).
+
 ## Sources
 
 - `src/services/auth.ts`
+- `src/services/account.ts`
 - `src/lib/authDomain.ts`
 - `src/router/guard.ts`
 - `src/stores/session.ts`

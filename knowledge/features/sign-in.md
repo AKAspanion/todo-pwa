@@ -40,15 +40,20 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   sign-up a password of at least `PASSWORD_MIN_LENGTH` characters with a letter and a digit (`isStrongPassword`,
   spec D14). Each field's error shows under it once the field loses focus, then updates as the user types
   ([decisions/email-format-check](../decisions/email-format-check.md)).
-- Google opens a popup; where popups are blocked or unsupported (some installed PWAs) it redirects instead,
-  and the sign-in screen picks the result up when the page comes back (`signInWithGoogle` and
-  `consumeRedirectResult` in `src/services/auth.ts`).
+- Google always redirects, never a popup (`signInWithGoogle` in `src/services/auth.ts`), since a Trusted Web
+  Activity and some installed PWAs can't show one. Both screens pick the result up when the page loads again
+  (`consumeRedirectResult` reports the operation, and only a `signIn` goes on to the app), and reset a busy Google
+  button when the browser restores the page from its back-forward cache (a `pageshow` listener). Cancelling
+  Google's page before it loads leaves the button busy
+  ([findings/google-redirect-cancel-leaves-button-busy](../findings/google-redirect-cancel-leaves-button-busy.md)).
+- Both screens show a "Privacy policy" link to `/privacy` ([features/legal-pages](legal-pages.md)).
 - After signing in, the app goes to the `redirect` query only when it is an in-app path that isn't sign-in or
   sign-up; anything else goes to `/home` (`safeRedirect` in `src/router/guard.ts`).
 - Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`). Whether
   wrong-password and unknown-user should share one message is open
-  ([questions/sign-in-error-enumeration](../questions/sign-in-error-enumeration.md)); so is popup versus redirect
-  for Google ([questions/google-sign-in-popup-or-redirect](../questions/google-sign-in-popup-or-redirect.md)).
+  ([questions/sign-in-error-enumeration](../questions/sign-in-error-enumeration.md)).
+- Popup versus redirect for Google was decided: redirect only, everywhere
+  ([decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md)).
 - The account menu shows the email once: as the title when there is no display name, as the subtitle under the
   name when there is one (`subtitle` in `src/components/layout/AppMenu.vue`). It keeps Vuetify's default menu
   z-index so it opens above the app bar; a fixed high value sat under the bar and clipped the top row.
@@ -58,6 +63,7 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 
 ## History
 
+- 2026-11-05: Google opened a popup and redirected only where popups failed; now it always redirects, both screens pick the result up on load and reset a busy button on a back-forward cache restore, and both link to `/privacy`, because the Play app's Trusted Web Activity can't show a popup. See [decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md).
 - 2026-11-05: messages were centred and fields sat 4 px below the message above; now messages are left-aligned and fields sit 12 px apart, with sign-up's button capped at the fields' width, because the form looked congested with errors showing.
 
 - 2026-11-05: sign-up accepted any email Firebase accepts and both forms showed errors only on submit, a malformed email only in a snackbar; now both forms require `name@site.tld` and show each error under its field as the user goes, because the developer asked for inline validation. See [decisions/email-format-check](../decisions/email-format-check.md).

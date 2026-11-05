@@ -20,6 +20,7 @@ vi.mock('firebase/messaging', () => ({
 }));
 vi.mock('@/services/devices', () => ({ saveDevice: vi.fn(), removeDevice: vi.fn() }));
 vi.mock('@/services/auth', () => ({ onUserChanged: vi.fn(), signOutUser: vi.fn() }));
+vi.mock('@/services/account', () => ({ deleteCurrentUser: vi.fn(async () => undefined) }));
 vi.mock('@/services/tasks', () => ({
   listTasks: vi.fn(),
   createTask: vi.fn(),
@@ -342,6 +343,42 @@ describe('two accounts on one browser (Review Focus 4)', () => {
 
     expect(l.fm.deleteToken).toHaveBeenCalledTimes(1);
     expect(l.authService.signOutUser).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('deleting the account (decisions/delete-account-deletes-user-first)', () => {
+  async function pushOnThenDelete(removal: () => Promise<void>) {
+    const l = await loadFresh();
+    supportedBrowser(l);
+    l.signIn(alice);
+    const messaging = l.useMessaging();
+    await messaging.enable();
+    vi.mocked(l.devices.removeDevice).mockImplementation(removal);
+    await l.session.deleteAccount();
+    return { l, messaging };
+  }
+
+  it('the token is removed even when the device-document delete never settles', async () => {
+    const { l, messaging } = await pushOnThenDelete(() => new Promise<void>(() => {}));
+
+    await vi.waitFor(() => expect(l.fm.deleteToken).toHaveBeenCalledTimes(1));
+    expect(l.devices.removeDevice).toHaveBeenCalledExactlyOnceWith('alice', TOKEN_A);
+    expect(localStorage.getItem(l.DEVICE_STORAGE_KEY)).toBeNull();
+    expect(messaging.enabled.value).toBe(false);
+  });
+
+  it('the token is removed when the rules refuse the device-document delete', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { l } = await pushOnThenDelete(async () => {
+      throw Object.assign(new Error('Missing or insufficient permissions.'), {
+        code: 'permission-denied',
+      });
+    });
+
+    await vi.waitFor(() => expect(l.fm.deleteToken).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() =>
+      expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'permission-denied'),
+    );
   });
 });
 

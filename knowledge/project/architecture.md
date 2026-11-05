@@ -13,12 +13,12 @@ verified: human:panditankit1995@gmail.com
 ## Services
 
 - **The web app** (`src/`) is a static SPA built by Vite to `dist/` and served by Firebase Hosting, which
-  rewrites every path to `/index.html` (`firebase.json`, `hosting.rewrites`).
+  rewrites every path to the built `index.html` (`firebase.json`, `hosting.rewrites`).
 - **There is no API server.** The app calls Firebase Auth and Cloud Firestore through the modular client SDK,
   set up once in `src/lib/firebase.ts`. `firestore.rules` is therefore the only server-side check on what a
   client may read or write ([security/roles](../security/roles.md)).
-- **Cloud Functions** (`functions/src/index.ts`) export exactly two functions, neither answering HTTP:
-  `sendReminders` and `stopBillingOnBudget` ([apps/functions](../apps/functions.md)). They use the Admin SDK,
+- **Cloud Functions** (`functions/src/index.ts`) export exactly three functions, none answering HTTP:
+  `sendReminders`, `stopBillingOnBudget` and `deleteUserData` ([apps/functions](../apps/functions.md)). They use the Admin SDK,
   which the rules don't govern.
 - **One service worker**, `src/sw.ts`, built by vite-plugin-pwa (`injectManifest`): the precached app shell,
   the update handshake and background push ([features/offline-and-updates](../features/offline-and-updates.md)).

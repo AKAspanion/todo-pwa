@@ -27,6 +27,8 @@ The client-side types are in `src/types/models.ts`; the stored fields and their 
 - The old app's `fcm/{uid}` documents are still in the live database but nothing reads them, and the rules
   deny them (no `match` covers them).
 
+- Deleting an account deletes its tasks, labels, notifications, devices and `users/{uid}` ([features/account-deletion](../features/account-deletion.md)): `deleteUserData` in `functions/src/deleteUserData.ts` erases every document of the five collections that is the user's, and the old `fcm/{uid}`.
+
 ## Relations
 
 - Every document carries its owner's `uid`; devices also live under the owner's path. The rules allow access

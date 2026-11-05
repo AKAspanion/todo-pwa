@@ -26,10 +26,10 @@ named in `.firebaserc`). The current code is a 2026-11-02 rebuild of a 2019 Vue 
 
 - [apps/web](../apps/web.md): the Vue 3 single-page app at the repository root (`src/`), served by Firebase
   Hosting. It reads and writes Firestore directly; there is no API server ([project/architecture](architecture.md)).
-- [apps/functions](../apps/functions.md): Cloud Functions in `functions/`: the scheduled reminder run and the
-  budget kill-switch.
+- [apps/functions](../apps/functions.md): Cloud Functions in `functions/`: the scheduled reminder run, the
+  budget kill-switch and the deletion of a deleted user's data.
 - [apps/android-twa](../apps/android-twa.md): the Play Store app, a Trusted Web Activity around the site
-  (`packages/android/source`).
+  (`packages/android`).
 - [apps/ios-webview](../apps/ios-webview.md): an Xcode WebView wrapper around the site (`packages/ios/src`), kept
   in the repository but not shipped.
 

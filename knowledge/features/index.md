@@ -2,9 +2,11 @@
 
 <!-- GA-GENERATED:index -->
 
+- [Delete account](account-deletion.md) - Profile's Delete account — the user confirms who they are by password or a Google redirect, types DELETE, and the Auth user is deleted; deleteUserData then erases their data.
 - [Add a task](add-task.md) - The add screen — a title, a Markdown description, a local date and time or indefinite, and any of the user's labels.
 - [Calendar](calendar.md) - The user's dated tasks by day, week or month; clicking one opens its details.
 - [Language and theme](language-and-theme.md) - English or Hindi, light or dark, each remembered on the device under the old app's storage keys.
+- [Privacy policy and account-deletion pages](legal-pages.md) - The public /privacy and /delete-account pages Google Play asks for, in English only, reachable signed in or out and linked from sign-in, sign-up, Profile and the delete dialog.
 - [Notifications and push reminders](notifications.md) - The notifications screen — a per-device push toggle and the list of reminders received, newest first.
 - [Install, offline and updates](offline-and-updates.md) - The app installs as a PWA, opens offline once loaded online, offers each new release instead of forcing it, and removes the old app's service workers.
 - [Profile and labels](profile-and-labels.md) - The profile screen — the user's name and photo, editing the display name, and creating labels with a name and colour.

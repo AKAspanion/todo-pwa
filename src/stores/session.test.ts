@@ -1,6 +1,8 @@
 import type { User } from 'firebase/auth';
+import { flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { deleteCurrentUser } from '@/services/account';
 import { onUserChanged, signOutUser } from '@/services/auth';
 import { useLabelsStore } from './labels';
 import { useNotificationsStore } from './notifications';
@@ -13,6 +15,7 @@ vi.mock('@/services/auth', () => ({
   onUserChanged: vi.fn(),
   signOutUser: vi.fn(),
 }));
+vi.mock('@/services/account', () => ({ deleteCurrentUser: vi.fn() }));
 vi.mock('@/services/tasks', () => ({
   listTasks: vi.fn(),
   createTask: vi.fn(),
@@ -77,6 +80,8 @@ describe('session store', () => {
     vi.mocked(onUserChanged).mockReset();
     vi.mocked(signOutUser).mockReset();
     vi.mocked(signOutUser).mockResolvedValue();
+    vi.mocked(deleteCurrentUser).mockReset();
+    vi.mocked(deleteCurrentUser).mockResolvedValue();
   });
 
   it('subscribes once, and becomes ready with the user Firebase reports', () => {
@@ -150,5 +155,147 @@ describe('session store', () => {
     listener({ ...alice, uid: 'bob' } as unknown as User);
 
     expectPerUserStateCleared();
+  });
+
+  it('runSignOutHooks runs every hook in turn, logging a failing one by its code only', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const order: string[] = [];
+    const session = useSessionStore();
+    session.onSignOut(() => {
+      order.push('hook 1');
+      throw Object.assign(new Error('secret-ish detail'), {
+        code: 'messaging/token-unsubscribe-failed',
+      });
+    });
+    session.onSignOut(() => {
+      order.push('hook 2');
+    });
+
+    await session.runSignOutHooks();
+
+    expect(order).toEqual(['hook 1', 'hook 2']);
+    expect(warn).toHaveBeenCalledWith(
+      '[session] a sign-out hook failed:',
+      'messaging/token-unsubscribe-failed',
+    );
+    expect(signOutUser).not.toHaveBeenCalled();
+  });
+
+  describe('deleteAccount (D5, decisions/delete-account-deletes-user-first)', () => {
+    function networkError(): Error {
+      return Object.assign(new Error('offline'), { code: 'auth/network-request-failed' });
+    }
+
+    it('calls deleteCurrentUser before any hook, then clears all per-user state and the user', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const order: string[] = [];
+      const session = useSessionStore();
+      session.onSignOut(() => {
+        order.push('hook 1');
+      });
+      session.onSignOut(async () => {
+        order.push('hook 2');
+      });
+      vi.mocked(deleteCurrentUser).mockImplementation(async () => {
+        order.push('deleteCurrentUser');
+        expect(useTasksStore().tasks).toEqual([task]);
+      });
+
+      await session.deleteAccount();
+
+      expect(order).toEqual(['deleteCurrentUser', 'hook 1', 'hook 2']);
+      expectPerUserStateCleared();
+      expect(session.user).toBeNull();
+      expect(signOutUser).not.toHaveBeenCalled();
+    });
+
+    it('rejects with auth/network-request-failed, runs no hook and changes nothing', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const hook = vi.fn();
+      const session = useSessionStore();
+      session.onSignOut(hook);
+      vi.mocked(deleteCurrentUser).mockRejectedValue(networkError());
+
+      await expect(session.deleteAccount()).rejects.toMatchObject({
+        code: 'auth/network-request-failed',
+      });
+      await flushPromises();
+
+      expect(hook).not.toHaveBeenCalled();
+      expect(useTasksStore().tasks).toEqual([task]);
+      expect(useLabelsStore().labels).toHaveLength(1);
+      expect(useNotificationsStore().items).toHaveLength(1);
+      expect(useUiStore().snack).not.toBeNull();
+      expect(session.user).toEqual(alice);
+    });
+
+    it('rejects with auth/requires-recent-login, runs no hook and clears nothing', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const hook = vi.fn();
+      vi.mocked(deleteCurrentUser).mockRejectedValue(
+        Object.assign(new Error('recent login needed'), { code: 'auth/requires-recent-login' }),
+      );
+      const session = useSessionStore();
+      session.onSignOut(hook);
+
+      await expect(session.deleteAccount()).rejects.toMatchObject({
+        code: 'auth/requires-recent-login',
+      });
+      await flushPromises();
+
+      expect(hook).not.toHaveBeenCalled();
+      expect(useTasksStore().tasks).toEqual([task]);
+      expect(useUiStore().snack).not.toBeNull();
+      expect(session.user).toEqual(alice);
+    });
+
+    it('resolves and clears state even when a hook never settles', async () => {
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const session = useSessionStore();
+      const pending = vi.fn(() => new Promise<void>(() => {}));
+      const after = vi.fn();
+      session.onSignOut(pending);
+      session.onSignOut(after);
+
+      await session.deleteAccount();
+
+      expect(pending).toHaveBeenCalledTimes(1);
+      expect(after).toHaveBeenCalledTimes(1);
+      expectPerUserStateCleared();
+      expect(session.user).toBeNull();
+    });
+
+    it('logs a rejecting or throwing hook by its code only, and still clears state', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const listener = startSession();
+      listener(alice as unknown as User);
+      fillPerUserState();
+      const session = useSessionStore();
+      session.onSignOut(async () => {
+        throw Object.assign(new Error('secret-ish detail'), {
+          code: 'permission-denied',
+        });
+      });
+      session.onSignOut(() => {
+        throw new TypeError('token delete failed');
+      });
+
+      await session.deleteAccount();
+
+      expectPerUserStateCleared();
+      expect(session.user).toBeNull();
+      await vi.waitFor(() => expect(warn).toHaveBeenCalledTimes(2));
+      expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'permission-denied');
+      expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'TypeError');
+      expect(JSON.stringify(warn.mock.calls)).not.toContain('secret-ish detail');
+    });
   });
 });

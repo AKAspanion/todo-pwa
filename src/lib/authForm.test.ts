@@ -47,13 +47,6 @@ describe('authErrorKey', () => {
     }
   });
 
-  it.each(['auth/popup-closed-by-user', 'auth/cancelled-popup-request'])(
-    'says nothing when the user closed the Google window (%s)',
-    (code) => {
-      expect(authErrorKey(firebaseError(code))).toBeNull();
-    },
-  );
-
   it.each([
     firebaseError('constructor'),
     firebaseError('__proto__'),

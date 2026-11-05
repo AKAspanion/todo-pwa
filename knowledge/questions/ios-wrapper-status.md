@@ -16,7 +16,7 @@ Is `packages/ios` a live App Store app to maintain, an experiment to leave alone
 
 ## Why it matters
 
-Its `rootUrl` opens `/index.html` on one Hosting domain, its `gcmMessageIDKey` is a placeholder, and the 2026
+Its `rootUrl` (`packages/ios/src/Task Manager/Settings.swift`) opens one fixed Hosting address, the old domain's `index.html`, its `gcmMessageIDKey` is a placeholder, and the 2026
 rebuild didn't touch it, so changes to the site's routes, domains or auth may break it unseen.
 
 ## Status

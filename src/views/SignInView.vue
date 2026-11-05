@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
@@ -81,24 +81,35 @@ async function submitEmail(): Promise<void> {
   }
 }
 
+/** G1: the page leaves for Google, so the button stays busy unless the redirect can't start. */
 async function signInGoogle(): Promise<void> {
   if (busy.value) return;
   busy.value = 'google';
   errorKey.value = null;
   try {
-    // null: popups are unavailable and the page is leaving for Google's redirect.
-    if (await signInWithGoogle()) await finish();
+    await signInWithGoogle();
   } catch (error) {
     fail('Google sign-in', error);
-  } finally {
     busy.value = null;
   }
 }
 
+/**
+ * Back from Google without finishing, the browser may restore this page from its back-forward
+ * cache with the Google button still busy: it is usable again.
+ */
+function onPageShow(event: PageTransitionEvent): void {
+  if (event.persisted && busy.value === 'google') busy.value = null;
+}
+
+onMounted(() => window.addEventListener('pageshow', onPageShow));
+onUnmounted(() => window.removeEventListener('pageshow', onPageShow));
+
 onMounted(async () => {
-  // Back from a Google redirect: an error it ended in is shown here.
+  // G2: back from Google's redirect, a sign-in goes on as any sign-in does; an error is shown here.
   try {
-    if (await consumeRedirectResult()) await finish();
+    const outcome = await consumeRedirectResult();
+    if (outcome?.operation === 'signIn') await finish();
   } catch (error) {
     fail('Google redirect sign-in', error);
   }
@@ -223,6 +234,11 @@ onMounted(async () => {
           <router-link class="auth-link text-caption" :to="signUpLink">{{
             t('auth.signIn.signUpLink')
           }}</router-link>
+          <div class="pt-2">
+            <router-link class="auth-link text-caption" to="/privacy">{{
+              t('auth.privacyLink')
+            }}</router-link>
+          </div>
         </v-card-text>
 
         <v-btn-toggle
