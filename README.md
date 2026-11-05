@@ -67,32 +67,42 @@ With `VITE_USE_EMULATORS=true` the Firebase values can stay empty: the app uses 
 ### Run the app against the emulators
 
 ```bash
-# terminal 1: Auth, Firestore and Functions emulators for the demo project
-npx firebase emulators:start --project demo-todo
-
-# terminal 2: the app, at http://localhost:5173
+# one command: the Auth and Firestore emulators, the Emulator UI and the app
 npm run dev
 ```
 
-The emulators use their own ports, set in `firebase.json`:
+The app is at http://localhost:2120 and the Emulator UI at http://localhost:2127. Ctrl+C stops
+everything. The local data is kept in `.emulator-data/` between runs (git and Prettier ignore it);
+delete that folder to reset it. `npm run dev` always uses the demo project from `.env.ci`, whatever
+`.env.local` holds; `npm run dev:app` uses `.env.local`. Sign up in the app to create an account.
 
-| Emulator | Port |
+Every local port is in the block 2120 to 2130, set in `firebase.json` and `vite.config.ts`:
+
+| Port | What |
 |---|---|
-| Auth | 9199 |
-| Firestore | 8180 |
-| Functions | 5101 |
+| 2120 | Vite dev server (`npm run dev`) |
+| 2121 | Emulator hub |
+| 2122 | Auth emulator |
+| 2123 | Firestore emulator |
+| 2124 | Firestore WebSocket |
+| 2125 | Functions emulator |
+| 2126 | Emulator logging |
+| 2127 | Emulator UI |
+| 2128 | Hosting emulator |
+| 2129 | `vite preview` (`npm run preview`) |
+| 2130 | Vite server of the e2e run |
 
-These are **not** Firebase's defaults (9099, 8080, 5001), because another local project uses the
-defaults on the developer's machine. The app, the tests and the scripts all read the ports from
-`firebase.json`, so change them there if you need to.
-
-The emulators start empty every time. Sign up in the app to create an account.
+These are **not** Firebase's defaults (9099, 8080, 5001, 4000), because another local project uses
+the defaults on the developer's machine. The app, the tests and the scripts all read the ports from
+`firebase.json`, so change them there if you need to. Vite's dev and preview servers fail if their
+port is taken, rather than move to the next one.
 
 ### Scripts
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Vite dev server |
+| `npm run dev` | Emulators (Auth, Firestore), the Emulator UI and the Vite dev server together |
+| `npm run dev:app` | Vite dev server alone, for emulators already running (or the real project) |
 | `npm run build` | Type-checks, then builds to `dist/`. Source maps go to `sourcemaps/`, never `dist/`. |
 | `npm run preview` | Serves the built `dist/` |
 | `npm run typecheck` | `vue-tsc` over the app |
@@ -100,7 +110,7 @@ The emulators start empty every time. Sign up in the app to create an account.
 | `npm run format` / `npm run format:check` | Prettier: write, or check only |
 | `npm run test` | Vitest unit tests, inside `firebase emulators:exec` (Auth and Firestore) |
 | `npm run test:rules` | The Firestore security-rules tests in `tests/rules` |
-| `npm run e2e` | Playwright tests in Chromium and WebKit, against the emulators and a Vite server on port 5179 |
+| `npm run e2e` | Playwright tests in Chromium and WebKit, against the emulators and a Vite server on port 2130 |
 
 `test`, `test:rules` and `e2e` start and stop the emulators themselves, so nothing else needs to be
 running. Pass file names after `--` to run some of them: `npm run e2e -- e2e/smoke.spec.ts`.

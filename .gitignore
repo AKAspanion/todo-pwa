@@ -59,6 +59,9 @@ packages/android/source/local.properties
 .claude/worktrees/
 .ga/runs/
 
+# Local emulator data kept by `pnpm dev`: delete the folder to reset
+.emulator-data/
+
 # Visual test output: per-run screenshot diffs (refs/ are committed baselines)
 design/modernize/*/compare/
 

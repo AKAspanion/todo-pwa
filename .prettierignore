@@ -16,6 +16,7 @@ functions/lib/
 packages/
 public/
 .firebase/
+.emulator-data/
 
 # Kept as written: the planning documents and local tooling
 docs/

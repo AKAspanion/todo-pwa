@@ -3,7 +3,7 @@ import { parseEnv } from 'node:util';
 import { defineConfig, devices } from '@playwright/test';
 
 /** A port of its own, so the e2e run never reuses a dev server started with other settings. */
-const PORT = Number(process.env.E2E_PORT ?? 5179);
+const PORT = Number(process.env.E2E_PORT ?? 2130);
 const baseURL = `http://localhost:${PORT}`;
 
 /** The app under test always talks to the emulators (project demo-todo), whatever `.env.local` holds. */

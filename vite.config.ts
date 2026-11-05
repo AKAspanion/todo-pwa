@@ -93,87 +93,97 @@ function vendorChunk(test: RegExp, name: string, priority: number) {
   return { name, test, priority };
 }
 
-export default defineConfig({
-  define: {
-    __FIREBASE_EMULATOR_HOSTS__: JSON.stringify(emulatorHosts()),
-  },
-  plugins: [
-    vue(),
-    vuetify({ autoImport: true }),
-    VitePWA({
-      strategies: 'injectManifest',
-      srcDir: 'src',
-      filename: 'sw.ts',
-      registerType: 'prompt',
-      // src/pwa/index.ts registers the worker itself (Task 9), so the plugin injects no script.
-      injectRegister: false,
-      includeAssets: ['favicon.ico', 'img/icons/*.png', 'img/icons/*.svg'],
-      manifest: {
-        id: '/',
-        name: 'Task Manager',
-        short_name: 'TODO',
-        description: 'Plan your tasks, label them and get reminded before they are due.',
-        lang: 'en',
-        scope: '/',
-        start_url: '/home',
-        display: 'standalone',
-        theme_color: '#1976D2',
-        background_color: '#FAFAFA',
-        icons: [
-          { src: '/img/icons/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/img/icons/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
-          {
-            src: '/img/icons/maskable-icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
-        ],
-      },
-      injectManifest: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webmanifest}'],
-        // Workbox's default ignore, plus the old app's two workers, which public/ now holds as
-        // kill switches (C1): they must stay on the network, served no-cache, never precached.
-        globIgnores: ['**/node_modules/**/*', 'service-worker.js', 'firebase-messaging-sw.js'],
-        maximumFileSizeToCacheInBytes: MAX_PRECACHE_BYTES,
-        sourcemap: 'hidden',
-      },
-      devOptions: { enabled: false },
-    }),
-    moveSourceMapsOutOfDist(),
-  ],
-  resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
-  },
-  optimizeDeps: {
-    include: vuetifyComponentEntries(),
-  },
-  build: {
-    sourcemap: 'hidden',
-    chunkSizeWarningLimit: 1024,
-    rolldownOptions: {
-      output: {
-        codeSplitting: {
-          groups: [
-            vendorChunk(/[\\/]node_modules[\\/](@firebase|firebase)[\\/]/, 'firebase', 40),
-            vendorChunk(/[\\/]node_modules[\\/]vuetify[\\/]/, 'vuetify', 30),
-            vendorChunk(
-              /[\\/]node_modules[\\/](@vue|vue|vue-router|pinia|vue-i18n|@intlify)[\\/]/,
-              'vue',
-              20,
-            ),
-            vendorChunk(/[\\/]node_modules[\\/]/, 'vendor', 10),
+export default defineConfig(({ mode }) => {
+  // `pnpm dev` runs in mode `emulators`: the demo values from .env.ci go into the environment
+  // before Vite reads the .env files, so they win over .env.local and the app always talks to
+  // the emulators as project demo-todo, never to a real project.
+  if (mode === 'emulators') Object.assign(process.env, testEnv);
+  return {
+    define: {
+      __FIREBASE_EMULATOR_HOSTS__: JSON.stringify(emulatorHosts()),
+    },
+    plugins: [
+      vue(),
+      vuetify({ autoImport: true }),
+      VitePWA({
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'sw.ts',
+        registerType: 'prompt',
+        // src/pwa/index.ts registers the worker itself (Task 9), so the plugin injects no script.
+        injectRegister: false,
+        includeAssets: ['favicon.ico', 'img/icons/*.png', 'img/icons/*.svg'],
+        manifest: {
+          id: '/',
+          name: 'Task Manager',
+          short_name: 'TODO',
+          description: 'Plan your tasks, label them and get reminded before they are due.',
+          lang: 'en',
+          scope: '/',
+          start_url: '/home',
+          display: 'standalone',
+          theme_color: '#1976D2',
+          background_color: '#FAFAFA',
+          icons: [
+            { src: '/img/icons/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/img/icons/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+            {
+              src: '/img/icons/maskable-icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable',
+            },
           ],
+        },
+        injectManifest: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webmanifest}'],
+          // Workbox's default ignore, plus the old app's two workers, which public/ now holds as
+          // kill switches (C1): they must stay on the network, served no-cache, never precached.
+          globIgnores: ['**/node_modules/**/*', 'service-worker.js', 'firebase-messaging-sw.js'],
+          maximumFileSizeToCacheInBytes: MAX_PRECACHE_BYTES,
+          sourcemap: 'hidden',
+        },
+        devOptions: { enabled: false },
+      }),
+      moveSourceMapsOutOfDist(),
+    ],
+    // Fixed ports, taken from the 2120 block (strictPort: fail rather than move onto the next one,
+    // which is the emulator hub's or Auth's).
+    server: { port: 2120, strictPort: true },
+    preview: { port: 2129, strictPort: true },
+    resolve: {
+      alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    },
+    optimizeDeps: {
+      include: vuetifyComponentEntries(),
+    },
+    build: {
+      sourcemap: 'hidden',
+      chunkSizeWarningLimit: 1024,
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              vendorChunk(/[\\/]node_modules[\\/](@firebase|firebase)[\\/]/, 'firebase', 40),
+              vendorChunk(/[\\/]node_modules[\\/]vuetify[\\/]/, 'vuetify', 30),
+              vendorChunk(
+                /[\\/]node_modules[\\/](@vue|vue|vue-router|pinia|vue-i18n|@intlify)[\\/]/,
+                'vue',
+                20,
+              ),
+              vendorChunk(/[\\/]node_modules[\\/]/, 'vendor', 10),
+            ],
+          },
         },
       },
     },
-  },
-  test: {
-    environment: 'jsdom',
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
-    env: testEnv,
-    restoreMocks: true,
-    unstubGlobals: true,
-    server: { deps: { inline: ['vuetify'] } },
-  },
+    test: {
+      environment: 'jsdom',
+      include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
+      env: testEnv,
+      restoreMocks: true,
+      unstubGlobals: true,
+      server: { deps: { inline: ['vuetify'] } },
+    },
+  };
 });
