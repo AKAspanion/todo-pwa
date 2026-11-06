@@ -39,7 +39,11 @@ vi.mock('virtual:pwa-register', () => ({ registerSW: vi.fn(() => vi.fn(async () 
 const alice = { uid: 'alice', email: 'a@example.com', displayName: 'Alice', photoURL: null };
 const bob = { uid: 'bob', email: 'b@example.com', displayName: 'Bob', photoURL: null };
 const TOKEN_A = 'tok-A';
-const registration = { scope: 'http://localhost/' } as ServiceWorkerRegistration;
+const showNotification = vi.fn(async () => undefined);
+const registration = {
+  scope: 'http://localhost/',
+  showNotification,
+} as unknown as ServiceWorkerRegistration;
 
 /** A browser Notification API whose permission prompt answers `answer`. */
 function stubNotification(permission: NotificationPermission, answer: NotificationPermission) {
@@ -181,6 +185,46 @@ describe('useMessaging enable and disable (D19, P3)', () => {
     expect(messaging.permission.value).toBe('granted');
   });
 
+  it('enable() granted shows one example notification, in the app’s language, once the device is saved', async () => {
+    const l = await loadFresh();
+    supportedBrowser(l);
+    l.signIn(alice);
+    const messaging = l.useMessaging();
+    const order: string[] = [];
+    vi.mocked(l.devices.saveDevice).mockImplementation(async () => {
+      order.push('saved');
+    });
+    showNotification.mockImplementation(async () => {
+      order.push('shown');
+    });
+
+    await expect(messaging.enable()).resolves.toBe('granted');
+
+    expect(order).toEqual(['saved', 'shown']);
+    expect(showNotification).toHaveBeenCalledExactlyOnceWith('Notifications are on', {
+      body: "You'll get a reminder like this one an hour before a task is due.",
+      icon: '/img/icons/android-chrome-192x192.png',
+      tag: 'notifications-example',
+    });
+  });
+
+  it('enable() stays granted when the example can’t be shown, logging only the code', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const l = await loadFresh();
+    supportedBrowser(l);
+    l.signIn(alice);
+    showNotification.mockRejectedValueOnce(
+      Object.assign(new TypeError('secret'), { name: 'TypeError' }),
+    );
+    const messaging = l.useMessaging();
+
+    await expect(messaging.enable()).resolves.toBe('granted');
+
+    expect(messaging.enabled.value).toBe(true);
+    expect(warn).toHaveBeenCalledWith(expect.any(String), 'TypeError');
+    warn.mockRestore();
+  });
+
   it('enable() denied saves nothing and reports denied', async () => {
     const l = await loadFresh();
     supportedBrowser(l);
@@ -192,6 +236,7 @@ describe('useMessaging enable and disable (D19, P3)', () => {
 
     expect(l.fm.getToken).not.toHaveBeenCalled();
     expect(l.devices.saveDevice).not.toHaveBeenCalled();
+    expect(showNotification).not.toHaveBeenCalled();
     expect(messaging.permission.value).toBe('denied');
     expect(messaging.enabled.value).toBe(false);
   });

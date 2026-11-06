@@ -14,7 +14,7 @@ verified: human:panditankit1995@gmail.com
 
 A visitor signs up or signs in with an email and password, or with Google. Facebook sign-in was removed
 ([decisions/facebook-sign-in-removed](../decisions/facebook-sign-in-removed.md)). A signed-out visit to any
-app screen goes to sign-in first and returns to that screen afterwards. Signing out from the menu
+app screen goes to sign-in first and returns to that screen afterwards. Signing out from the menu, or from Profile's Account card (one flow, `src/composables/useSignOut.ts`),
 (`src/components/layout/AppMenu.vue`) removes this device's push registration first, then clears every
 per-user store. How sessions and tokens work: [security/auth](../security/auth.md).
 
@@ -36,6 +36,9 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   phone the buttons are 240 px and a long label such as "Sign in with Google" wraps onto two lines rather than
   sticking out of the card. `.auth-btn`'s `max-width: none` in `src/assets/style.css` doesn't stop the cap, which
   Vuetify sets inline.
+- From Vuetify's `sm` breakpoint (600 px) sign-up's form is `460px` wide (`.auth-form` in
+  `src/views/SignUpView.vue`): the card is as wide as its content, which left the two password fields 128 px wide on a
+  desktop. A phone keeps the content-sized card.
 - The email form links "Forgot password?" to `/forgot-password`, carrying the typed email in history state
   ([features/password-reset](password-reset.md)).
 - The language can be switched on both screens; the menu and bottom navigation are hidden on them.
@@ -55,9 +58,11 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 - Both screens show a "Privacy policy" link to `/privacy` ([features/legal-pages](legal-pages.md)).
 - After signing in, the app goes to the `redirect` query only when it is an in-app path that isn't sign-in or
   sign-up; anything else goes to `/home` (`safeRedirect` in `src/router/guard.ts`).
-- Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`). Whether
-  wrong-password and unknown-user should share one message is open
-  ([questions/sign-in-error-enumeration](../questions/sign-in-error-enumeration.md)).
+- Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`). A wrong
+  password and an unknown email share one message
+  ([decisions/sign-in-one-error-message](../decisions/sign-in-one-error-message.md)).
+- Email sign-up also sends a verification email; the reminder that follows is
+  [features/email-verification](email-verification.md).
 - Popup versus redirect for Google was decided: redirect only, everywhere
   ([decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md)).
 - The account menu shows the email once: as the title when there is no display name, as the subtitle under the
@@ -69,6 +74,7 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 
 ## History
 
+- 2026-11-06: an unknown email and a wrong password had their own messages, and sign-up's form was content-sized on desktop; now they share "Incorrect email or password." and the form is `460px` wide from 600 px, because the developer asked. See [decisions/sign-in-one-error-message](../decisions/sign-in-one-error-message.md).
 - 2026-11-05: an email user who forgot their password had no way back in; now the email form links to a forgot-password screen, because of [decisions/password-reset](../decisions/password-reset.md).
 - 2026-11-05: only sign-up's button was capped at the card's width, and sign-in's two buttons stuck 40 px out of the card on a 360 px phone; now sign-in's buttons are capped too, because the Play Store app opens on phones that narrow.
 - 2026-11-05: Google opened a popup and redirected only where popups failed; now it always redirects, both screens pick the result up on load and reset a busy button on a back-forward cache restore, and both link to `/privacy`, because the Play app's Trusted Web Activity can't show a popup. See [decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md).
@@ -89,3 +95,4 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 - `src/router/guard.ts`
 - `src/assets/style.css`
 - `src/stores/session.ts`
+- `src/i18n/locales/en/auth.json`

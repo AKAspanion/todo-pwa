@@ -26,7 +26,7 @@ test.describe('legal pages, signed out (W1, W3, W4)', () => {
     await page.getByRole('link', { name: 'Privacy policy' }).click();
     await expect(page).toHaveURL(/\/privacy$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
-    await expect(page.getByText('Effective 4 November 2026')).toBeVisible();
+    await expect(page.getByText('Effective 6 November 2026')).toBeVisible();
     await expect(page.locator('[lang="en"]').first()).toBeVisible();
     await expectNoAppChrome(page);
 

@@ -322,8 +322,16 @@ onMounted(async () => {
   justify-content: center;
 }
 .auth-form {
-  max-width: 420px;
+  max-width: 460px;
   margin: 0 auto;
   text-align: center;
+}
+/* The card is as wide as its content, which left the password fields 128 px wide on a desktop and
+   cut their labels off. From Vuetify's sm breakpoint the form takes a set width instead; a phone
+   keeps the content-sized card, which fits its screen. */
+@media (min-width: 600px) {
+  .auth-form {
+    width: 460px;
+  }
 }
 </style>

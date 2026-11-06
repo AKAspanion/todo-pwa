@@ -8,6 +8,16 @@
     "cancel": "Cancel editing the name",
     "error": "Error updating name"
   },
+  "photo": {
+    "edit": "Edit photo",
+    "title": "Profile photo",
+    "field": "Photo link",
+    "hint": "An https:// link to an image. Leave it empty to remove your photo.",
+    "invalid": "Enter a link that starts with https://",
+    "save": "Save",
+    "cancel": "Cancel",
+    "error": "Couldn't update the photo. Try again."
+  },
   "labels": {
     "heading": "LABELS",
     "create": "Create a new label",

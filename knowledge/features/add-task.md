@@ -26,10 +26,15 @@ non-home route has (`src/components/layout/AppMenu.vue`; its titles are `common.
   (`TITLE_MAX`, `DESCRIPTION_MAX` in `src/views/TaskAddView.vue`, the same limits as `firestore.rules`).
 - The date and time are taken as the device's local wall-clock time; the store adds `timeZone`, `remindAt`
   and `reminded` ([data/task](../data/task.md)).
+- The title, time and date each keep their message line, then 12 px more, so an error never touches the field
+  below (the grid's text fields, matched in `src/views/TaskAddView.vue`'s styles, since time and date render
+  through a menu with no root a class could reach).
 - The save never times out or retries; after 15 s the form says it is still saving, and a rejected save keeps
   the input and shows the error in the snackbar ([decisions/saves-never-time-out](../decisions/saves-never-time-out.md)).
 
 ## History
+
+- 2026-11-06: an error under the title touched the time field; now the fields keep 12 px below their message line, because the developer found the gap wrong.
 
 - 2026-11-04: was the rewrite's layout and text; now the old TaskAdd's, with a failed save shown in the snackbar, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).
 

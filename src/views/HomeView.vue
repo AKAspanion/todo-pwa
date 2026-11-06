@@ -278,7 +278,7 @@ onBeforeUnmount(() => stopDayChange?.());
   position: relative;
 }
 .home__card {
-  height: calc(100vh - 80px - 56px);
+  height: calc(100vh - 80px - 56px - var(--verify-banner-height, 0px));
 }
 .content-wrapper {
   position: relative;

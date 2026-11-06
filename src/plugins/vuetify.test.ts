@@ -54,6 +54,12 @@ describe('vuetify look (restore the original design, 4.1)', () => {
     expect(defaults.VSelect?.variant).toBe('filled');
   });
 
+  it('draws every switch inset, its thumb inside the track, keeping the md2 defaults too', () => {
+    const defaults = vuetify.defaults.value ?? {};
+    expect(defaults.VSwitch?.inset).toBe(true);
+    expect(defaults.VBtn?.class).toBe('text-uppercase');
+  });
+
   it("has Vuetify 2.6.10's light colours with the old primary", () => {
     const colors = vuetify.theme.themes.value.light.colors;
     expect(colors).toMatchObject({

@@ -87,7 +87,9 @@ function onOpenChange(open: boolean): void {
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-btn variant="text" color="secondary" @click="emit('close')">{{
+        <!-- Primary, like the app's other dialog actions: Vuetify 2's secondary (#424242) is dark
+             grey, and on the dark theme's surface it read as a disabled button. -->
+        <v-btn variant="text" color="primary" @click="emit('close')">{{
           t('calendar.details.close')
         }}</v-btn>
       </v-card-actions>

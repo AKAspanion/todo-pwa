@@ -25,6 +25,8 @@ verified: human:panditankit1995@gmail.com
   Resetting deletes the accounts and documents but not the Auth emulator's recorded reset codes, so a spec that
   reads codes compares them with a snapshot taken before its action (`newResetCodes` in
   `e2e/support/emulator.ts`); counting all of them failed once the same spec ran in a second browser.
+  `createUser` makes accounts verified unless given `verified: false`, so the verify-email banner shows only in
+  `e2e/verify-email.spec.ts`.
 - **Visual:** each screen's spec has one visual test (Chromium) that captures its states at 390 and 1280 px into
   `design/modernize/<screen>/` and compares them with the references in `refs/`. The references are captures
   of the old app (`b8af93e^`), taken by `e2e/old-app-refs.spec.ts` against a worktree that
@@ -57,5 +59,6 @@ The policy's `checks.commands.test` and `checks.commands.e2e`, plus `pnpm run te
 - `e2e/support/old-app.mjs`
 - `design/modernize/old-app-states.md`
 - `e2e/support/emulator.ts`
+- `e2e/verify-email.spec.ts`
 - `e2e/auth.spec.ts`
 - `README.md`

@@ -50,6 +50,10 @@ export const DEVICE_STORAGE_KEY = 'pushDevice';
 /** The message the service worker posts when a notification is clicked (src/sw.ts sends the same). */
 const OPEN_NOTIFICATIONS = 'OPEN_NOTIFICATIONS';
 const NOTIFICATIONS_PATH = '/notification';
+/** The icon the service worker shows reminders with (src/sw.ts uses the same). */
+const NOTIFICATION_ICON = '/img/icons/android-chrome-192x192.png';
+/** One example at a time: turning notifications on again replaces the last one. */
+const EXAMPLE_TAG = 'notifications-example';
 /** A foreground message is shown in the snackbar, cut to this many characters per part. */
 const MESSAGE_PART_MAX = 200;
 
@@ -179,17 +183,42 @@ function start(): Promise<boolean> {
   return ready;
 }
 
-/** This device's FCM token, through the app's own service worker (never firebase-messaging-sw.js). */
-async function tokenForThisDevice(): Promise<string> {
-  if (!messaging) throw new Error('messaging/unsupported');
+/** The app's own service worker; push goes through it (never firebase-messaging-sw.js). */
+async function appRegistration(): Promise<ServiceWorkerRegistration> {
   const registration = await navigator.serviceWorker.getRegistration();
   if (!registration) throw new Error('messaging/no-service-worker');
+  return registration;
+}
+
+/** This device's FCM token, through the app's own service worker. */
+async function tokenForThisDevice(): Promise<string> {
+  if (!messaging) throw new Error('messaging/unsupported');
   const token = await getToken(messaging, {
     vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-    serviceWorkerRegistration: registration,
+    serviceWorkerRegistration: await appRegistration(),
   });
   registrationBound = true;
   return token;
+}
+
+/**
+ * Shows an example notification as soon as notifications are on, so the user sees at once what a
+ * reminder looks like and that this device can show one. It is shown by the page through the
+ * service worker, not pushed, so it proves the permission and the worker, not delivery from the
+ * server. A failure is logged by its name and leaves notifications on.
+ */
+async function showExample(): Promise<void> {
+  const { t } = i18n.global;
+  try {
+    const registration = await appRegistration();
+    await registration.showNotification(t('notifications.example.title'), {
+      body: t('notifications.example.body'),
+      icon: NOTIFICATION_ICON,
+      tag: EXAMPLE_TAG,
+    });
+  } catch (error) {
+    console.warn('[messaging] could not show the example notification:', errorCode(error));
+  }
 }
 
 /**
@@ -253,6 +282,7 @@ async function enable(): Promise<EnableResult> {
     const previous = device.value;
     await saveDevice(uid, token);
     setDevice({ uid, token });
+    await showExample();
     if (previous && previous.uid === uid && previous.token !== token) {
       // The token changed: the old one is dead, so its document goes too.
       removeDevice(previous.uid, previous.token).catch((error: unknown) => {

@@ -20,8 +20,9 @@ verified: human:panditankit1995@gmail.com
 
 ## Folder layout
 
-- Only `src/services/` touches Firestore and Auth; `src/lib/firebase.ts` creates the one app. Views and components go through a store (`src/views/HomeView.vue`), except every auth screen (`SignInView`, `SignUpView`, `ForgotPasswordView`, `ResetPasswordView`), which calls `src/services/auth.ts` directly (a ruling in the password-reset run: there is no per-user data to hold). Push messaging is the one other Firebase caller, and lives in `src/pwa/useMessaging.ts` and `src/sw.ts`.
+- Only `src/services/` touches Firestore and Auth; `src/lib/firebase.ts` creates the one app. Views and components go through a store (`src/views/HomeView.vue`), except every auth screen (`SignInView`, `SignUpView`, `ForgotPasswordView`, `ResetPasswordView`, `VerifyEmailView`), which calls `src/services/auth.ts` directly (a ruling in the password-reset run: there is no per-user data to hold). `VerifyEmailView` also asks the session store to re-check the signed-in user. Push messaging is the one other Firebase caller, and lives in `src/pwa/useMessaging.ts` and `src/sw.ts`.
 - Shared components are grouped by area under `src/components/<area>/` (`tasks`, `fields`, `layout`, `calendar`).
+- A composable shared by components of different areas goes in `src/composables/use<Name>.ts` (`src/composables/useSignOut.ts`); the PWA's own stay in `src/pwa/`.
 - Every visible string lives in `src/i18n/locales/<lang>/<feature>.json`, with the same keys in `en` and `hi`; each file is the `<feature>` namespace (`src/plugins/i18n.ts`).
 - Imports from `src/` use the `@/` alias (`vite.config.ts`). Components use `<script setup lang="ts">`.
 - In `functions/`, rules with no Firebase in them go in their own module so they are cheap to test (`functions/src/dueTasks.ts`).
@@ -58,10 +59,14 @@ verified: human:panditankit1995@gmail.com
 
 ## History
 
+- 2026-11-06: there was no place for a composable shared across areas; now `src/composables/`, first used for sign-out, which the menu and Profile share.
+- 2026-11-06: four auth screens called `src/services/auth.ts` directly; now `VerifyEmailView` does too, and re-checks the signed-in user through the session store.
 - 2026-11-05: views always went through a store; now the four auth screens call `src/services/auth.ts` directly, because they hold no per-user data and sign-in and sign-up already did.
 - 2026-11-03: the store style for new code was an open question; now setup style. See [Setup-style stores](../decisions/setup-style-stores.md).
 
 ## Sources
+
+- `src/composables/useSignOut.ts`
 
 - `functions/src/deleteUserData.ts`
 - `./eslint.config.js`
@@ -76,6 +81,7 @@ verified: human:panditankit1995@gmail.com
 - `src/router/index.ts`
 - `src/views/HomeView.vue`
 - `src/services/auth.ts`
+- `src/views/VerifyEmailView.vue`
 - `src/stores/tasks.ts`
 - `src/stores/session.ts`
 - `src/services/tasks.ts`

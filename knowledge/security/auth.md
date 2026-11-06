@@ -36,7 +36,10 @@ verified: human:panditankit1995@gmail.com
   path no longer than `MAX_REDIRECT_LENGTH`; `//host`, `/\host` and the like go to `/home`.
 - The guard keeps two sets (`src/router/guard.ts`): `safeRedirect` never returns `/signin`, `/signup` or
   `/forgot-password`, and a signed-in visit is sent away only from `/signin` and `/signup`. So a signed-in visitor can
-  open `/forgot-password`, and `/reset-password` is open to everyone ([features/password-reset](../features/password-reset.md)).
+  open `/forgot-password`, and `/reset-password` is open to everyone ([features/password-reset](../features/password-reset.md)),
+  as is `/verify-email` ([features/email-verification](../features/email-verification.md)).
+- Nothing reads `emailVerified` to allow or refuse anything: verification is a reminder
+  ([decisions/email-verification-reminder](../decisions/email-verification-reminder.md)).
   The sets compare paths exactly ([findings/guard-compares-paths-exactly](../findings/guard-compares-paths-exactly.md)).
 - A reset code (`oobCode`), email or password is never logged. Resetting the password of the account signed in on a
   device makes Firebase revoke that account's refresh tokens, so its sessions, on this device and others, end at their
@@ -55,6 +58,7 @@ verified: human:panditankit1995@gmail.com
 
 ## Sources
 
+- `src/views/VerifyEmailView.vue`
 - `src/services/auth.ts`
 - `src/services/account.ts`
 - `src/lib/authDomain.ts`

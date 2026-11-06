@@ -290,10 +290,16 @@ watch(
           </v-form>
         </v-card-text>
 
+        <!-- A way home from every state; a signed-out visitor is sent on to sign in from there. -->
         <v-card-text class="pt-9 pb-7">
-          <router-link class="auth-link text-caption" to="/privacy">{{
-            t('auth.privacyLink')
+          <router-link class="auth-link text-caption" to="/home">{{
+            t('auth.reset.home')
           }}</router-link>
+          <div class="pt-2">
+            <router-link class="auth-link text-caption" to="/privacy">{{
+              t('auth.privacyLink')
+            }}</router-link>
+          </div>
         </v-card-text>
 
         <v-btn-toggle

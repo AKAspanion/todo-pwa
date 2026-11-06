@@ -11,6 +11,7 @@ import {
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AccountSection from '@/components/profile/AccountSection.vue';
+import PhotoDialog from '@/components/profile/PhotoDialog.vue';
 import { vFocusOnMount } from '@/directives/focusOnMount';
 import { authErrorCode, authErrorKey } from '@/lib/authForm';
 import { consumeRedirectResult, updateDisplayName } from '@/services/auth';
@@ -68,6 +69,10 @@ const initials = computed(() => {
 
 /** The provider's photo, only when it is an https URL (`httpsPhotoUrl`). */
 const photoUrl = computed(() => httpsPhotoUrl(session.user?.photoURL) ?? undefined);
+
+// Editing the photo link
+
+const photoDialogOpen = ref(false);
 
 // Editing the name
 
@@ -210,14 +215,25 @@ onMounted(async () => {
         <div class="old-app-bg bg-primary" style="height: 224px"></div>
         <div class="old-app-content">
           <div class="pt-2 pb-4 d-flex justify-center">
-            <v-avatar size="110" class="profile__avatar" aria-hidden="true">
-              <v-img v-if="photoUrl" :src="photoUrl" cover />
-              <template v-else>
-                <span v-if="initials" class="profile__initials">{{ initials }}</span>
-                <v-icon v-else icon="mdi-face-man" color="primary" />
-              </template>
-            </v-avatar>
+            <div class="profile__photo">
+              <v-avatar size="110" class="profile__avatar" aria-hidden="true">
+                <v-img v-if="photoUrl" :src="photoUrl" cover />
+                <template v-else>
+                  <span v-if="initials" class="profile__initials">{{ initials }}</span>
+                  <v-icon v-else icon="mdi-face-man" color="primary" />
+                </template>
+              </v-avatar>
+              <v-btn
+                icon="mdi-pencil"
+                size="small"
+                color="white"
+                class="profile__photo-edit"
+                :aria-label="t('profile.photo.edit')"
+                @click="photoDialogOpen = true"
+              />
+            </div>
           </div>
+          <PhotoDialog :open="photoDialogOpen" @close="photoDialogOpen = false" />
 
           <div v-if="!editingName" class="profile__row profile__name-row mb-n2">
             <h1 class="profile__name text-white">{{ displayName }}</h1>
@@ -226,7 +242,8 @@ onMounted(async () => {
               icon="mdi-pencil"
               variant="text"
               size="small"
-              class="profile__edit text-white"
+              color="white"
+              class="profile__edit"
               :aria-label="t('profile.name.edit')"
               @click="startNameEdit"
             />
@@ -388,6 +405,18 @@ onMounted(async () => {
 
 <!-- The old Profile: a colour band with the avatar, name and email, the labels in an outlined card. -->
 <style scoped>
+/* The photo's pencil sits on the avatar's lower right edge, as on most profile screens. */
+.profile__photo {
+  position: relative;
+}
+.profile__photo-edit {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+}
+.profile__photo-edit :deep(.v-icon) {
+  color: rgb(var(--v-theme-primary));
+}
 .profile__avatar {
   background: #fff;
   color: rgba(0, 0, 0, 0.87);

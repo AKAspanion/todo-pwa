@@ -8,10 +8,13 @@
 const ERROR_KEYS: ReadonlyMap<string, string> = new Map([
   ['auth/email-already-in-use', 'auth.errors.emailInUse'],
   ['auth/invalid-email', 'auth.errors.invalidEmail'],
-  ['auth/wrong-password', 'auth.errors.wrongPassword'],
+  // A wrong password and an unknown email share one message, so sign-in can't be used to learn who
+  // has an account, whether or not the project's email enumeration protection is on
+  // (questions/sign-in-error-enumeration).
+  ['auth/wrong-password', 'auth.errors.invalidCredential'],
   ['auth/invalid-credential', 'auth.errors.invalidCredential'],
   ['auth/invalid-login-credentials', 'auth.errors.invalidCredential'],
-  ['auth/user-not-found', 'auth.errors.userNotFound'],
+  ['auth/user-not-found', 'auth.errors.invalidCredential'],
   ['auth/user-disabled', 'auth.errors.userDisabled'],
   ['auth/weak-password', 'auth.errors.weakPassword'],
   ['auth/too-many-requests', 'auth.errors.tooManyRequests'],

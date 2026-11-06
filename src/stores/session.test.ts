@@ -3,7 +3,12 @@ import { flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { deleteCurrentUser } from '@/services/account';
-import { onUserChanged, signOutUser } from '@/services/auth';
+import {
+  onUserChanged,
+  reloadEmailVerified,
+  sendVerificationEmail,
+  signOutUser,
+} from '@/services/auth';
 import { useLabelsStore } from './labels';
 import { useNotificationsStore } from './notifications';
 import { useSessionStore } from './session';
@@ -14,6 +19,8 @@ import type { Task } from '@/types/models';
 vi.mock('@/services/auth', () => ({
   onUserChanged: vi.fn(),
   signOutUser: vi.fn(),
+  reloadEmailVerified: vi.fn(),
+  sendVerificationEmail: vi.fn(),
 }));
 vi.mock('@/services/account', () => ({ deleteCurrentUser: vi.fn() }));
 vi.mock('@/services/tasks', () => ({
@@ -28,7 +35,13 @@ vi.mock('@/services/notifications', () => ({
   deleteNotification: vi.fn(),
 }));
 
-const alice = { uid: 'alice', email: 'a@example.com', displayName: 'Alice', photoURL: null };
+const alice = {
+  uid: 'alice',
+  email: 'a@example.com',
+  displayName: 'Alice',
+  photoURL: null,
+  emailVerified: true,
+};
 
 const task: Task = {
   id: 't1',
@@ -296,6 +309,53 @@ describe('session store', () => {
       expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'permission-denied');
       expect(warn).toHaveBeenCalledWith('[session] a sign-out hook failed:', 'TypeError');
       expect(JSON.stringify(warn.mock.calls)).not.toContain('secret-ish detail');
+    });
+  });
+
+  describe('email verification (decisions/email-verification-reminder)', () => {
+    beforeEach(() => {
+      vi.mocked(reloadEmailVerified).mockReset();
+      vi.mocked(sendVerificationEmail).mockReset();
+    });
+
+    it('marks the user verified once the reload says so', async () => {
+      startSession()({ ...alice, emailVerified: false } as unknown as User);
+      vi.mocked(reloadEmailVerified).mockResolvedValue(true);
+      const session = useSessionStore();
+
+      await expect(session.checkEmailVerified()).resolves.toBe(true);
+      expect(session.user?.emailVerified).toBe(true);
+    });
+
+    it('leaves the user unverified when the reload says not yet', async () => {
+      startSession()({ ...alice, emailVerified: false } as unknown as User);
+      vi.mocked(reloadEmailVerified).mockResolvedValue(false);
+      const session = useSessionStore();
+
+      await expect(session.checkEmailVerified()).resolves.toBe(false);
+      expect(session.user?.emailVerified).toBe(false);
+    });
+
+    it('drops the answer when the user changed while it ran', async () => {
+      const listener = startSession();
+      listener({ ...alice, emailVerified: false } as unknown as User);
+      const bob = { ...alice, uid: 'bob', emailVerified: false };
+      vi.mocked(reloadEmailVerified).mockImplementation(async () => {
+        listener(bob as unknown as User);
+        return true;
+      });
+      const session = useSessionStore();
+
+      await expect(session.checkEmailVerified()).resolves.toBe(false);
+      expect(session.user).toEqual(bob);
+    });
+
+    it('resends through the service, and the failure reaches the caller', async () => {
+      startSession()({ ...alice, emailVerified: false } as unknown as User);
+      const error = Object.assign(new Error('x'), { code: 'auth/too-many-requests' });
+      vi.mocked(sendVerificationEmail).mockRejectedValue(error);
+
+      await expect(useSessionStore().resendVerification()).rejects.toBe(error);
     });
   });
 });
