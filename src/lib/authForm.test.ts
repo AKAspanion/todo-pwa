@@ -40,8 +40,11 @@ describe('authErrorKey', () => {
       'auth/network-request-failed',
       "Couldn't reach the server. Check your connection and try again.",
     ],
-    ['auth/wrong-password', 'The password is invalid or the user does not have a password.'],
-    ['auth/invalid-credential', 'The email address or password is incorrect.'],
+    // One message for a wrong password and an unknown email, so sign-in never tells who has an account.
+    ['auth/wrong-password', 'Incorrect email or password.'],
+    ['auth/user-not-found', 'Incorrect email or password.'],
+    ['auth/invalid-credential', 'Incorrect email or password.'],
+    ['auth/invalid-login-credentials', 'Incorrect email or password.'],
     ['auth/invalid-email', 'The email address is badly formatted.'],
     ['auth/expired-action-code', 'This reset link has expired. Ask for a new one.'],
     [
@@ -57,7 +60,6 @@ describe('authErrorKey', () => {
 
   it('gives a key that exists for every code it knows', () => {
     for (const code of [
-      'auth/user-not-found',
       'auth/user-disabled',
       'auth/weak-password',
       'auth/too-many-requests',

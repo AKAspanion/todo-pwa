@@ -2,7 +2,12 @@ import type { User } from 'firebase/auth';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { deleteCurrentUser } from '@/services/account';
-import { onUserChanged, signOutUser } from '@/services/auth';
+import {
+  onUserChanged,
+  reloadEmailVerified,
+  sendVerificationEmail,
+  signOutUser,
+} from '@/services/auth';
 import type { SessionUser } from '@/types/models';
 import { useLabelsStore } from './labels';
 import { useNotificationsStore } from './notifications';
@@ -12,7 +17,13 @@ import { useUiStore } from './ui';
 export type SignOutHook = () => Promise<void> | void;
 
 function toSessionUser(u: User): SessionUser {
-  return { uid: u.uid, email: u.email, displayName: u.displayName, photoURL: u.photoURL };
+  return {
+    uid: u.uid,
+    email: u.email,
+    displayName: u.displayName,
+    photoURL: u.photoURL,
+    emailVerified: u.emailVerified,
+  };
 }
 
 /** Firebase errors carry a `code`; anything else is logged by its name only, never its message. */
@@ -123,5 +134,33 @@ export const useSessionStore = defineStore('session', () => {
     user.value = null;
   }
 
-  return { user, ready, start, signOut, onSignOut, runSignOutHooks, deleteAccount };
+  /** Sends the signed-in user another verification email; the failure reaches the caller. */
+  function resendVerification(): Promise<void> {
+    return sendVerificationEmail();
+  }
+
+  /**
+   * Asks Firebase whether the signed-in user's email is verified yet, and marks it when it is.
+   * Firebase's reload doesn't call the auth listener, so the store sets the flag itself. Resolves
+   * false, changing nothing, when the user changed while it ran.
+   */
+  async function checkEmailVerified(): Promise<boolean> {
+    const uid = currentUid();
+    const verified = await reloadEmailVerified();
+    if (!verified || !user.value || user.value.uid !== uid) return false;
+    user.value = { ...user.value, emailVerified: true };
+    return true;
+  }
+
+  return {
+    user,
+    ready,
+    start,
+    signOut,
+    onSignOut,
+    runSignOutHooks,
+    deleteAccount,
+    resendVerification,
+    checkEmailVerified,
+  };
 });

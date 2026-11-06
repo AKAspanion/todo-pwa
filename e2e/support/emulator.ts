@@ -63,11 +63,16 @@ export async function resetEmulators(): Promise<void> {
   ]);
 }
 
-/** Creates an email and password account in the Auth emulator. */
+/**
+ * Creates an email and password account in the Auth emulator. It is verified unless
+ * `verified: false`, so the verify-email banner (decisions/email-verification-reminder) shows only
+ * in the specs about it.
+ */
 export async function createUser(
   email: string,
   password: string,
   displayName?: string,
+  { verified = true }: { verified?: boolean } = {},
 ): Promise<TestUser> {
   const auth = `http://${AUTH_HOST}/identitytoolkit.googleapis.com/v1`;
   const json = { 'Content-Type': 'application/json' };
@@ -84,6 +89,14 @@ export async function createUser(
       method: 'POST',
       headers: json,
       body: JSON.stringify({ idToken: created.idToken, displayName, returnSecureToken: false }),
+    });
+  }
+  if (verified) {
+    // Only an admin may set emailVerified; the emulator takes `Bearer owner` as one.
+    await call(`${auth}/projects/${PROJECT_ID}/accounts:update`, {
+      method: 'POST',
+      headers: { ...json, Authorization: 'Bearer owner' },
+      body: JSON.stringify({ localId: created.localId, emailVerified: true }),
     });
   }
   return { uid: created.localId, email, password, displayName: displayName ?? null };
@@ -214,15 +227,24 @@ export async function listOobCodes(): Promise<OobCode[]> {
 }
 
 /**
- * The password-reset codes recorded for `email` since `before` (an earlier `listOobCodes()`).
- * The emulator keeps its codes when `resetEmulators()` deletes the accounts, so a spec that runs
- * in a second browser would otherwise also see the first browser's codes.
+ * The codes of one kind (`PASSWORD_RESET`, `VERIFY_EMAIL`) recorded for `email` since `before` (an
+ * earlier `listOobCodes()`). The emulator keeps its codes when `resetEmulators()` deletes the
+ * accounts, so a spec that runs in a second browser would otherwise also see the first browser's.
  */
-export async function newResetCodes(email: string, before: OobCode[]): Promise<OobCode[]> {
+export async function newOobCodes(
+  email: string,
+  before: OobCode[],
+  requestType: string,
+): Promise<OobCode[]> {
   const seen = new Set(before.map((c) => c.oobCode));
   return (await listOobCodes()).filter(
-    (c) => c.email === email && c.requestType === 'PASSWORD_RESET' && !seen.has(c.oobCode),
+    (c) => c.email === email && c.requestType === requestType && !seen.has(c.oobCode),
   );
+}
+
+/** The password-reset codes recorded for `email` since `before`. */
+export function newResetCodes(email: string, before: OobCode[]): Promise<OobCode[]> {
+  return newOobCodes(email, before, 'PASSWORD_RESET');
 }
 
 /** Sets an account's photo URL in the Auth emulator, signing in over REST to do it. */

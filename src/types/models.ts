@@ -49,4 +49,6 @@ export interface SessionUser {
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
+  /** False for an email account whose address isn't verified yet; the reminder banner shows then. */
+  emailVerified: boolean;
 }

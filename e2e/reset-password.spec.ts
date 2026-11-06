@@ -17,9 +17,8 @@ const EN = JSON.parse(
 const ANN = 'ann@example.com';
 const OLD_PASSWORD = 'abc-def_9';
 const NEW_PASSWORD = 'newpass12';
-/** The emulator reports a wrong password as wrong-password, or invalid-credential with email enumeration protection on. */
-const WRONG_PASSWORD_ERROR =
-  /The password is invalid or the user does not have a password\.|The email address or password is incorrect\./;
+/** A wrong password and an unknown email share one message (questions/sign-in-error-enumeration). */
+const WRONG_PASSWORD_ERROR = /Incorrect email or password\./;
 
 /** Asks for a reset through /forgot-password and returns the code the Auth emulator recorded. */
 async function askForReset(page: Page, email: string): Promise<string> {

@@ -22,7 +22,7 @@ Raised on 2026-11-05 after the sign-in visual fixes; the developer hasn't answer
 
 ## Status
 
-Open
+Answered: one message, "Incorrect email or password.", for both, whatever the console setting. See [decisions/sign-in-one-error-message](../decisions/sign-in-one-error-message.md).
 
 ## Sources
 

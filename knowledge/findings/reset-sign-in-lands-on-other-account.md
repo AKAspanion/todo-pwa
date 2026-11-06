@@ -14,7 +14,8 @@ generated:
 Suppose account B's password is reset while A is signed in on the device. The done state's "Sign in" goes to `/signin`,
 which the guard sends a signed-in visitor on from, to A's `/home`, under a screen that just said B's password changed.
 On a shared device the user may act in A believing it is B. ("Ask for a new link" goes to `/forgot-password`, which a
-signed-in visitor can now open, so only "Sign in" is affected after this branch's guard change.) The e2e spec checks
+signed-in visitor can now open, so only "Sign in" is affected after this branch's guard change. The "Back to home" link
+added on 2026-11-06 goes to A's `/home` the same way.) The e2e spec checks
 only the link's href on a signed-in device, not where the click ends up.
 
 ## Evidence

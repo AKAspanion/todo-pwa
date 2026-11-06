@@ -26,6 +26,14 @@ screen. When reminders are sent is [domain/reminder-schedule](../domain/reminder
 
 ## Rules
 
+- Turning notifications on shows one example notification once the device is saved ("Notifications are on"), shown
+  by the page through the service worker (`showExample` in `src/pwa/useMessaging.ts`), so the user sees what a
+  reminder looks like. It proves the permission and the worker, not delivery from the server; a failure to show it
+  is logged and leaves notifications on.
+- The toggle's label sits before the switch, as in the menu.
+- Why reminders weren't reaching a device was still being traced on 2026-11-06:
+  [findings/push-reminders-not-received](../findings/push-reminders-not-received.md).
+
 - Permission is asked for only by the toggle, from a click, and only where Firebase messaging is supported and
   the browser has `Notification` and service workers (iOS Safari has no `Notification`); elsewhere the toggle
   is disabled with a message (spec P1).
@@ -40,6 +48,8 @@ screen. When reminders are sent is [domain/reminder-schedule](../domain/reminder
   ([security/roles](../security/roles.md)).
 
 ## History
+
+- 2026-11-06: turning notifications on showed nothing, and the toggle's label sat after the switch; now an example notification shows at once and the label comes first, because the developer asked.
 
 - 2026-11-05: sign-out removed the device document and then the push token, and a failed delete stopped the token's removal; now the token is removed whatever the delete does, even offline, and after an account deletion the hook runs best-effort, because a token left behind would send reminders to the next user of the browser. See [decisions/delete-account-deletes-user-first](../decisions/delete-account-deletes-user-first.md).
 - 2026-11-04: was the rewrite's layout and text; now the old Notification's, because the app is restored to the old look. See [decisions/restore-original-design](../decisions/restore-original-design.md).

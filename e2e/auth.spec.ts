@@ -37,9 +37,8 @@ const EN = STRINGS.en;
 const PASSWORD = 'abc-def_9';
 /** The old app printed Firebase's raw error here; the app keeps its own text, shown in the old snackbar. */
 const NETWORK_ERROR = "Couldn't reach the server. Check your connection and try again.";
-/** The emulator reports a wrong password as wrong-password, or invalid-credential with email enumeration protection on. */
-const WRONG_PASSWORD_ERROR =
-  /The password is invalid or the user does not have a password\.|The email address or password is incorrect\./;
+/** A wrong password and an unknown email share one message (questions/sign-in-error-enumeration). */
+const WRONG_PASSWORD_ERROR = /Incorrect email or password\./;
 
 /** Name rules axe checks: every button, link and field has an accessible name (W5). */
 const NAME_RULES = [

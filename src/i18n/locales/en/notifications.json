@@ -16,5 +16,9 @@
     "retry": "Retry",
     "delete": "Delete notification",
     "deleteFailed": "Error deleting notification"
+  },
+  "example": {
+    "title": "Notifications are on",
+    "body": "You'll get a reminder like this one an hour before a task is due."
   }
 }

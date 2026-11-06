@@ -3,7 +3,10 @@
 import LegalPage from '@/components/layout/LegalPage.vue';
 
 /** W3: a change to this policy updates this date. */
-const PRIVACY_EFFECTIVE = '4 November 2026';
+const PRIVACY_EFFECTIVE = '6 November 2026';
+/** decisions/adsense-ads: where Google explains its ad data and where to opt out. */
+const ADS_SETTINGS = 'https://adssettings.google.com';
+const GOOGLE_PARTNER_SITES = 'https://policies.google.com/technologies/partner-sites';
 const CONTACT_EMAIL = 'panditankit1995@gmail.com';
 </script>
 
@@ -41,14 +44,30 @@ const CONTACT_EMAIL = 'panditankit1995@gmail.com';
     <h2 class="text-subtitle-1 font-weight-medium">Who processes it</h2>
     <p>
       Google, through Firebase (Firebase Authentication, Cloud Firestore, Hosting, Cloud Functions
-      and Cloud Messaging), on Google's servers. Nobody else.
+      and Cloud Messaging), on Google's servers; and Google again as our ad provider (below). Nobody
+      else.
+    </p>
+
+    <h2 class="text-subtitle-1 font-weight-medium">Ads</h2>
+    <p>
+      Task Manager shows ads from Google AdSense. Google and its partners use cookies and device
+      identifiers to show and measure these ads, and may personalise them based on your visits to
+      this and other websites. Your tasks, labels and account details are never given to them. If
+      you are in the EEA, the UK or Switzerland, you are asked for your consent first.
+    </p>
+    <p>
+      You can turn off personalised ads at
+      <a :href="ADS_SETTINGS" target="_blank" rel="noopener">adssettings.google.com</a>, and read
+      how Google uses this data at
+      <a :href="GOOGLE_PARTNER_SITES" target="_blank" rel="noopener"
+        >policies.google.com/technologies/partner-sites</a
+      >.
     </p>
 
     <h2 class="text-subtitle-1 font-weight-medium">What we don't do</h2>
     <ul>
-      <li>No ads.</li>
-      <li>No analytics or tracking.</li>
-      <li>No selling or sharing of your data.</li>
+      <li>No analytics of our own.</li>
+      <li>No selling of your data.</li>
       <li>No access to your contacts, location, camera or files.</li>
     </ul>
 

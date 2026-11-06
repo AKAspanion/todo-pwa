@@ -218,8 +218,9 @@
  * The old ContainerApp: a flat card the height of the screen between the bars, with a rounded,
  * raised colour band behind the top of its content (the old profile, as the new home draws it).
  */
+/* The verify-email banner sets --verify-banner-height while it shows (VerifyEmailBanner.vue). */
 .old-app-card {
-  height: calc(100vh - 80px - 56px);
+  height: calc(100vh - 80px - 56px - var(--verify-banner-height, 0px));
 }
 .old-app-wrapper {
   position: relative;

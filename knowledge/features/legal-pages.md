@@ -15,7 +15,8 @@ generated:
 Two public pages that Play's listing links to ([decisions/account-deletion-for-play](../decisions/account-deletion-for-play.md)):
 
 - `/privacy`: the privacy policy. It says who runs the app, what is collected and why, who processes it (Google,
-  through Firebase), what the app doesn't do, how long data is kept, and children. It carries an effective date
+  through Firebase), that the app shows Google AdSense ads ([decisions/adsense-ads](../decisions/adsense-ads.md)),
+  what the app doesn't do, how long data is kept, and children. It carries an effective date
   that a change to the policy updates (`PRIVACY_EFFECTIVE` in `src/views/PrivacyView.vue`).
 - `/delete-account`: how to delete an account: the in-app steps, an email request for someone who can't sign in,
   what is deleted and what is kept. The deletion itself is [features/account-deletion](account-deletion.md).
@@ -37,6 +38,10 @@ Two public pages that Play's listing links to ([decisions/account-deletion-for-p
 - What the pages state must stay true to what the app does: the policy's retention paragraph describes the order and
   scope of [features/account-deletion](account-deletion.md) and `deleteUserData` ([apps/functions](../apps/functions.md)).
 - The root `PRIVACY.md` is now only a pointer to `/privacy`; the policy's text lives in the view.
+
+## History
+
+- 2026-11-06: the policy promised no ads; now it has an Ads section on Google AdSense, its cookies, consent and opt-out, because the app will show ads. See [decisions/adsense-ads](../decisions/adsense-ads.md).
 
 ## Sources
 

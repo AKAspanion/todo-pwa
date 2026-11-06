@@ -289,6 +289,13 @@ onBeforeUnmount(() => {
 .add-task__wide {
   grid-column: 1 / -1;
 }
+/* The title, time and date keep a line under them for their message; 12 px more below it, so an
+   error doesn't touch the field under it (as sign-in's fields do). Time and date render through a
+   menu with no single root, so a class can't reach their field: they are matched as the grid's
+   text fields, the description's textarea aside. */
+.add-task__grid > :deep(.v-text-field:not(.v-textarea)) {
+  margin-bottom: 12px;
+}
 .add-task__labels {
   display: flex;
   align-items: center;

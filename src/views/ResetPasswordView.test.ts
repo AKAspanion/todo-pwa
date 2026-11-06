@@ -203,6 +203,7 @@ describe('ResetPasswordView', () => {
 
       expect(mounted().text()).toContain(INVALID);
       expect(link('Ask for a new link')?.attributes('href')).toBe('/forgot-password');
+      expect(link('Back to home')?.attributes('href')).toBe('/home');
       expect(mounted().text()).not.toContain(CHECKING);
       expect(mounted().find('input[name="new-password"]').exists()).toBe(false);
       expect(checkResetCode).not.toHaveBeenCalled();
@@ -304,6 +305,7 @@ describe('ResetPasswordView', () => {
     expect(resetPassword).toHaveBeenCalledExactlyOnceWith('abc', 'newpass12');
     expect(mounted().text()).toContain(DONE);
     expect(link('Sign in')?.attributes('href')).toBe('/signin');
+    expect(link('Back to home')?.attributes('href')).toBe('/home');
     expect(mounted().find('input[name="new-password"]').exists()).toBe(false);
   });
 

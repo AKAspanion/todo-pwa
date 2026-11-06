@@ -74,6 +74,9 @@ const SHARED_COLORS = {
 
 export const vuetify = createVuetify({
   blueprint: md2,
+  // Merged over md2's defaults. md2's switch has a thumb wider than its track, which overhangs the
+  // track's start and was clipped where a row cut it off; inset keeps the thumb inside the track.
+  defaults: { VSwitch: { inset: true } },
   locale: { adapter: vuetifyLocaleAdapter },
   theme: {
     defaultTheme: storedTheme(),

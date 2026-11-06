@@ -17,7 +17,10 @@ sign-up screens). Both are remembered per device, not per account, and survive s
 
 ## Screens and routes
 
-The app menu, `src/components/layout/AppMenu.vue`; the state is `src/stores/ui.ts`.
+The app menu, `src/components/layout/AppMenu.vue`; the state is `src/stores/ui.ts`. In the menu each option is a row with its name on the
+left and its control at the end: the language toggle, and the dark mode switch, which the switch's
+`aria-label` names. The switch sits in the row's `append` slot; in the row's content its thumb was clipped and its
+label sat beside it.
 
 ## Rules
 
@@ -29,6 +32,10 @@ The app menu, `src/components/layout/AppMenu.vue`; the state is `src/stores/ui.t
   ([project/conventions](../project/conventions.md)). Vuetify's own strings come from the app's
   `vuetify.json` locale files through the vue-i18n adapter.
 - Blocked storage never breaks the app: the choice applies until the page reloads.
+
+## History
+
+- 2026-11-06: the dark mode switch sat in the row's content with its label beside it, its thumb clipped; now the row's title is the label and the switch sits at the end, lined up with the language toggle, because the developer found it misaligned.
 
 ## Sources
 

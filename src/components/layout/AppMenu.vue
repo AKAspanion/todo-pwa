@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
-import { authErrorCode } from '@/lib/authForm';
+import { useSignOut } from '@/composables/useSignOut';
 import { httpsPhotoUrl } from '@/lib/photo';
 import heartIcon from '@/assets/heart-icon.png';
 import { useSessionStore } from '@/stores/session';
@@ -20,7 +20,8 @@ const session = useSessionStore();
 const ui = useUiStore();
 
 const open = ref(false);
-const signingOut = ref(false);
+/** Shared with Profile's Account card, so this menu's watcher skips either sign-out. */
+const { signingOut, signOut: signOutAndLeave } = useSignOut();
 
 /** Shown on the app's own screens only: never on sign-in or sign-up. */
 const visible = computed(() => session.user !== null && route.meta.requireAuth === true);
@@ -50,23 +51,11 @@ const dark = computed({
 });
 
 async function signOut(): Promise<void> {
-  if (signingOut.value) return;
-  signingOut.value = true;
-  try {
-    await session.signOut();
-    open.value = false;
-    await router.replace('/signin');
-    ui.showSnack(t('auth.menu.signedOut'));
-  } catch (error) {
-    console.warn('[auth] sign-out failed:', authErrorCode(error) || 'unknown');
-    ui.showSnack(t('auth.menu.signOutFailed'));
-  } finally {
-    signingOut.value = false;
-  }
+  if (await signOutAndLeave()) open.value = false;
 }
 
 // Signed out elsewhere (another tab, an expired session): leave the page for sign-in, which
-// brings the user back here afterwards. A sign-out from this menu goes to plain /signin instead.
+// brings the user back here afterwards. A sign-out from this menu or Profile goes to plain /signin.
 watch(
   () => session.user,
   (user, previous) => {
@@ -157,14 +146,19 @@ watch(
             </template>
           </v-list-item>
 
-          <v-list-item class="text-left">
-            <v-switch
-              v-model="dark"
-              color="primary"
-              density="compact"
-              hide-details
-              :label="t('auth.menu.darkMode')"
-            />
+          <!-- Drawn like the rows around it: the text as the title, the switch at the end. Inside
+               the row's content the switch's thumb was clipped and its label sat beside it. -->
+          <v-list-item :title="t('auth.menu.darkMode')" class="text-left">
+            <template #append>
+              <v-switch
+                v-model="dark"
+                color="primary"
+                density="compact"
+                hide-details
+                class="menu-switch"
+                :aria-label="t('auth.menu.darkMode')"
+              />
+            </template>
           </v-list-item>
 
           <!-- An action, not a place: a button to assistive tech (Vuetify gives it role listitem). -->
@@ -208,6 +202,10 @@ watch(
 }
 .bar-right {
   margin-right: 4px;
+}
+/* The switch keeps its own width, so the row's end lines it up under the language toggle. */
+.menu-switch {
+  flex: none;
 }
 .made-by img {
   width: 12px;

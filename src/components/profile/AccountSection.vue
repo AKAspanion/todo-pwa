@@ -1,14 +1,16 @@
 <script setup lang="ts">
 /**
- * Profile's Account card (D1), drawn like the labels card above it: the privacy policy (W2) and
- * Delete account, whose dialog it owns. Profile calls `openDialog` when Google's re-confirmation
- * redirect comes back (D4).
+ * Profile's Account card (D1), drawn like the labels card above it: the privacy policy (W2), Sign
+ * out (the menu's flow, `useSignOut`) and Delete account, whose dialog it owns. Profile calls
+ * `openDialog` when Google's re-confirmation redirect comes back (D4).
  */
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useSignOut } from '@/composables/useSignOut';
 import DeleteAccountDialog from './DeleteAccountDialog.vue';
 
 const { t } = useI18n();
+const { signingOut, signOut } = useSignOut();
 
 const dialogOpen = ref(false);
 const dialogConfirmed = ref(false);
@@ -35,6 +37,10 @@ defineExpose({ openDialog });
         <v-icon icon="mdi-shield-account" class="account__icon" />
         <span class="account__text">{{ t('profile.account.privacy') }}</span>
       </router-link>
+      <button type="button" class="account__item" :disabled="signingOut" @click="signOut">
+        <v-icon icon="mdi-logout-variant" class="account__icon" />
+        <span class="account__text">{{ t('auth.menu.signOut') }}</span>
+      </button>
       <button type="button" class="account__item" @click="openDialog(false, null)">
         <v-icon icon="mdi-delete" class="account__icon" />
         <span class="account__text">{{ t('profile.delete.button') }}</span>
@@ -72,6 +78,10 @@ defineExpose({ openDialog });
   text-align: left;
   text-decoration: none;
   cursor: pointer;
+}
+.account__item:disabled {
+  cursor: progress;
+  opacity: 0.6;
 }
 .account__item:hover {
   background: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));

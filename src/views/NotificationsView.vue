@@ -228,8 +228,13 @@ async function remove(n: AppNotification): Promise<void> {
   --v-input-control-height: 32px;
 }
 
+/* The label before the switch, as in the menu and on add task: Vuetify puts it after. */
+.notifications__toggle :deep(.v-selection-control) {
+  flex-direction: row-reverse;
+}
 .notifications__toggle :deep(.v-label) {
   font-size: 0.75rem;
   opacity: 1;
+  padding-inline: 0 8px;
 }
 </style>

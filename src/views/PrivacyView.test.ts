@@ -28,6 +28,7 @@ const HEADINGS = [
   'Who',
   'What we collect and why',
   'Who processes it',
+  'Ads',
   "What we don't do",
   'Security',
   'Keeping and deleting your data',
@@ -45,7 +46,7 @@ describe('PrivacyView (W3)', () => {
     const { wrapper } = await mountPrivacy();
 
     expect(wrapper.get('h1').text()).toBe('Privacy policy');
-    expect(wrapper.text()).toContain('Effective 4 November 2026');
+    expect(wrapper.text()).toContain('Effective 6 November 2026');
   });
 
   it('names the developer and links to his email', async () => {
@@ -69,7 +70,7 @@ describe('PrivacyView (W3)', () => {
     expect(wrapper.find('a[href="/delete-account"]').exists()).toBe(true);
   });
 
-  it('names each Firebase service, and says no ads and no analytics', async () => {
+  it('names each Firebase service, and says there is no analytics', async () => {
     const { wrapper } = await mountPrivacy();
     const text = wrapper.text();
 
@@ -82,8 +83,21 @@ describe('PrivacyView (W3)', () => {
     ]) {
       expect(text).toContain(service);
     }
-    expect(text).toContain('No ads');
+    expect(text).not.toContain('No ads');
     expect(text).toContain('No analytics');
+  });
+
+  it('says the app shows Google AdSense ads, how consent works, and how to opt out', async () => {
+    const { wrapper } = await mountPrivacy();
+    const text = wrapper.text();
+
+    expect(text).toContain('Google AdSense');
+    expect(text).toContain('cookies');
+    expect(text).toContain('the EEA, the UK or Switzerland');
+    expect(wrapper.find('a[href="https://adssettings.google.com"]').exists()).toBe(true);
+    expect(
+      wrapper.find('a[href="https://policies.google.com/technologies/partner-sites"]').exists(),
+    ).toBe(true);
   });
 
   it('marks its root as English', async () => {

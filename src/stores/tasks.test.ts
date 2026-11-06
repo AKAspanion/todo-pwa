@@ -45,6 +45,7 @@ describe('tasks store', () => {
       email: 'a@example.com',
       displayName: null,
       photoURL: null,
+      emailVerified: true,
     };
     for (const fn of [listTasks, createTask, updateTask, deleteTask]) vi.mocked(fn).mockReset();
   });
