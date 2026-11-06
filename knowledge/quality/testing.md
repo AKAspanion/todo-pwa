@@ -22,6 +22,9 @@ verified: human:panditankit1995@gmail.com
 - **End to end:** Playwright specs in `e2e/`, one per screen plus `smoke`, `shell` and `pwa`, in Chromium and
   WebKit (`playwright.config.ts`). They share one set of emulators and reset them, so they run one at a time,
   against their own Vite server. `e2e/auth.spec.ts` also checks accessibility with `@axe-core/playwright`.
+  Resetting deletes the accounts and documents but not the Auth emulator's recorded reset codes, so a spec that
+  reads codes compares them with a snapshot taken before its action (`newResetCodes` in
+  `e2e/support/emulator.ts`); counting all of them failed once the same spec ran in a second browser.
 - **Visual:** each screen's spec has one visual test (Chromium) that captures its states at 390 and 1280 px into
   `design/modernize/<screen>/` and compares them with the references in `refs/`. The references are captures
   of the old app (`b8af93e^`), taken by `e2e/old-app-refs.spec.ts` against a worktree that

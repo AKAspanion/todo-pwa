@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { createUser, listOobCodes, resetEmulators } from './support/emulator';
+import { createUser, listOobCodes, newResetCodes, resetEmulators } from './support/emulator';
 
 /** The strings these tests look for, read from the app's own locale file. */
 interface AuthStrings {
@@ -37,28 +37,23 @@ test.describe('forgot password', () => {
 
   test('a known address gets a reset code and the neutral confirmation', async ({ page }) => {
     await createUser('ann@example.com', PASSWORD);
+    const before = await listOobCodes();
 
     await askForResetFromSignIn(page, 'ann@example.com');
 
     await expect(page.getByText(EN.forgot.sent)).toBeVisible();
     await expect(page.getByRole('link', { name: EN.forgot.backToSignIn })).toBeVisible();
-    await expect
-      .poll(async () =>
-        (await listOobCodes()).filter(
-          (c) => c.email === 'ann@example.com' && c.requestType === 'PASSWORD_RESET',
-        ),
-      )
-      .toHaveLength(1);
+    await expect.poll(() => newResetCodes('ann@example.com', before)).toHaveLength(1);
   });
 
   test('an unknown address gets the same confirmation and no code', async ({ page }) => {
     await createUser('ann@example.com', PASSWORD);
+    const before = await listOobCodes();
 
     await askForResetFromSignIn(page, 'nobody@example.com');
 
     await expect(page.getByText(EN.forgot.sent)).toBeVisible();
     await expect(page.getByRole('link', { name: EN.forgot.backToSignIn })).toBeVisible();
-    const codes = await listOobCodes();
-    expect(codes.filter((c) => c.email === 'nobody@example.com')).toHaveLength(0);
+    expect(await newResetCodes('nobody@example.com', before)).toHaveLength(0);
   });
 });

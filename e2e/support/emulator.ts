@@ -213,6 +213,18 @@ export async function listOobCodes(): Promise<OobCode[]> {
   return result.oobCodes ?? [];
 }
 
+/**
+ * The password-reset codes recorded for `email` since `before` (an earlier `listOobCodes()`).
+ * The emulator keeps its codes when `resetEmulators()` deletes the accounts, so a spec that runs
+ * in a second browser would otherwise also see the first browser's codes.
+ */
+export async function newResetCodes(email: string, before: OobCode[]): Promise<OobCode[]> {
+  const seen = new Set(before.map((c) => c.oobCode));
+  return (await listOobCodes()).filter(
+    (c) => c.email === email && c.requestType === 'PASSWORD_RESET' && !seen.has(c.oobCode),
+  );
+}
+
 /** Sets an account's photo URL in the Auth emulator, signing in over REST to do it. */
 export async function setPhotoUrl(
   email: string,
