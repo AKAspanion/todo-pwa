@@ -195,7 +195,11 @@ describe('ForgotPasswordView', () => {
     expect(requestPasswordReset).toHaveBeenCalledWith(ANN);
     expect(mounted().text()).toContain(SENT);
     expect(mounted().find('input[name="email"]').exists()).toBe(false);
-    expect(mounted().findAll('a').some((a) => a.text() === 'Back to sign in')).toBe(true);
+    expect(
+      mounted()
+        .findAll('a')
+        .some((a) => a.text() === 'Back to sign in'),
+    ).toBe(true);
   });
 
   it('asks once when "Send reset link" is pressed twice before the first call settles', async () => {
@@ -282,7 +286,9 @@ describe('ForgotPasswordView', () => {
     await hindi.trigger('click');
     await flushPromises();
 
-    expect(mounted().text()).toContain('अगर इस ईमेल से कोई खाता है, तो रीसेट लिंक भेज दिया गया है।');
+    expect(mounted().text()).toContain(
+      'अगर इस ईमेल से कोई खाता है, तो रीसेट लिंक भेज दिया गया है।',
+    );
     expect(mounted().text()).not.toContain(SENT);
     expect(mounted().find('input[name="email"]').exists()).toBe(false);
   });
