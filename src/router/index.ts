@@ -48,6 +48,20 @@ export const routes: RouteRecordRaw[] = [
   },
   { path: '/signin', name: 'signin', component: () => import('@/views/SignInView.vue') },
   { path: '/signup', name: 'signup', component: () => import('@/views/SignUpView.vue') },
+  // decisions/password-reset: the email typed on sign-in arrives in history state, never the URL.
+  {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('@/views/ForgotPasswordView.vue'),
+  },
+  // decisions/password-reset: the reset email's link lands here with `mode` and `oobCode`. Open to
+  // everyone, signed in or not, so a link opened on a signed-in device still works: not a
+  // signed-out path (guard.ts), and no meta.
+  {
+    path: '/reset-password',
+    name: 'reset-password',
+    component: () => import('@/views/ResetPasswordView.vue'),
+  },
   // W1: public to anyone, signed in or not; no meta, so neither the menu nor the bottom bar shows.
   { path: '/privacy', name: 'privacy', component: () => import('@/views/PrivacyView.vue') },
   {

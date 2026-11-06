@@ -15,9 +15,10 @@ generated:
 Play requires an app that lets people create an account to let them delete it, both inside the app and through a
 web link given in the Data safety form. Deletion was agreed as part 8 of
 [decisions/usability-roadmap](usability-roadmap.md), to be built after parts 1–7
-([decisions/data-export-import-and-account-deletion](data-export-import-and-account-deletion.md)). The app has no
-password reset ([questions/password-reset](../questions/password-reset.md)), so an email user who forgot their
-password can't reach an in-app button.
+([decisions/data-export-import-and-account-deletion](data-export-import-and-account-deletion.md)). The app had no
+password reset when this was decided ([questions/password-reset](../questions/password-reset.md)), so an email user
+who forgot their password couldn't reach an in-app button; one has since been decided
+([decisions/password-reset](password-reset.md)).
 
 ## Decision
 

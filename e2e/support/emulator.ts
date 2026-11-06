@@ -198,6 +198,21 @@ export async function listUserEmails(): Promise<string[]> {
   return (result.userInfo ?? []).map((u) => u.email ?? '').sort();
 }
 
+export interface OobCode {
+  email: string;
+  requestType: string;
+  oobCode: string;
+  oobLink: string;
+}
+
+/** The out-of-band codes the Auth emulator recorded, from GET /emulator/v1/projects/demo-todo/oobCodes. */
+export async function listOobCodes(): Promise<OobCode[]> {
+  const result = await call<{ oobCodes?: OobCode[] }>(
+    `http://${AUTH_HOST}/emulator/v1/projects/${PROJECT_ID}/oobCodes`,
+  );
+  return result.oobCodes ?? [];
+}
+
 /** Sets an account's photo URL in the Auth emulator, signing in over REST to do it. */
 export async function setPhotoUrl(
   email: string,

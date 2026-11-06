@@ -34,6 +34,14 @@ verified: human:panditankit1995@gmail.com
 - `authGuard` (`src/router/guard.ts`) sends a signed-out visit to a `requireAuth` route to `/signin` with a
   `redirect` query, and a signed-in visit to sign-in or sign-up onwards. `safeRedirect` accepts only an in-app
   path no longer than `MAX_REDIRECT_LENGTH`; `//host`, `/\host` and the like go to `/home`.
+- The guard keeps two sets (`src/router/guard.ts`): `safeRedirect` never returns `/signin`, `/signup` or
+  `/forgot-password`, and a signed-in visit is sent away only from `/signin` and `/signup`. So a signed-in visitor can
+  open `/forgot-password`, and `/reset-password` is open to everyone ([features/password-reset](../features/password-reset.md)).
+  The sets compare paths exactly ([findings/guard-compares-paths-exactly](../findings/guard-compares-paths-exactly.md)).
+- A reset code (`oobCode`), email or password is never logged. Resetting the password of the account signed in on a
+  device makes Firebase revoke that account's refresh tokens, so its sessions, on this device and others, end at their
+  next token refresh, within the hour; the Firestore rules don't check revocation, so the current ID token works until
+  then.
 - The guard only decides which screen shows. What a user can read or write is decided by `firestore.rules`
   ([security/roles](roles.md)).
 - When Firebase reports another user, or none, the session store clears every per-user store so the next
@@ -42,6 +50,7 @@ verified: human:panditankit1995@gmail.com
 
 ## History
 
+- 2026-11-05: the guard kept one set of signed-out screens; now it keeps two, so a signed-in visitor can open `/forgot-password`, because a reset link opened on a signed-in device must be able to ask for a new one. See [decisions/password-reset](../decisions/password-reset.md).
 - 2026-11-05: Google used a popup and fell back to a redirect; now it is a redirect only, and re-authentication before deleting an account is by password or Google redirect, because the Play app's Trusted Web Activity can't show a popup. See [decisions/google-sign-in-redirect-only](../decisions/google-sign-in-redirect-only.md).
 
 ## Sources

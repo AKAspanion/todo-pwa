@@ -55,6 +55,20 @@ const signUpLink = computed(() => {
   return { path: '/signup', query: typeof redirect === 'string' ? { redirect } : {} };
 });
 
+/**
+ * The forgot-password screen, keeping the page to return to. The email typed so far rides in
+ * history state, never the URL, so it stays out of logs and the address bar
+ * (decisions/password-reset).
+ */
+const forgotLink = computed(() => {
+  const redirect = route.query.redirect;
+  return {
+    path: '/forgot-password',
+    query: typeof redirect === 'string' ? { redirect } : {},
+    state: { email: email.value.trim() },
+  };
+});
+
 function finish(): Promise<unknown> {
   return router.replace(safeRedirect(route.query.redirect));
 }
@@ -195,6 +209,11 @@ onMounted(async () => {
                         />
                       </template>
                     </v-text-field>
+                    <div class="text-right">
+                      <router-link class="auth-link text-caption" :to="forgotLink">{{
+                        t('auth.signIn.forgotLink')
+                      }}</router-link>
+                    </div>
                   </div>
                 </v-form>
               </div>

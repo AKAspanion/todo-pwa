@@ -9,6 +9,7 @@
 - [Privacy policy and account-deletion pages](legal-pages.md) - The public /privacy and /delete-account pages Google Play asks for, in English only, reachable signed in or out and linked from sign-in, sign-up, Profile and the delete dialog.
 - [Notifications and push reminders](notifications.md) - The notifications screen — a per-device push toggle and the list of reminders received, newest first.
 - [Install, offline and updates](offline-and-updates.md) - The app installs as a PWA, opens offline once loaded online, offers each new release instead of forcing it, and removes the old app's service workers.
+- [Password reset](password-reset.md) - A "Forgot password?" link on sign-in opens /forgot-password, which sends Firebase's reset email; /reset-password sets the new password under sign-up's rule.
 - [Profile and labels](profile-and-labels.md) - The profile screen — the user's name and photo, editing the display name, and creating labels with a name and colour.
 - [Sign in and sign up](sign-in.md) - Email and password or Google; signed-out visitors are sent to sign in and come back to the page they asked for.
 - [Task board (home)](task-board.md) - The home screen — Todo and Done lists, narrowed by text, labels and a day, where tasks are checked, dragged, edited and deleted.

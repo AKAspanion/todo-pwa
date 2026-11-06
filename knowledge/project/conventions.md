@@ -20,7 +20,7 @@ verified: human:panditankit1995@gmail.com
 
 ## Folder layout
 
-- Only `src/services/` touches Firestore and Auth; `src/lib/firebase.ts` creates the one app. Views and components go through a store (`src/views/HomeView.vue`). Push messaging is the one other Firebase caller, and lives in `src/pwa/useMessaging.ts` and `src/sw.ts`.
+- Only `src/services/` touches Firestore and Auth; `src/lib/firebase.ts` creates the one app. Views and components go through a store (`src/views/HomeView.vue`), except every auth screen (`SignInView`, `SignUpView`, `ForgotPasswordView`, `ResetPasswordView`), which calls `src/services/auth.ts` directly (a ruling in the password-reset run: there is no per-user data to hold). Push messaging is the one other Firebase caller, and lives in `src/pwa/useMessaging.ts` and `src/sw.ts`.
 - Shared components are grouped by area under `src/components/<area>/` (`tasks`, `fields`, `layout`, `calendar`).
 - Every visible string lives in `src/i18n/locales/<lang>/<feature>.json`, with the same keys in `en` and `hi`; each file is the `<feature>` namespace (`src/plugins/i18n.ts`).
 - Imports from `src/` use the `@/` alias (`vite.config.ts`). Components use `<script setup lang="ts">`.
@@ -58,6 +58,7 @@ verified: human:panditankit1995@gmail.com
 
 ## History
 
+- 2026-11-05: views always went through a store; now the four auth screens call `src/services/auth.ts` directly, because they hold no per-user data and sign-in and sign-up already did.
 - 2026-11-03: the store style for new code was an open question; now setup style. See [Setup-style stores](../decisions/setup-style-stores.md).
 
 ## Sources
@@ -74,6 +75,7 @@ verified: human:panditankit1995@gmail.com
 - `vite.config.ts`
 - `src/router/index.ts`
 - `src/views/HomeView.vue`
+- `src/services/auth.ts`
 - `src/stores/tasks.ts`
 - `src/stores/session.ts`
 - `src/services/tasks.ts`

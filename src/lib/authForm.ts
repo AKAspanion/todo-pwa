@@ -1,7 +1,7 @@
 /**
- * What the sign-in and sign-up screens share: the password rule (D14) and the locale key that
- * explains a Firebase auth error. The screens show these keys, never Firebase's own message,
- * which can carry internals.
+ * What the sign-in, sign-up and password-reset screens share: the password rule (D14) and the
+ * locale key that explains a Firebase auth error. The screens show these keys, never Firebase's
+ * own message, which can carry internals.
  */
 
 /** The Firebase auth error codes the screens explain, each with the key that explains it. */
@@ -17,6 +17,8 @@ const ERROR_KEYS: ReadonlyMap<string, string> = new Map([
   ['auth/too-many-requests', 'auth.errors.tooManyRequests'],
   ['auth/account-exists-with-different-credential', 'auth.errors.accountExists'],
   ['auth/network-request-failed', 'auth.errors.network'],
+  ['auth/expired-action-code', 'auth.errors.resetLinkExpired'],
+  ['auth/invalid-action-code', 'auth.errors.resetLinkInvalid'],
 ]);
 
 const UNKNOWN_KEY = 'auth.errors.unknown';
