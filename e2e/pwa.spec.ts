@@ -15,12 +15,14 @@ import { AUTH_EMULATOR_HOST, createUser, resetEmulators, type TestUser } from '.
 const PREVIEW_PORT = Number(process.env.E2E_PREVIEW_PORT ?? 4179);
 const ORIGIN = `http://localhost:${PREVIEW_PORT}`;
 const PASSWORD = 'abc-def_9';
-const TWA_PACKAGE = 'app.web.spanion_todo.twa';
-/** Both signing keys (Play app signing and upload), from the old statement and the Android build. */
-const FINGERPRINTS = [
-  '01:C6:DD:FE:78:5B:44:73:09:DF:8B:6C:02:F0:72:AE:E2:C2:1F:C5:C0:F1:68:AC:E5:DA:53:EF:EF:C3:40:1C',
-  '05:FF:05:24:25:81:9B:BA:C2:A8:85:AF:0B:A2:33:B1:19:E9:C1:A0:22:EF:24:D1:B8:6A:79:19:AF:BA:A0:80',
-];
+/** The Play app, renamed from app.web.spanion_todo.twa (knowledge/apps/android-twa.md). */
+const TWA_PACKAGE = 'in.spanion.todo.twa';
+/**
+ * The upload key's SHA-256, which the statement must list. Play's app-signing key joins it after the
+ * first upload, so the test allows more fingerprints, as tests/android/twa-manifest.test.ts does.
+ */
+const UPLOAD_KEY_FINGERPRINT =
+  '05:FF:05:24:25:81:9B:BA:C2:A8:85:AF:0B:A2:33:B1:19:E9:C1:A0:22:EF:24:D1:B8:6A:79:19:AF:BA:A0:80';
 const demoEnv = parseEnv(readFileSync('.env.ci', 'utf8')) as Record<string, string>;
 /** The app's demo key: Firebase Auth keeps the signed-in user under a key named after it. */
 const API_KEY = demoEnv.VITE_FIREBASE_API_KEY ?? 'demo-api-key';
@@ -184,7 +186,7 @@ test.describe('PWA production build', () => {
     }
   });
 
-  test('/.well-known/assetlinks.json is JSON naming the TWA and both signing keys (W1)', async ({
+  test('/.well-known/assetlinks.json is JSON naming the TWA and its upload key (W1)', async ({
     request,
   }) => {
     const response = await request.get(`${ORIGIN}/.well-known/assetlinks.json`);
@@ -201,9 +203,11 @@ test.describe('PWA production build', () => {
       namespace: 'android_app',
       package_name: TWA_PACKAGE,
     });
-    expect([...(statements[0]?.target.sha256_cert_fingerprints ?? [])].sort()).toEqual(
-      [...FINGERPRINTS].sort(),
-    );
+    const fingerprints = statements[0]?.target.sha256_cert_fingerprints ?? [];
+    expect(fingerprints).toContain(UPLOAD_KEY_FINGERPRINT);
+    for (const fingerprint of fingerprints) {
+      expect(fingerprint).toMatch(/^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
+    }
   });
 
   test('a waiting new version shows "A new version is available" and reloads only on Reload (D20)', async ({

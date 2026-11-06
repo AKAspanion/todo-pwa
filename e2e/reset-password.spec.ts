@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { createUser, listOobCodes, resetEmulators } from './support/emulator';
+import { createUser, listOobCodes, newResetCodes, resetEmulators } from './support/emulator';
 
 /** The strings these tests look for, read from the app's own locale file. */
 interface AuthStrings {
@@ -23,6 +23,7 @@ const WRONG_PASSWORD_ERROR =
 
 /** Asks for a reset through /forgot-password and returns the code the Auth emulator recorded. */
 async function askForReset(page: Page, email: string): Promise<string> {
+  const before = await listOobCodes();
   await page.goto('/forgot-password');
   await page.getByLabel(EN.fields.email, { exact: true }).fill(email);
   await page.getByRole('button', { name: EN.forgot.submit }).click();
@@ -31,9 +32,7 @@ async function askForReset(page: Page, email: string): Promise<string> {
   let code = '';
   await expect
     .poll(async () => {
-      const found = (await listOobCodes()).find(
-        (c) => c.email === email && c.requestType === 'PASSWORD_RESET',
-      );
+      const [found] = await newResetCodes(email, before);
       code = found?.oobCode ?? '';
       return code;
     })
