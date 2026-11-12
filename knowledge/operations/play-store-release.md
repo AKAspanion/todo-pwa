@@ -22,8 +22,10 @@ so the two don't drift:
   assembleRelease`) then signed by `jarsigner` and `apksigner` reading the password from its file, and saved as
   `~/keys/task-manager/app-release-<version>-<code>.aab` and `.apk`. The Gradle route is the one that works here:
   Bubblewrap's build refuses the Android Studio SDK at `~/Library/Android/sdk`, which has no `tools/` or `bin/`.
-- **Fingerprints:** the SHA-256 of the upload key and of Play's app-signing key go into `public/.well-known/assetlinks.json`
-  and `twa-manifest.json`; until they are there the app shows a URL bar.
+- **Fingerprints:** the SHA-256 of the upload key and of every certificate Play signs the installed app with go into
+  `public/.well-known/assetlinks.json`; until they are there a Play install shows a URL bar. Play's are read from
+  an install, since Android 17 checks a post-quantum signer the App signing page doesn't show
+  ([apps/android-twa](../apps/android-twa.md)).
 - **Play Console answers:** the README lists them (privacy policy `/privacy`, account deletion `/delete-account`,
   see [features/legal-pages](../features/legal-pages.md)).
 - **Closed test:** a new personal developer account needs a closed test with 12 testers for 14 days before it can
@@ -34,6 +36,7 @@ so the two don't drift:
 
 ## History
 
+- 2026-11-12: the fingerprints were to go into `assetlinks.json` and `twa-manifest.json`, Play's being the App signing page's key; now only `assetlinks.json`, with every certificate read from a Play install, because a Play install still showed a URL bar on Android 17.
 - 2026-11-05: the developer was to create a new upload key and build with `bubblewrap build`; now the existing key in
   `~/keys/task-manager/` is reused and releases follow the flashcards pattern (Gradle, then `jarsigner` and
   `apksigner` with a password file), because the developer asked for that pattern and Bubblewrap's SDK check fails

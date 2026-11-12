@@ -71,8 +71,19 @@ public, so they are committed, and nothing reads the keystore to get them.
    ```
 
 2. Add it to `sha256_cert_fingerprints` in `assetlinks.json`.
-3. After the first upload, Play signs the app with its own app-signing key: in Play Console, App integrity,
-   App signing, copy the app-signing key certificate's SHA-256 fingerprint and add it beside the first.
+3. After the first upload, Play signs the app with its own keys, and adds every one of them beside the first.
+   Play Console's App integrity, App signing page shows the RSA app-signing key, but a Play install also
+   carries a hybrid signing block whose ML-DSA certificate is the signer Android 17 checks, so read them all
+   from an install: with the phone on USB debugging,
+
+   ```bash
+   adb shell pm get-app-links in.spanion.todo.twa   # Signatures: the certificate this Android checks
+   adb pull "$(adb shell pm path in.spanion.todo.twa | head -1 | cut -d: -f2)" base.apk
+   apksigner verify --print-certs --max-sdk-version 36 base.apk   # the RSA signer
+   ```
+
+   `apksigner` needs Java 24 or later to read the ML-DSA signer itself. Skip the Source Stamp certificate:
+   it isn't a signer.
 4. Deploy the site, then check `https://todo.spanion.in` with `in.spanion.todo.twa` and each fingerprint in
    Google's [Statement List Generator and Tester](https://developers.google.com/digital-asset-links/tools/generator).
    Hosting serves the file as `application/json` (`firebase.json`).
