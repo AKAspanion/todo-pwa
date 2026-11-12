@@ -5,7 +5,10 @@
       "namespace": "android_app",
       "package_name": "in.spanion.todo.twa",
       "sha256_cert_fingerprints": [
-        "05:FF:05:24:25:81:9B:BA:C2:A8:85:AF:0B:A2:33:B1:19:E9:C1:A0:22:EF:24:D1:B8:6A:79:19:AF:BA:A0:80"
+        "05:FF:05:24:25:81:9B:BA:C2:A8:85:AF:0B:A2:33:B1:19:E9:C1:A0:22:EF:24:D1:B8:6A:79:19:AF:BA:A0:80",
+        "62:95:65:D7:7A:56:80:F6:7B:F1:1D:D6:82:69:8E:AB:F9:C1:B8:94:3B:4F:DC:FD:37:E7:31:2F:B1:89:01:E3",
+        "30:B5:77:E3:F8:9D:BA:06:59:3E:EC:8E:ED:B3:3B:87:A2:B7:CD:22:DE:81:48:D3:68:48:AD:FD:54:5D:2B:E1",
+        "EF:16:6E:62:16:0A:A5:94:48:D5:FD:E5:9B:02:BE:66:AE:C7:CE:F4:6A:56:91:BB:76:22:AD:76:37:D4:E8:AD"
       ]
     }
   }
