@@ -1,0 +1,8 @@
+{
+  "workflow": {
+    "review": {
+      "when": "end-of-plan"
+    }
+  },
+  "habitsOffered": "2026-11-18"
+}

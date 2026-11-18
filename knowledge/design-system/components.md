@@ -20,7 +20,7 @@ Everything else is a Vuetify component, auto-imported by `vite-plugin-vuetify` (
   route a plain bar with a back arrow to `/home` and a title chip from `common.bar.*`), `AppNav.vue` (the old
   BarNav, from each route's `meta.nav`; the profile tab shows the user's photo, else `mdi-face-man`, with an
   https-only check in `src/lib/photo.ts`), `AppSnackbar.vue` (the one snackbar, driven by `src/stores/ui.ts`), `AppLogo.vue` (the blue double tick as a decorative inline SVG, prop `size`; an exception to the old look, see [decisions/app-logo](../decisions/app-logo.md)), `VerifyEmailBanner.vue` (the verify-email reminder above Home and Profile, see [features/email-verification](../features/email-verification.md)).
-- `src/components/layout/LegalPage.vue`: the shared layout of the public `/privacy` and `/delete-account` pages: a back
+- `src/components/layout/LegalPage.vue`: the shared layout of the public `/privacy`, `/terms` and `/delete-account` pages: a back
   button, the heading and the text, with `lang="en"` on its root ([features/legal-pages](../features/legal-pages.md)).
 - `src/components/profile/`: Profile's Account card, `AccountSection.vue`; `DeleteAccountDialog.vue`, the
   delete dialog it opens ([features/account-deletion](../features/account-deletion.md)); and `PhotoDialog.vue`, which

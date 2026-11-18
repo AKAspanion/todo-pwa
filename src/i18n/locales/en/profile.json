@@ -31,7 +31,8 @@
   },
   "account": {
     "title": "Account",
-    "privacy": "Privacy policy"
+    "privacy": "Privacy policy",
+    "terms": "Terms of service"
   },
   "delete": {
     "button": "Delete account",

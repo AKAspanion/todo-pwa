@@ -256,7 +256,10 @@ onMounted(async () => {
           <router-link class="auth-link text-caption" :to="signUpLink">{{
             t('auth.signIn.signUpLink')
           }}</router-link>
-          <div class="pt-2">
+          <div class="pt-2 d-flex justify-center ga-3">
+            <router-link class="auth-link text-caption" to="/terms">{{
+              t('auth.termsLink')
+            }}</router-link>
             <router-link class="auth-link text-caption" to="/privacy">{{
               t('auth.privacyLink')
             }}</router-link>

@@ -33,7 +33,7 @@ labels and creates new ones with a name and a colour. Labels are create-only by 
   link removes the photo, sent to Firebase as an empty string because the Auth API refuses null (`updatePhotoUrl` in
   `src/services/auth.ts`). A failed save keeps the dialog and the link as typed. The name pencil is `color="white"`:
   Vuetify's buttons default to the primary colour, which beat a `text-white` class and hid it on the blue band.
-- An Account card below the labels holds a link to the privacy policy ([features/legal-pages](legal-pages.md)), Sign
+- An Account card below the labels holds links to the privacy policy and the terms of service ([features/legal-pages](legal-pages.md)), Sign
   out (the menu's flow, shared through `src/composables/useSignOut.ts`) and
   Delete account ([features/account-deletion](account-deletion.md)); Profile also picks up Google's re-confirmation
   redirect on load (`ProfileView.vue`).
@@ -41,6 +41,7 @@ labels and creates new ones with a name and a colour. Labels are create-only by 
 
 ## History
 
+- 2026-11-18: the Account card had the privacy link only; now a Terms of service row follows it, because the developer asked for a terms page. See [decisions/terms-of-service](../decisions/terms-of-service.md).
 - 2026-11-06: the name pencil was invisible (primary on the blue band), the photo couldn't be changed and signing out was only in the menu; now the pencil is white, a pencil on the avatar edits the photo link and the Account card has Sign out, because the developer asked.
 
 - 2026-11-05: Profile ended at the labels; now an Account card with the privacy link and Delete account follows, because Play requires an in-app way to delete an account. See [decisions/account-deletion-for-play](../decisions/account-deletion-for-play.md).

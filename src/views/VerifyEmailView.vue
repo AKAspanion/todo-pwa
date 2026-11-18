@@ -147,7 +147,10 @@ watch(
           </div>
         </v-card-text>
 
-        <v-card-text class="pt-9 pb-7">
+        <v-card-text class="pt-9 pb-7 d-flex justify-center ga-3">
+          <router-link class="auth-link text-caption" to="/terms">{{
+            t('auth.termsLink')
+          }}</router-link>
           <router-link class="auth-link text-caption" to="/privacy">{{
             t('auth.privacyLink')
           }}</router-link>
