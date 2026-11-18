@@ -38,7 +38,10 @@ let wrapper: VueWrapper | null = null;
 async function mountAt(path: string, signedIn = false): Promise<VueWrapper> {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/verify-email', '/home', '/privacy'].map((p) => ({ path: p, component: Blank })),
+    routes: ['/verify-email', '/home', '/privacy', '/terms'].map((p) => ({
+      path: p,
+      component: Blank,
+    })),
   });
   await router.push(path);
   await router.isReady();
@@ -82,6 +85,15 @@ afterEach(() => {
 });
 
 describe('VerifyEmailView', () => {
+  it('links the privacy policy and the terms of service', async () => {
+    vi.mocked(applyVerificationCode).mockResolvedValue();
+
+    const w = await mountAt(LINK);
+
+    expect(w.get('a[href="/privacy"]').text()).toBe('Privacy policy');
+    expect(w.get('a[href="/terms"]').text()).toBe('Terms of service');
+  });
+
   it('applies the code once and says the email is verified, with a way home', async () => {
     vi.mocked(applyVerificationCode).mockResolvedValue();
 

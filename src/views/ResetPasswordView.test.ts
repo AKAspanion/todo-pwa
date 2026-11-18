@@ -56,10 +56,12 @@ let wrapper: VueWrapper | null = null;
 async function mountAt(path: string): Promise<Router> {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/signin', '/forgot-password', '/reset-password', '/home', '/privacy'].map((p) => ({
-      path: p,
-      component: Blank,
-    })),
+    routes: ['/signin', '/forgot-password', '/reset-password', '/home', '/privacy', '/terms'].map(
+      (p) => ({
+        path: p,
+        component: Blank,
+      }),
+    ),
   });
   await router.push(path);
   await router.isReady();
@@ -419,6 +421,7 @@ describe('ResetPasswordView', () => {
     expect(mounted().text()).toContain('Set a new password');
     expect(mounted().find('[role="group"][aria-label="Language"]').exists()).toBe(true);
     expect(link('Privacy policy')?.attributes('href')).toBe('/privacy');
+    expect(link('Terms of service')?.attributes('href')).toBe('/terms');
   });
 
   it('switching to Hindi on the invalid-link state keeps that state, in Hindi', async () => {

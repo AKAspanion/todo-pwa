@@ -15,6 +15,7 @@ async function mountPrivacy() {
     routes: [
       { path: '/home', component: Blank },
       { path: '/privacy', component: PrivacyView },
+      { path: '/terms', component: Blank },
       { path: '/delete-account', component: Blank },
     ],
   });
@@ -46,7 +47,7 @@ describe('PrivacyView (W3)', () => {
     const { wrapper } = await mountPrivacy();
 
     expect(wrapper.get('h1').text()).toBe('Privacy policy');
-    expect(wrapper.text()).toContain('Effective 6 November 2026');
+    expect(wrapper.text()).toContain('Effective 18 November 2026');
   });
 
   it('names the developer and links to his email', async () => {
@@ -65,9 +66,19 @@ describe('PrivacyView (W3)', () => {
   it('says how long logs are kept, the age limit, and links to /delete-account', async () => {
     const { wrapper } = await mountPrivacy();
 
-    expect(wrapper.text()).toContain('under 13');
+    expect(wrapper.text()).toContain('under 18');
+    expect(wrapper.text()).not.toContain('13');
     expect(wrapper.text()).toContain('30 days');
     expect(wrapper.find('a[href="/delete-account"]').exists()).toBe(true);
+  });
+
+  it('keeps data until the account is deleted by the user or by us, and links the terms', async () => {
+    const { wrapper } = await mountPrivacy();
+
+    expect(wrapper.text()).toContain(
+      'Your data is kept until your account is deleted: by you, or by us if the account breaks the Terms of service.',
+    );
+    expect(wrapper.find('a[href="/terms"]').exists()).toBe(true);
   });
 
   it('names each Firebase service, and says there is no analytics', async () => {

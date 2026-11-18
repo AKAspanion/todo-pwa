@@ -3,7 +3,7 @@
 import LegalPage from '@/components/layout/LegalPage.vue';
 
 /** W3: a change to this policy updates this date. */
-const PRIVACY_EFFECTIVE = '6 November 2026';
+const PRIVACY_EFFECTIVE = '18 November 2026';
 /** decisions/adsense-ads: where Google explains its ad data and where to opt out. */
 const ADS_SETTINGS = 'https://adssettings.google.com';
 const GOOGLE_PARTNER_SITES = 'https://policies.google.com/technologies/partner-sites';
@@ -79,9 +79,10 @@ const CONTACT_EMAIL = 'panditankit1995@gmail.com';
 
     <h2 class="text-subtitle-1 font-weight-medium">Keeping and deleting your data</h2>
     <p>
-      Your data is kept until you delete your account. Deleting it erases the account at once and
-      its data within minutes. Google Cloud's server logs, which may hold your account ID, are kept
-      for up to 30 days.
+      Your data is kept until your account is deleted: by you, or by us if the account breaks the
+      <router-link to="/terms">Terms of service</router-link>. Deleting it erases the account at
+      once and its data within minutes. Google Cloud's server logs, which may hold your account ID,
+      are kept for up to 30 days.
     </p>
     <p>
       How to delete your account:
@@ -90,8 +91,8 @@ const CONTACT_EMAIL = 'panditankit1995@gmail.com';
 
     <h2 class="text-subtitle-1 font-weight-medium">Children</h2>
     <p>
-      Task Manager is not directed at children under 13. An account found to belong to a child under
-      13 is deleted.
+      Task Manager is not directed at anyone under 18. An account found to belong to someone under
+      18 is deleted.
     </p>
 
     <h2 class="text-subtitle-1 font-weight-medium">Changes</h2>

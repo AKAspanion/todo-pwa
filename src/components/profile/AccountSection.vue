@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * Profile's Account card (D1), drawn like the labels card above it: the privacy policy (W2), Sign
- * out (the menu's flow, `useSignOut`) and Delete account, whose dialog it owns. Profile calls
- * `openDialog` when Google's re-confirmation redirect comes back (D4).
+ * Profile's Account card (D1), drawn like the labels card above it: the privacy policy (W2), the
+ * terms of service, Sign out (the menu's flow, `useSignOut`) and Delete account, whose dialog it
+ * owns. Profile calls `openDialog` when Google's re-confirmation redirect comes back (D4).
  */
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -36,6 +36,10 @@ defineExpose({ openDialog });
       <router-link to="/privacy" class="account__item">
         <v-icon icon="mdi-shield-account" class="account__icon" />
         <span class="account__text">{{ t('profile.account.privacy') }}</span>
+      </router-link>
+      <router-link to="/terms" class="account__item">
+        <v-icon icon="mdi-file-document-outline" class="account__icon" />
+        <span class="account__text">{{ t('profile.account.terms') }}</span>
       </router-link>
       <button type="button" class="account__item" :disabled="signingOut" @click="signOut">
         <v-icon icon="mdi-logout-variant" class="account__icon" />

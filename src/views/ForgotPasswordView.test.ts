@@ -46,7 +46,7 @@ let wrapper: VueWrapper | null = null;
 async function mountAt(path: string, state?: HistoryState): Promise<Router> {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/signin', '/forgot-password', '/home', '/privacy'].map((p) => ({
+    routes: ['/signin', '/forgot-password', '/home', '/privacy', '/terms'].map((p) => ({
       path: p,
       component: Blank,
     })),
@@ -143,6 +143,7 @@ describe('ForgotPasswordView', () => {
     expect(mounted().text()).toContain('Reset your password');
     expect(mounted().find('[role="group"][aria-label="Language"]').exists()).toBe(true);
     expect(mounted().get('a[href="/privacy"]').text()).toBe('Privacy policy');
+    expect(mounted().get('a[href="/terms"]').text()).toBe('Terms of service');
   });
 
   it('links "Back to sign in" to /signin, keeping the page to return to', async () => {

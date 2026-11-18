@@ -55,7 +55,9 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
   button when the browser restores the page from its back-forward cache (a `pageshow` listener). Cancelling
   Google's page before it loads leaves the button busy
   ([findings/google-redirect-cancel-leaves-button-busy](../findings/google-redirect-cancel-leaves-button-busy.md)).
-- Both screens show a "Privacy policy" link to `/privacy` ([features/legal-pages](legal-pages.md)).
+- Sign-in's card shows "Terms of service" and "Privacy policy" links; sign-up's carries the notice "By creating an
+  account you agree to the Terms of service and Privacy policy." with both linked and no checkbox
+  ([features/legal-pages](legal-pages.md), [decisions/terms-of-service](../decisions/terms-of-service.md)).
 - After signing in, the app goes to the `redirect` query only when it is an in-app path that isn't sign-in or
   sign-up; anything else goes to `/home` (`safeRedirect` in `src/router/guard.ts`).
 - Errors are shown from Firebase's error code, translated (`authErrorKey` in `src/lib/authForm.ts`). A wrong
@@ -74,6 +76,7 @@ per-user store. How sessions and tokens work: [security/auth](../security/auth.m
 
 ## History
 
+- 2026-11-18: both cards showed a lone "Privacy policy" link; now sign-in shows the terms and privacy links and sign-up an agreement notice in place of its link, because the developer asked for a terms page. See [decisions/terms-of-service](../decisions/terms-of-service.md).
 - 2026-11-06: an unknown email and a wrong password had their own messages, and sign-up's form was content-sized on desktop; now they share "Incorrect email or password." and the form is `460px` wide from 600 px, because the developer asked. See [decisions/sign-in-one-error-message](../decisions/sign-in-one-error-message.md).
 - 2026-11-05: an email user who forgot their password had no way back in; now the email form links to a forgot-password screen, because of [decisions/password-reset](../decisions/password-reset.md).
 - 2026-11-05: only sign-up's button was capped at the card's width, and sign-in's two buttons stuck 40 px out of the card on a 360 px phone; now sign-in's buttons are capped too, because the Play Store app opens on phones that narrow.

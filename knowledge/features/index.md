@@ -7,7 +7,7 @@
 - [Calendar](calendar.md) - The user's dated tasks by day, week or month; clicking one opens its details.
 - [Email verification reminder](email-verification.md) - Email sign-up sends a verification email whose link opens /verify-email in the app; a banner on signed-in screens reminds unverified users, with Resend email and I've verified.
 - [Language and theme](language-and-theme.md) - English or Hindi, light or dark, each remembered on the device under the old app's storage keys.
-- [Privacy policy and account-deletion pages](legal-pages.md) - The public /privacy and /delete-account pages Google Play asks for, in English only, reachable signed in or out and linked from sign-in, sign-up, Profile and the delete dialog.
+- [Privacy policy, terms of service and account-deletion pages](legal-pages.md) - The public /privacy, /terms and /delete-account pages, in English only, reachable signed in or out; the policy and the terms are linked from every auth card and Profile, and sign-up shows an agreement notice.
 - [Notifications and push reminders](notifications.md) - The notifications screen — a per-device push toggle and the list of reminders received, newest first.
 - [Install, offline and updates](offline-and-updates.md) - The app installs as a PWA, opens offline once loaded online, offers each new release instead of forcing it, and removes the old app's service workers.
 - [Password reset](password-reset.md) - A "Forgot password?" link on sign-in opens /forgot-password, which sends Firebase's reset email; /reset-password sets the new password under sign-up's rule.

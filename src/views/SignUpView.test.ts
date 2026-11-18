@@ -49,7 +49,7 @@ let wrapper: VueWrapper | null = null;
 async function mountAt(path: string): Promise<Router> {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/signin', '/signup', '/home', '/calendar', '/privacy'].map((p) => ({
+    routes: ['/signin', '/signup', '/home', '/calendar', '/privacy', '/terms'].map((p) => ({
       path: p,
       component: Blank,
     })),
@@ -169,5 +169,34 @@ describe('SignUpView', () => {
 
     const link = wrapper!.get('a[href="/privacy"]');
     expect(link.text()).toBe('Privacy policy');
+  });
+
+  it('says the account agrees to the terms and the privacy policy, linking both', async () => {
+    await mountAt('/signup');
+
+    const notice = wrapper!.get('[data-testid="signup-agreement"]');
+    expect(notice.text()).toBe(
+      'By creating an account you agree to the Terms of service and Privacy policy.',
+    );
+    expect(notice.get('a[href="/terms"]').text()).toBe('Terms of service');
+    expect(notice.get('a[href="/privacy"]').text()).toBe('Privacy policy');
+  });
+
+  it('has no checkbox, and both sign-up buttons are enabled untouched', async () => {
+    await mountAt('/signup');
+
+    expect(wrapper!.findAll('input[type="checkbox"]')).toHaveLength(0);
+    expect(submitButton().attributes('disabled')).toBeUndefined();
+    expect(googleButton().attributes('disabled')).toBeUndefined();
+  });
+
+  it('says the same in Hindi, the links unchanged', async () => {
+    i18n.global.locale.value = 'hi';
+    await mountAt('/signup');
+
+    const notice = wrapper!.get('[data-testid="signup-agreement"]');
+    expect(notice.text()).toBe('खाता बनाकर आप सेवा की शर्तें और गोपनीयता नीति से सहमत होते हैं।');
+    expect(notice.get('a[href="/terms"]').text()).toBe('सेवा की शर्तें');
+    expect(notice.get('a[href="/privacy"]').text()).toBe('गोपनीयता नीति');
   });
 });

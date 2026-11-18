@@ -48,9 +48,15 @@ let wrapper: VueWrapper | null = null;
 async function mountAt(path: string): Promise<Router> {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/signin', '/signup', '/home', '/calendar', '/privacy', '/forgot-password'].map(
-      (p) => ({ path: p, component: Blank }),
-    ),
+    routes: [
+      '/signin',
+      '/signup',
+      '/home',
+      '/calendar',
+      '/privacy',
+      '/terms',
+      '/forgot-password',
+    ].map((p) => ({ path: p, component: Blank })),
   });
   await router.push(path);
   await router.isReady();
@@ -223,5 +229,19 @@ describe('SignInView', () => {
 
     const link = mounted().get('a[href="/privacy"]');
     expect(link.text()).toBe('Privacy policy');
+  });
+
+  it('links "Terms of service" to /terms beside the privacy link', async () => {
+    await mountAt('/signin');
+
+    expect(mounted().get('a[href="/terms"]').text()).toBe('Terms of service');
+    expect(mounted().get('a[href="/privacy"]').text()).toBe('Privacy policy');
+  });
+
+  it('links the terms in Hindi', async () => {
+    i18n.global.locale.value = 'hi';
+    await mountAt('/signin');
+
+    expect(mounted().get('a[href="/terms"]').text()).toBe('सेवा की शर्तें');
   });
 });
