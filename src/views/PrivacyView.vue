@@ -17,8 +17,7 @@ const CONTACT_EMAIL = 'panditankit1995@gmail.com';
     <h2 class="text-subtitle-1 font-weight-medium">Who</h2>
     <p>
       Task Manager is made by Ankit Kumar Pandit, an individual developer. Contact:
-      <a :href="`mailto:${CONTACT_EMAIL}`">{{ CONTACT_EMAIL }}</a
-      >.
+      <a :href="`mailto:${CONTACT_EMAIL}`">{{ CONTACT_EMAIL }}</a>.
     </p>
 
     <h2 class="text-subtitle-1 font-weight-medium">What we collect and why</h2>

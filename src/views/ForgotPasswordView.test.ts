@@ -287,9 +287,7 @@ describe('ForgotPasswordView', () => {
     await hindi.trigger('click');
     await flushPromises();
 
-    expect(mounted().text()).toContain(
-      'अगर इस ईमेल से कोई खाता है, तो रीसेट लिंक भेज दिया गया है।',
-    );
+    expect(mounted().text()).toContain('अगर इस ईमेल से कोई खाता है, तो रीसेट लिंक भेज दिया गया है।');
     expect(mounted().text()).not.toContain(SENT);
     expect(mounted().find('input[name="email"]').exists()).toBe(false);
   });
