@@ -159,6 +159,7 @@ describe('authGuard', () => {
 
   it.each([
     ['/privacy', 'privacy'],
+    ['/terms', 'terms'],
     ['/delete-account', 'delete-account'],
   ])('routes %s to its own public page, with no menu and no bottom bar (W1)', (path, name) => {
     const location = to(path);
@@ -168,7 +169,7 @@ describe('authGuard', () => {
     expect(location.meta.nav).toBeUndefined();
   });
 
-  it.each(['/privacy', '/delete-account'])(
+  it.each(['/privacy', '/terms', '/delete-account'])(
     'lets a signed-out visit to %s through (W1)',
     async (path) => {
       signedOut();
@@ -177,7 +178,7 @@ describe('authGuard', () => {
     },
   );
 
-  it.each(['/privacy', '/delete-account'])(
+  it.each(['/privacy', '/terms', '/delete-account'])(
     'lets a signed-in visit to %s through, with no redirect (W1)',
     async (path) => {
       signedIn();

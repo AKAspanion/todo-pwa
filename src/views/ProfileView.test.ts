@@ -87,7 +87,7 @@ let loadedRouter: ReturnType<typeof createRouter> | null = null;
 async function loadProfile(): Promise<VueWrapper> {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/profile', '/signin', '/privacy', '/delete-account'].map((path) => ({
+    routes: ['/profile', '/signin', '/privacy', '/terms', '/delete-account'].map((path) => ({
       path,
       component: Blank,
     })),
@@ -147,6 +147,20 @@ afterEach(() => {
 });
 
 describe('ProfileView: the Account card (D1)', () => {
+  it('lists Privacy policy, Terms of service, Sign out and Delete account, in that order', async () => {
+    const profile = await loadProfile();
+
+    const rows = profile.findAll('.account__item');
+    expect(rows.map((r) => r.text())).toEqual([
+      'Privacy policy',
+      'Terms of service',
+      'Sign out',
+      'Delete account',
+    ]);
+    expect(rows[0].attributes('href')).toBe('/privacy');
+    expect(rows[1].attributes('href')).toBe('/terms');
+  });
+
   it('sits below the labels, with a Privacy policy link and a Delete account button', async () => {
     const profile = await loadProfile();
 

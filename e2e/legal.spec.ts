@@ -26,7 +26,7 @@ test.describe('legal pages, signed out (W1, W3, W4)', () => {
     await page.getByRole('link', { name: 'Privacy policy' }).click();
     await expect(page).toHaveURL(/\/privacy$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
-    await expect(page.getByText('Effective 6 November 2026')).toBeVisible();
+    await expect(page.getByText('Effective 18 November 2026')).toBeVisible();
     await expect(page.locator('[lang="en"]').first()).toBeVisible();
     await expectNoAppChrome(page);
 
@@ -61,5 +61,80 @@ test.describe('legal pages, signed out (W1, W3, W4)', () => {
     await page.getByRole('button', { name: 'Back' }).click();
 
     await expect(page).toHaveURL(/\/signin\?redirect=(%2F|\/)home$/);
+  });
+});
+
+test.describe('terms of service page', () => {
+  let user: TestUser;
+
+  test.beforeEach(async () => {
+    await resetEmulators();
+    user = await createUser('ankit@example.info', PASSWORD, 'Ankit');
+  });
+
+  test('a signed-out visitor can open /terms directly, with no app chrome', async ({ page }) => {
+    await page.goto('/terms');
+
+    await expect(page).toHaveURL(/\/terms$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Terms of service' })).toBeVisible();
+    await expectNoAppChrome(page);
+  });
+
+  test('opened first, the back button goes to /home, through sign-in when signed out', async ({
+    page,
+  }) => {
+    await page.goto('/terms');
+
+    await page.getByRole('button', { name: 'Back' }).click();
+
+    await expect(page).toHaveURL(/\/signin\?redirect=(%2F|\/)home$/);
+  });
+
+  test('a signed-in user can open /terms directly', async ({ page }) => {
+    await page.goto('/signin');
+    await signInAs(page, user.email, user.password);
+
+    await page.goto('/terms');
+
+    await expect(page).toHaveURL(/\/terms$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Terms of service' })).toBeVisible();
+  });
+});
+
+test.describe('links to the terms', () => {
+  let user: TestUser;
+
+  test.beforeEach(async () => {
+    await resetEmulators();
+    user = await createUser('ankit@example.info', PASSWORD, 'Ankit');
+  });
+
+  test('from the sign-up notice, the terms lead on to the privacy policy', async ({ page }) => {
+    await page.goto('/signup');
+
+    await page.getByRole('link', { name: 'Terms of service' }).click();
+    await expect(page).toHaveURL(/\/terms$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Terms of service' })).toBeVisible();
+
+    await page.getByRole('link', { name: 'Privacy policy' }).first().click();
+    await expect(page).toHaveURL(/\/privacy$/);
+  });
+
+  test('from sign-in, the terms of service link opens /terms', async ({ page }) => {
+    await page.goto('/signin');
+
+    await page.getByRole('link', { name: 'Terms of service' }).click();
+
+    await expect(page).toHaveURL(/\/terms$/);
+  });
+
+  test('from Profile, the Terms of service row opens /terms', async ({ page }) => {
+    await page.goto('/signin');
+    await signInAs(page, user.email, user.password);
+    await page.goto('/profile');
+
+    await page.getByRole('link', { name: 'Terms of service' }).click();
+
+    await expect(page).toHaveURL(/\/terms$/);
   });
 });

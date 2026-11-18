@@ -41,7 +41,7 @@ The exception is the logo: the browser-tab favicon and the loading screen in `in
 
 The routes are declared in `src/router/index.ts`: `/home`, `/calendar`, `/add`, `/notification` and `/profile`
 need a signed-in user (`meta.requireAuth`, enforced by `authGuard` in `src/router/guard.ts`); `/signin` and
-`/signup` don't, and neither do the public `/privacy` and `/delete-account` pages, which also show no menu or
+`/signup` don't, and neither do the public `/privacy`, `/terms` and `/delete-account` pages, which also show no menu or
 bottom bar ([features/legal-pages](../features/legal-pages.md)). `/`, `/index` and any unknown path redirect to `/home`. Each route's `meta.nav` names the
 bottom-navigation tab it marks. The screens are described per feature in [features](../features/index.md).
 
@@ -53,6 +53,7 @@ bottom-navigation tab it marks. The screens are described per feature in [featur
 
 ## History
 
+- 2026-11-18: the public pages were `/privacy` and `/delete-account`; now `/terms` is public too, because of [decisions/terms-of-service](../decisions/terms-of-service.md).
 - 2026-11-05: the tab icon was an up arrow and the loading screen a plain spinner; now both show the blue double tick, because the developer chose it as the logo everywhere. See [decisions/app-logo](../decisions/app-logo.md).
 
 ## Sources

@@ -81,6 +81,7 @@ export const routes: RouteRecordRaw[] = [
   },
   // W1: public to anyone, signed in or not; no meta, so neither the menu nor the bottom bar shows.
   { path: '/privacy', name: 'privacy', component: () => import('@/views/PrivacyView.vue') },
+  { path: '/terms', name: 'terms', component: () => import('@/views/TermsView.vue') },
   {
     path: '/delete-account',
     name: 'delete-account',

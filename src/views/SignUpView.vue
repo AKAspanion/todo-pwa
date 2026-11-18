@@ -251,10 +251,17 @@ onMounted(async () => {
           <router-link class="auth-link text-caption" :to="signInLink">{{
             t('auth.signUp.signInLink')
           }}</router-link>
-          <div class="pt-2">
-            <router-link class="auth-link text-caption" to="/privacy">{{
-              t('auth.privacyLink')
-            }}</router-link>
+          <div class="pt-2 text-caption" data-testid="signup-agreement">
+            <i18n-t keypath="auth.signUp.agreement" scope="global">
+              <template #terms>
+                <router-link class="auth-link" to="/terms">{{ t('auth.termsLink') }}</router-link>
+              </template>
+              <template #privacy>
+                <router-link class="auth-link" to="/privacy">{{
+                  t('auth.privacyLink')
+                }}</router-link>
+              </template>
+            </i18n-t>
           </div>
         </v-card-text>
 
