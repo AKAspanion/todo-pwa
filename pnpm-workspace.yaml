@@ -18,3 +18,9 @@ overrides:
   'editorconfig>minimatch': ^11.0.4
   'readdir-glob>minimatch': ^11.0.4
   'filelist>minimatch': ^11.0.4
+auditConfig:
+  ignoreGhsas:
+    # picomatch ReDoS, no patched version yet. Reached only through vue-router's build-time
+    # helpers (unplugin-utils, tinyglobby), never in the browser. Remove once a fix ships:
+    # knowledge/decisions/audit-ignore-picomatch-redos.
+    - GHSA-fc5q-39xc-vjpf
