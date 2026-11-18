@@ -1,5 +1,5 @@
 <!-- GA-WORKFLOW:START -->
-<!-- ga:rules f2323835f512 -->
+<!-- ga:rules feb5b8848f24 -->
 
 ## How work flows here
 
@@ -47,7 +47,7 @@ Set in `.ga/config.json` under `workflow`. `/ga:workflow` asks the developer and
 - The final review uses no extra review agents.
 - Screens are compared with the design at 390 and 1280 pixels wide.
 - A task runs no checks: only the tests it writes, each alone, by name, to watch it fail and then pass. Every check runs once, at the end.
-- Before the work is done, run smoke (`ga.mjs run smoke --since <the branch's base>`: the apps and the routes the branch adds start and answer, and no app's latest compile failed), typecheck (`npm run typecheck`) and lint (`npm run lint`). Run those for what the branch changed, in one command: `ga.mjs run checks --since <the branch's base> --only typecheck,lint --run` runs each, narrowed to the packages it changed and those that depend on them, and fails only on an error in a file the branch changed; one only in files it didn't touch is `pre-existing`, said in the merge request, not fixed here. Test and e2e run only when the developer asks ("run the tests", "run e2e", "run all checks"): `ga.mjs run checks --since <the branch's base> --only <checks>` gives each command, narrowed to what changed. Then `ga:verify`: read the output, don't assume it.
+- Before the work is done, run smoke (`ga.mjs run smoke --since <the branch's base>`: the apps and the routes the branch adds start and answer, and no app's latest compile failed), typecheck (`npm run typecheck`), lint (`npm run lint`) and format-check (`npm run format:check`). Run those for what the branch changed, in one command: `ga.mjs run checks --since <the branch's base> --only typecheck,lint --run` runs each, narrowed to the packages it changed and those that depend on them, and fails only on an error in a file the branch changed; one only in files it didn't touch is `pre-existing`, said in the merge request, not fixed here. Test and e2e run only when the developer asks ("run the tests", "run e2e", "run all checks"): `ga.mjs run checks --since <the branch's base> --only <checks>` gives each command, narrowed to what changed. Then `ga:verify`: read the output, don't assume it.
 - Commit at the end of each step: each spec, each approved design, each task. In a plan run the implementer commits its task, and the task is complete then. Stage the step's files by name, never `git add -A`, with the knowledge that describes them in the same commit.
 - Commit messages are Conventional Commits: `type(scope): summary`.
 - Build on a branch named `feat/<topic>`.
@@ -110,10 +110,10 @@ Never configurable, whatever the project sets:
 
 _Generated from `knowledge/`. Do not edit by hand._
 
-_116 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
+_117 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
 
 - [data/](knowledge/data/) — 2 concepts
-- [decisions/](knowledge/decisions/) — 53 concepts
+- [decisions/](knowledge/decisions/) — 54 concepts
 - [design-system/](knowledge/design-system/) — 2 concepts
 - [domain/](knowledge/domain/) — 3 concepts
 - [features/](knowledge/features/) — 12 concepts

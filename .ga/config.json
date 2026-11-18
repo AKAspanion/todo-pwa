@@ -16,7 +16,13 @@
         "format-check": "npm run format:check",
         "test": "npm test",
         "e2e": "npm run e2e"
-      }
+      },
+      "at-end": [
+        "smoke",
+        "typecheck",
+        "lint",
+        "format-check"
+      ]
     }
   }
 }
