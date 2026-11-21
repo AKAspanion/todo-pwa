@@ -18,11 +18,11 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5
       firebase-admin:
-        specifier: ^14.5.0
-        version: 14.5.0
+        specifier: ^14.5.1
+        version: 14.5.1
       firebase-functions:
         specifier: ^7.4.0
-        version: 7.4.0(firebase-admin@14.5.0)
+        version: 7.4.0(firebase-admin@14.5.1)
       google-auth-library:
         specifier: ^11.3.4
         version: 11.3.4
@@ -993,8 +993,8 @@ packages:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
 
-  firebase-admin@14.5.0:
-    resolution: {integrity: sha512-DElmgmaH9aPXu2dWXGQiDoan33UfTnbfAAKaue4fwEZxmpdaNrTk5DmuFn+vVDki2KZ6TiaC0IHRWcEzcDxB3Q==}
+  firebase-admin@14.5.1:
+    resolution: {integrity: sha512-3NSWRREeFCET2tyiOd0ENvRFdagi9voBRGCiNbGSIRbwuMJh2Eh/dcmItNWd82rcqd+fyW5/77/oZOZxC27/sA==}
     engines: {node: '>=22'}
 
   firebase-functions@7.4.0:
@@ -2928,7 +2928,7 @@ snapshots:
       locate-path: 6.0.0
       path-exists: 4.0.0
 
-  firebase-admin@14.5.0:
+  firebase-admin@14.5.1:
     dependencies:
       '@fastify/busboy': 3.2.4
       '@firebase/database-compat': 2.1.7
@@ -2945,13 +2945,13 @@ snapshots:
       - '@firebase/app-compat'
       - supports-color
 
-  firebase-functions@7.4.0(firebase-admin@14.5.0):
+  firebase-functions@7.4.0(firebase-admin@14.5.1):
     dependencies:
       '@types/cors': 2.8.19
       '@types/express': 5.0.6
       cors: 2.8.6
       express: 5.3.0
-      firebase-admin: 14.5.0
+      firebase-admin: 14.5.1
       protobufjs: 7.6.6
     transitivePeerDependencies:
       - supports-color
